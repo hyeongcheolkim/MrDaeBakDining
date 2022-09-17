@@ -1,15 +1,10 @@
 package NaNSsoGong.MrDaeBakDining.item.ingredient.service;
 
-import NaNSsoGong.MrDaeBakDining.item.food.domain.Food;
-import NaNSsoGong.MrDaeBakDining.item.food.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.item.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.item.ingredient.repository.IngredientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -27,8 +22,7 @@ public class IngredientService {
         if (foundIngredient.isEmpty())
             return Optional.empty();
         foundIngredient.get().setStockQuantity(foundIngredient.get().getStockQuantity() + quantity);
-        Ingredient savedIngredient = ingredientRepository.save(foundIngredient.get());
-        return Optional.of(savedIngredient);
+        return Optional.of(foundIngredient.get());
     }
 
     public Optional<Ingredient> minusStockQuantity(Long ingredientId, Integer quantity){
@@ -39,8 +33,7 @@ public class IngredientService {
         if(newStockQuantity < 0)
             return Optional.empty();
         foundIngredient.get().setStockQuantity(newStockQuantity);
-        Ingredient savedIngredient = ingredientRepository.save(foundIngredient.get());
-        return Optional.of(savedIngredient);
+        return Optional.of(foundIngredient.get());
     }
 
     public Optional<Ingredient> findById(Long ingredientId){

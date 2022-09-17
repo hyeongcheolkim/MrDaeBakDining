@@ -21,11 +21,11 @@ public class Member {
     @GeneratedValue
     @Column(name = "member_id")
     private Long id;
+    private String name;
     private String loginId;
     private String password;
-    private String name;
-    private String cardNumber;
     private Boolean enable;
+    private String cardNumber;
     @Enumerated(EnumType.STRING)
     private MemberGrade memberGrade;
     @Embedded

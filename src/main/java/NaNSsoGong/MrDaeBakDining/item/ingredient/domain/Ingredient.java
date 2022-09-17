@@ -1,6 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.item.ingredient.domain;
 
-import NaNSsoGong.MrDaeBakDining.item.food.domain.Recipe;
+import NaNSsoGong.MrDaeBakDining.item.recipe.domain.Recipe;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,4 +24,6 @@ public class Ingredient {
     private Integer stockQuantity;
     @OneToMany(mappedBy = "ingredient")
     private List<Recipe> recipeList = new ArrayList<>();
+
+    private void setRecipeList(){}
 }

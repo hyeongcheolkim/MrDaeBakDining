@@ -35,15 +35,7 @@ public class MemberService {
         if(foundMember.isEmpty())
             return Optional.empty();
         foundMember.get().setEnable(false);
-        Member savedMember = memberRepository.save(foundMember.get());
-        return Optional.of(savedMember);
-    }
-
-    public Optional<Member> update(Member member){
-        if(member.getId() == null || !memberRepository.existsById(member.getId()))
-            return Optional.empty();
-        Member updatedMember = memberRepository.save(member);
-        return Optional.of(updatedMember);
+        return Optional.of(foundMember.get());
     }
 
     public Optional<Member> findById(Long memberId){

@@ -1,7 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.item.food.service;
 
 import NaNSsoGong.MrDaeBakDining.item.food.domain.Food;
-import NaNSsoGong.MrDaeBakDining.item.food.domain.Recipe;
+import NaNSsoGong.MrDaeBakDining.item.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.item.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.item.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.item.ingredient.service.IngredientService;
@@ -16,6 +16,10 @@ import java.util.Optional;
 public class FoodService {
     private final FoodRepository foodRepository;
     private final IngredientService ingredientService;
+
+    public Optional<Food> register(Food food){
+        return Optional.ofNullable(foodRepository.save(food));
+    }
 
     public Boolean isMakeAble(Long foodId){
         Optional<Food> foundFood = foodRepository.findById(foodId);
@@ -44,5 +48,9 @@ public class FoodService {
             ingredientService.minusStockQuantity(ingredient.getId(), ingredientQuantity);
         }
         return foundFood;
+    }
+
+    public Optional<Food> findById(Long foodId){
+        return foodRepository.findById(foodId);
     }
 }

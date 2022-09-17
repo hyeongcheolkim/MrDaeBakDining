@@ -5,7 +5,6 @@ import NaNSsoGong.MrDaeBakDining.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.member.domain.MemberGrade;
 import NaNSsoGong.MrDaeBakDining.member.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -52,7 +50,7 @@ class MemberServiceTest {
     }
 
     @Test
-    void isLoginIdAvailable() {
+    void 가입가능한아이디인지확인_중복체크() {
         memberRepository.save(member1);
         Boolean loginIdAvailable = memberService.isLoginIdAvailable(member1.getLoginId());
         assertThat(loginIdAvailable).isFalse();
@@ -65,6 +63,15 @@ class MemberServiceTest {
         Optional<Member> foundMember = memberRepository.findById(member1.getId());
         assertThat(foundMember).isPresent();
         assertThat(foundMember.get()).isEqualTo(member1);
+    }
+
+    @Test
+    void signOut(){
+        memberService.sign(member1);
+        memberService.signOut(member1.getId());
+        Optional<Member> sign = memberService.sign(member2);
+        assertThat(member1.getEnable()).isFalse();
+        assertThat(sign).isPresent();
     }
 
     @Test
@@ -88,23 +95,5 @@ class MemberServiceTest {
         assertThat(member2.getId()).isNotNull();
         List<Member> allByLoginId = memberRepository.findAllByLoginId(member1.getLoginId());
         assertThat(allByLoginId.size()).isEqualTo(2);
-    }
-
-    @Test
-    void update(){
-        memberService.sign(member1);
-        member1.setName("updatedName");
-        Optional<Member> update = memberService.update(member1);
-        assertThat(update).isPresent();
-        assertThat(update.get().getName()).isEqualTo("updatedName");
-    }
-
-    @Test
-    void 존재하지않는MemberId에대한update(){
-        member1.setId(32312324L);
-        Optional<Member> update = memberService.update(member1);
-        assertThat(update).isEmpty();
-        long count = memberRepository.count();
-        assertThat(count).isEqualTo(0);
     }
 }

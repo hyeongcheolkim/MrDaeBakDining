@@ -1,5 +1,6 @@
-package NaNSsoGong.MrDaeBakDining.item.food.domain;
+package NaNSsoGong.MrDaeBakDining.item.recipe.domain;
 
+import NaNSsoGong.MrDaeBakDining.item.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.item.ingredient.domain.Ingredient;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

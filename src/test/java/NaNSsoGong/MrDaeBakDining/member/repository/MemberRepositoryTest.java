@@ -4,18 +4,18 @@ import NaNSsoGong.MrDaeBakDining.Address;
 import NaNSsoGong.MrDaeBakDining.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.member.domain.MemberGrade;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -24,6 +24,8 @@ class MemberRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
+    @PersistenceContext
+    EntityManager em;
     Member member1;
     Member member2;
 
@@ -58,5 +60,17 @@ class MemberRepositoryTest {
         memberRepository.save(member2);
         List<Member> allByLoginId1 = memberRepository.findAllByLoginId(member1.getLoginId());
         assertThat(allByLoginId1.size()).isEqualTo(2);
+    }
+
+    @Test
+    void 영속성테스트(){
+        Member savedMember = memberRepository.save(member1);
+        Optional<Member> foundMember = memberRepository.findById(member1.getId());
+        foundMember.get().setName("영속성적용?");
+        em.flush();
+        em.clear();
+        System.out.println("*************************************************");
+
+        System.out.println("member.name = " + memberRepository.findById(member1.getId()).get().getName());
     }
 }
