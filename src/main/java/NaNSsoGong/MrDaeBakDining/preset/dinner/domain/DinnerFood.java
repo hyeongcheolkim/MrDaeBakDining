@@ -17,10 +17,10 @@ public class DinnerFood {
     @Id
     @GeneratedValue
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="dinner_id")
     private Dinner dinner;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="food_id")
     private Food food;
     private Integer foodQuantity;

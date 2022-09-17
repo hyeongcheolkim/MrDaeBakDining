@@ -22,6 +22,6 @@ public class Rider {
     private String password;
     private String name;
     private Boolean Enable;
-    @OneToOne(mappedBy = "rider")
+    @OneToOne(mappedBy = "rider", fetch = FetchType.LAZY)
     Order order;
 }

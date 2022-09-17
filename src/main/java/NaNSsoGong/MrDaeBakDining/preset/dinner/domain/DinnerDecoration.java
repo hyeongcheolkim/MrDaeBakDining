@@ -17,10 +17,10 @@ public class DinnerDecoration {
     @Id
     @GeneratedValue
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="dinner_id")
     private Dinner dinner;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="item_id")
     private Decoration decoration;
     private Integer decorationQuantity;

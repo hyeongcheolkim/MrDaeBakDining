@@ -17,10 +17,10 @@ public class StyleTableware {
     @Id
     @GeneratedValue
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="style_id")
     private Style style;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="item_id")
     private Tableware tableware;
     private Integer tablewareQuantity;
