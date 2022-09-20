@@ -16,7 +16,4 @@ public class ChefService {
     private final OrderService orderService;
     private final OrderRepository orderRepository;
 
-    Optional<Chef> register(Chef chef){
-        return Optional.of(chefRepository.save(chef));
-    }
 }

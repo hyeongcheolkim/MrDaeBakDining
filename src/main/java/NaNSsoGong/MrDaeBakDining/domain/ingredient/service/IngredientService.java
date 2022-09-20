@@ -12,11 +12,6 @@ import java.util.Optional;
 public class IngredientService {
     private final IngredientRepository ingredientRepository;
 
-    public Optional<Ingredient> register(Ingredient ingredient) {
-        Ingredient savedIngredient = ingredientRepository.save(ingredient);
-        return Optional.of(savedIngredient);
-    }
-
     public Optional<Ingredient> plusStockQuantity(Long ingredientId, Integer quantity) {
         Optional<Ingredient> foundIngredient = ingredientRepository.findById(ingredientId);
         if (foundIngredient.isEmpty())
@@ -34,9 +29,5 @@ public class IngredientService {
             return Optional.empty();
         foundIngredient.get().setStockQuantity(newStockQuantity);
         return Optional.of(foundIngredient.get());
-    }
-
-    public Optional<Ingredient> findById(Long ingredientId){
-        return ingredientRepository.findById(ingredientId);
     }
 }

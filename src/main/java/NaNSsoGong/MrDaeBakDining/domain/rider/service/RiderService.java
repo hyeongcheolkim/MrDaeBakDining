@@ -11,8 +11,4 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RiderService {
     private final RiderRepository riderRepository;
-
-    public Optional<Rider> register(Rider rider){
-        return Optional.of(riderRepository.save(rider));
-    }
 }

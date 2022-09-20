@@ -11,8 +11,4 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DecorationService {
     private final DecorationRepository decorationRepository;
-
-    public Optional<Decoration> register(Decoration decoration){
-        return Optional.ofNullable(decorationRepository.save(decoration));
-    }
 }

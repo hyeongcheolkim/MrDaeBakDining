@@ -1,6 +1,6 @@
-package NaNSsoGong.MrDaeBakDining.domain.preset.dinner.domain;
+package NaNSsoGong.MrDaeBakDining.domain.style.domain;
 
-import NaNSsoGong.MrDaeBakDining.domain.decoration.domain.Decoration;
+import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,15 +13,15 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class DinnerDecoration {
+public class StyleTableware {
     @Id
     @GeneratedValue
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="dinner_id")
-    private Dinner dinner;
+    @JoinColumn(name="style_id")
+    private Style style;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="item_id")
-    private Decoration decoration;
-    private Integer decorationQuantity;
+    private Tableware tableware;
+    private Integer tablewareQuantity;
 }

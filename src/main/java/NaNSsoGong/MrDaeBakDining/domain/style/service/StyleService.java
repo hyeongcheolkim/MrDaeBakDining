@@ -1,11 +1,11 @@
-package NaNSsoGong.MrDaeBakDining.domain.preset.style.service;
+package NaNSsoGong.MrDaeBakDining.domain.style.service;
 
 import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
-import NaNSsoGong.MrDaeBakDining.domain.preset.style.domain.Style;
-import NaNSsoGong.MrDaeBakDining.domain.preset.style.domain.StyleTableware;
-import NaNSsoGong.MrDaeBakDining.domain.preset.style.dto.StyleDTO;
-import NaNSsoGong.MrDaeBakDining.domain.preset.style.repository.StyleRepository;
+import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
+import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleTableware;
+import NaNSsoGong.MrDaeBakDining.domain.style.dto.StyleDTO;
+import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ public class StyleService {
     private final StyleRepository styleRepository;
     private final TablewareRepository tablewareRepository;
 
-    public Optional<Style> register(StyleDTO styleDTO){
+    public Optional<Style> makeStyle(StyleDTO styleDTO){
         Style style = new Style();
         style.setName(styleDTO.getName());
         style.setStyleTablewareList(makeStyleTableware(style, styleDTO));

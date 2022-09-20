@@ -62,10 +62,6 @@ public class OrderService {
         return true;
     }
 
-    public Optional<Order> findById(Long orderId) {
-        return orderRepository.findById(orderId);
-    }
-
     private List<OrderFood> makeOrderFoodList(Order order, OrderDTO orderDTO) {
         var ret = new ArrayList<OrderFood>();
         Map<Long, Integer> foodIdAndQuantity = orderDTO.getFoodIdAndQuantity();

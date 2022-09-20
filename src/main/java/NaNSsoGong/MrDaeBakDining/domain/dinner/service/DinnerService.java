@@ -1,14 +1,14 @@
-package NaNSsoGong.MrDaeBakDining.domain.preset.dinner.service;
+package NaNSsoGong.MrDaeBakDining.domain.dinner.service;
 
 import NaNSsoGong.MrDaeBakDining.domain.decoration.domain.Decoration;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationRepository;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerDecoration;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerFood;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.dto.DinnerDTO;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
-import NaNSsoGong.MrDaeBakDining.domain.preset.dinner.domain.Dinner;
-import NaNSsoGong.MrDaeBakDining.domain.preset.dinner.domain.DinnerDecoration;
-import NaNSsoGong.MrDaeBakDining.domain.preset.dinner.domain.DinnerFood;
-import NaNSsoGong.MrDaeBakDining.domain.preset.dinner.dto.DinnerDTO;
-import NaNSsoGong.MrDaeBakDining.domain.preset.dinner.repository.DinnerRepository;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class DinnerService {
     private final FoodRepository foodRepository;
     private final DecorationRepository decorationRepository;
 
-    public Optional<Dinner> register(DinnerDTO dinnerDTO){
+    public Optional<Dinner> makeDinner(DinnerDTO dinnerDTO){
         Dinner dinner = new Dinner();
         dinner.setName(dinnerDTO.getName());
         dinner.setDinnerFoodList(makeDinnerFoodList(dinner, dinnerDTO));

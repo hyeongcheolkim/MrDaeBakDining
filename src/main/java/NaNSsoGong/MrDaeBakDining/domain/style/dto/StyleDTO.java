@@ -1,4 +1,4 @@
-package NaNSsoGong.MrDaeBakDining.domain.preset.style.dto;
+package NaNSsoGong.MrDaeBakDining.domain.style.dto;
 
 import lombok.Data;
 

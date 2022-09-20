@@ -49,8 +49,4 @@ public class FoodService {
         }
         return foundFood;
     }
-
-    public Optional<Food> findById(Long foodId){
-        return foodRepository.findById(foodId);
-    }
 }

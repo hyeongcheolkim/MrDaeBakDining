@@ -11,8 +11,4 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TablewareService {
     private final TablewareRepository tablewareRepository;
-
-    public Optional<Tableware> register(Tableware tableware){
-        return Optional.ofNullable(tablewareRepository.save(tableware));
-    }
 }

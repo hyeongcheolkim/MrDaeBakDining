@@ -1,4 +1,4 @@
-package NaNSsoGong.MrDaeBakDining.domain.preset.style.domain;
+package NaNSsoGong.MrDaeBakDining.domain.style.domain;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

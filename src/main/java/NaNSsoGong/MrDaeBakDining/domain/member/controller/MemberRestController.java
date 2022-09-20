@@ -2,11 +2,11 @@ package NaNSsoGong.MrDaeBakDining.domain.member.controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.Address;
 import NaNSsoGong.MrDaeBakDining.domain.SessionConst;
+import NaNSsoGong.MrDaeBakDining.domain.member.controller.dto.*;
 import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.domain.member.domain.MemberGrade;
+import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,31 +15,39 @@ import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/api")
+@RequestMapping(value = "/api/member")
 @RequiredArgsConstructor
 public class MemberRestController {
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
-    @PostMapping("/member/login")
+    @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         Optional<Member> loginMember = memberService.login(loginRequest.getLoginId(), loginRequest.getPassword());
         if (loginMember.isEmpty())
             return new LoginResponse(null);
-
         HttpSession session = request.getSession(true);
         if (session == null)
             return null;
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember.get());
-
-        return new LoginResponse(loginMember.get().getId());
+        session.getId();
+        return new LoginResponse(session.getId());
     }
 
+    @PostMapping("/logout")
+    public LogoutResponse logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null)
+            return new LogoutResponse(false);
+        session.invalidate();
+        return new LogoutResponse(true);
+    }
 
-    @PostMapping("/member/sign")
-    public String sign(@RequestBody SignRequest signRequest) {
+    @PostMapping("/sign")
+    public SignResponse sign(@RequestBody SignRequest signRequest) {
         Boolean loginIdAvailable = memberService.isLoginIdAvailable(signRequest.getLoginId());
         if (!loginIdAvailable)
-            return "아이디가 중복입니다";
+            return new SignResponse(false);
         Member member = new Member();
         member.setName(signRequest.getName());
         member.setLoginId(signRequest.getLoginId());
@@ -49,34 +57,29 @@ public class MemberRestController {
         member.setMemberGrade(MemberGrade.BRONZE);
         member.setEnable(true);
         memberService.sign(member);
-        return "아이디생성성공";
+        return new SignResponse(true);
     }
 
-    @Data
-    static private class SignRequest {
-        private String name;
-        private String loginId;
-        private String password;
-        private String cardNumber;
-        private String city;
-        private String street;
-        private String zipcode;
+    @PutMapping("/signout")
+    public String signout(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member member, HttpSession session) {
+        if (member == null)
+            return "존재하지않는멤버";
+        Optional<Member> foundMember = memberRepository.findById(member.getId());
+        if (foundMember.isEmpty())
+            return "fail";
+        foundMember.get().setEnable(false);
+        session.invalidate();
+        return "ok";
     }
 
-    @Data
-    static private class LoginResponse {
-        private Long memberId;
-
-        LoginResponse(Long id) {
-            this.memberId = id;
-        }
+    @GetMapping("/info")
+    public InfoResponse info(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member member) {
+        return new InfoResponse(member);
     }
 
-    @Data
-    static private class LoginRequest {
-        private String loginId;
-        private String password;
+    @GetMapping("/JSessionId")
+    public String sessionInfo(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        return session.getId();
     }
-
-
 }
