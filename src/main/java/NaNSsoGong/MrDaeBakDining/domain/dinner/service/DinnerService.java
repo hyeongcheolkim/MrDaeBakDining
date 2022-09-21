@@ -5,7 +5,7 @@ import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationReposito
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerDecoration;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerFood;
-import NaNSsoGong.MrDaeBakDining.domain.dinner.dto.DinnerDTO;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.dto.DinnerDto;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
@@ -25,11 +25,11 @@ public class DinnerService {
     private final FoodRepository foodRepository;
     private final DecorationRepository decorationRepository;
 
-    public Optional<Dinner> makeDinner(DinnerDTO dinnerDTO){
+    public Optional<Dinner> makeDinner(DinnerDto dinnerDto){
         Dinner dinner = new Dinner();
-        dinner.setName(dinnerDTO.getName());
-        dinner.setDinnerFoodList(makeDinnerFoodList(dinner, dinnerDTO));
-        dinner.setDinnerDecorationList(makeDinnerDecorationList(dinner, dinnerDTO));
+        dinner.setName(dinnerDto.getName());
+        dinner.setDinnerFoodList(makeDinnerFoodList(dinner, dinnerDto));
+        dinner.setDinnerDecorationList(makeDinnerDecorationList(dinner, dinnerDto));
         Dinner savedDinner = dinnerRepository.save(dinner);
 
         return Optional.of(savedDinner);
@@ -57,7 +57,7 @@ public class DinnerService {
         return ret;
     }
 
-    private List<DinnerFood> makeDinnerFoodList(Dinner dinner, DinnerDTO dinnerDTO){
+    private List<DinnerFood> makeDinnerFoodList(Dinner dinner, DinnerDto dinnerDTO){
         var ret = new ArrayList<DinnerFood>();
         Map<Long, Integer> foodIdAndQuantity = dinnerDTO.getFoodIdAndQuantity();
         for(var foodId : foodIdAndQuantity.keySet()){
@@ -73,7 +73,7 @@ public class DinnerService {
         return ret;
     }
 
-    private List<DinnerDecoration> makeDinnerDecorationList(Dinner dinner, DinnerDTO dinnerDTO){
+    private List<DinnerDecoration> makeDinnerDecorationList(Dinner dinner, DinnerDto dinnerDTO){
         var ret = new ArrayList<DinnerDecoration>();
         Map<Long, Integer> decorationIdAndQuantity = dinnerDTO.getDecorationIdAndQuantity();
         for(var decorationId : decorationIdAndQuantity.keySet()){

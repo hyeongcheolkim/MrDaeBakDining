@@ -20,7 +20,7 @@ import NaNSsoGong.MrDaeBakDining.domain.tableware.service.TablewareService;
 import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.domain.member.domain.MemberGrade;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.Order;
-import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDTO;
+import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -112,34 +112,34 @@ class OrderServiceTest {
         decoration1 = new Decoration();
         decoration1.setName("하트장식");
         decoration1.setStockQuantity(2);
-        decorationService.register(decoration1);
+        decorationRepository.save(decoration1);
 
         decoration2 = new Decoration();
         decoration2.setName("달빛장식");
         decoration2.setStockQuantity(1);
-        decorationService.register(decoration2);
+        decorationRepository.save(decoration2);
 
         tableware1 = new Tableware();
         tableware1.setName("와인잔");
         tableware1.setStockQuantity(4);
-        tablewareService.register(tableware1);
+        tablewareRepository.save(tableware1);
 
         tableware2 = new Tableware();
         tableware2.setName("냅킨");
         tableware2.setStockQuantity(2);
-        tablewareService.register(tableware2);
+        tablewareRepository.save(tableware2);
 
         food1 = new Food();
         food1.setName("스테이크");
         food1.setSellPrice(30000);
         food1.setFoodCategory(FoodCategory.MEAT);
-        foodService.register(food1);
+        foodRepository.save(food1);
 
         food2 = new Food();
         food2.setName("치킨");
         food2.setSellPrice(25000);
         food2.setFoodCategory(FoodCategory.MEAT);
-        foodService.register(food2);
+        foodRepository.save(food2);
 
         ingredient1 = new Ingredient();
         ingredient1.setName("소고기");
@@ -156,11 +156,11 @@ class OrderServiceTest {
         ingredient5 = new Ingredient();
         ingredient5.setName("튀김가루");
         ingredient5.setStockQuantity(2);
-        ingredientService.register(ingredient1);
-        ingredientService.register(ingredient2);
-        ingredientService.register(ingredient3);
-        ingredientService.register(ingredient4);
-        ingredientService.register(ingredient5);
+        ingredientRepository.save(ingredient1);
+        ingredientRepository.save(ingredient2);
+        ingredientRepository.save(ingredient3);
+        ingredientRepository.save(ingredient4);
+        ingredientRepository.save(ingredient5);
 
         recipe1 = recipeService.makeRecipe(food1.getId(), ingredient1.getId(), 1).get();
         recipe2 = recipeService.makeRecipe(food1.getId(), ingredient2.getId(), 1).get();
@@ -172,7 +172,8 @@ class OrderServiceTest {
 
     @Test
     void makeOrder() {
-        OrderDTO orderDTO = new OrderDTO();
+        OrderDto orderDTO = new OrderDto();
+        orderDTO.setAddress(member1.getAddress());
         Map<Long, Integer> foodIdAndQuantity = new HashMap<>();
         Map<Long, Integer> decorationIdAndQuantity = new HashMap<>();
         Map<Long, Integer> tablewareIdAndQuantity = new HashMap<>();
@@ -196,7 +197,8 @@ class OrderServiceTest {
 
     @Test
     void 데코레이션부족할때주문불가판정() {
-        OrderDTO orderDTO = new OrderDTO();
+        OrderDto orderDTO = new OrderDto();
+        orderDTO.setAddress(member1.getAddress());
         Map<Long, Integer> foodIdAndQuantity = new HashMap<>();
         Map<Long, Integer> decorationIdAndQuantity = new HashMap<>();
         Map<Long, Integer> tablewareIdAndQuantity = new HashMap<>();
@@ -217,13 +219,14 @@ class OrderServiceTest {
         Optional<Order> order = orderService.makeOrder(member1, orderDTO);
 
         decoration1.setStockQuantity(0);
-        Boolean orderAble = orderService.isOderAble(order.get().getId());
+        Boolean orderAble = orderService.isMakeAbleOrder(order.get().getId());
         assertThat(orderAble).isFalse();
     }
 
     @Test
     void 테이블웨어부족할때주문불가판정() {
-        OrderDTO orderDTO = new OrderDTO();
+        OrderDto orderDTO = new OrderDto();
+        orderDTO.setAddress(member1.getAddress());
         Map<Long, Integer> foodIdAndQuantity = new HashMap<>();
         Map<Long, Integer> decorationIdAndQuantity = new HashMap<>();
         Map<Long, Integer> tablewareIdAndQuantity = new HashMap<>();
@@ -244,13 +247,14 @@ class OrderServiceTest {
         Optional<Order> order = orderService.makeOrder(member1, orderDTO);
 
         tableware1.setStockQuantity(0);
-        Boolean orderAble = orderService.isOderAble(order.get().getId());
+        Boolean orderAble = orderService.isMakeAbleOrder(order.get().getId());
         assertThat(orderAble).isFalse();
     }
 
     @Test
     void 음식재료부족할때주문불가판정() {
-        OrderDTO orderDTO = new OrderDTO();
+        OrderDto orderDTO = new OrderDto();
+        orderDTO.setAddress(member1.getAddress());
         Map<Long, Integer> foodIdAndQuantity = new HashMap<>();
         Map<Long, Integer> decorationIdAndQuantity = new HashMap<>();
         Map<Long, Integer> tablewareIdAndQuantity = new HashMap<>();
@@ -271,7 +275,7 @@ class OrderServiceTest {
         Optional<Order> order = orderService.makeOrder(member1, orderDTO);
 
         ingredientService.minusStockQuantity(ingredient1.getId(), ingredient1.getStockQuantity());
-        Boolean orderAble = orderService.isOderAble(order.get().getId());
+        Boolean orderAble = orderService.isMakeAbleOrder(order.get().getId());
         assertThat(orderAble).isFalse();
     }
 }

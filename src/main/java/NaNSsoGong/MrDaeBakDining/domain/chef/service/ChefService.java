@@ -2,18 +2,52 @@ package NaNSsoGong.MrDaeBakDining.domain.chef.service;
 
 import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;
 import NaNSsoGong.MrDaeBakDining.domain.chef.repository.ChefRepository;
+import NaNSsoGong.MrDaeBakDining.domain.decoration.domain.Decoration;
+import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationRepository;
+import NaNSsoGong.MrDaeBakDining.domain.food.service.FoodService;
+import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.Order;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderDecoration;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderFood;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderTableware;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
-import NaNSsoGong.MrDaeBakDining.domain.order.service.OrderService;
+import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
+import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ChefService {
     private final ChefRepository chefRepository;
-    private final OrderService orderService;
     private final OrderRepository orderRepository;
+    private final FoodService foodService;
+    private final DecorationRepository decorationRepository;
+    private final TablewareRepository tablewareRepository;
 
+    public Boolean isLoginIdAvailable(String loginId) {
+        List<Chef> chefList = chefRepository.findAllByLoginId(loginId);
+        for (var chef : chefList)
+            if (chef.getEnable())
+                return false;
+        return true;
+    }
+
+    public Optional<Chef> sign(Chef chef) {
+        if (!isLoginIdAvailable(chef.getLoginId()))
+            return Optional.empty();
+        Chef savedChef = chefRepository.save(chef);
+        return Optional.of(savedChef);
+    }
+
+    public Optional<Chef> login(String loginId, String password) {
+        List<Chef> chefList = chefRepository.findAllByLoginId(loginId);
+        for (var chef : chefList)
+            if (chef.getEnable() && chef.getPassword().equals(password))
+                return Optional.of(chef);
+        return Optional.empty();
+    }
 }

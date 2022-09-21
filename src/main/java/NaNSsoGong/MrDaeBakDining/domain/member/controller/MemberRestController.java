@@ -2,16 +2,21 @@ package NaNSsoGong.MrDaeBakDining.domain.member.controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.Address;
 import NaNSsoGong.MrDaeBakDining.domain.SessionConst;
-import NaNSsoGong.MrDaeBakDining.domain.member.controller.dto.*;
+import NaNSsoGong.MrDaeBakDining.domain.member.controller.form.*;
 import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.domain.member.domain.MemberGrade;
 import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.Order;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -29,8 +34,8 @@ public class MemberRestController {
         HttpSession session = request.getSession(true);
         if (session == null)
             return null;
+        session.setMaxInactiveInterval(1800);
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember.get());
-        session.getId();
         return new LoginResponse(session.getId());
     }
 
@@ -53,7 +58,11 @@ public class MemberRestController {
         member.setLoginId(signRequest.getLoginId());
         member.setPassword(signRequest.getPassword());
         member.setCardNumber(signRequest.getCardNumber());
-        member.setAddress(new Address(signRequest.getCity(), signRequest.getStreet(), signRequest.getCity()));
+        member.setAddress(new Address(
+                signRequest.getAddress().getCity(),
+                signRequest.getAddress().getStreet(),
+                signRequest.getAddress().getCity()
+                ));
         member.setMemberGrade(MemberGrade.BRONZE);
         member.setEnable(true);
         memberService.sign(member);
@@ -63,7 +72,7 @@ public class MemberRestController {
     @PutMapping("/signout")
     public String signout(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member member, HttpSession session) {
         if (member == null)
-            return "존재하지않는멤버";
+            return "세션이존재하지않음";
         Optional<Member> foundMember = memberRepository.findById(member.getId());
         if (foundMember.isEmpty())
             return "fail";
@@ -77,9 +86,19 @@ public class MemberRestController {
         return new InfoResponse(member);
     }
 
-    @GetMapping("/JSessionId")
-    public String sessionInfo(HttpServletRequest request) {
+    @GetMapping("/order-list")
+    public List<Order> orderList() {
+        return new ArrayList<>();
+    }
+
+    @GetMapping("/page-list")
+    public Page<Member> pageList(@RequestBody MemberPageListRequest memberPageListRequest) {
+        return memberRepository.findAllByEnable(memberPageListRequest.getEnable(), memberPageListRequest.of());
+    }
+
+    @GetMapping("/session-id")
+    public SessionIdResponse sessionId(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        return session.getId();
+        return (session == null ? null : new SessionIdResponse(session.getId()));
     }
 }

@@ -1,5 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.rider.service;
 
+import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,4 +12,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RiderService {
     private final RiderRepository riderRepository;
+    private final OrderRepository orderRepository;
+
+    
 }

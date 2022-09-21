@@ -64,16 +64,6 @@ class MemberServiceTest {
         assertThat(foundMember).isPresent();
         assertThat(foundMember.get()).isEqualTo(member1);
     }
-
-    @Test
-    void signOut(){
-        memberService.sign(member1);
-        memberService.signOut(member1.getId());
-        Optional<Member> sign = memberService.sign(member2);
-        assertThat(member1.getEnable()).isFalse();
-        assertThat(sign).isPresent();
-    }
-
     @Test
     void 아이디중복가입불가(){
         Optional<Member> signedMember1 = memberService.sign(member1);

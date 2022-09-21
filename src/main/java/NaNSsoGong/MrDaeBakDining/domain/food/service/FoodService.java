@@ -17,10 +17,6 @@ public class FoodService {
     private final FoodRepository foodRepository;
     private final IngredientService ingredientService;
 
-    public Optional<Food> register(Food food){
-        return Optional.ofNullable(foodRepository.save(food));
-    }
-
     public Boolean isMakeAble(Long foodId){
         Optional<Food> foundFood = foodRepository.findById(foodId);
         if(foundFood.isEmpty())

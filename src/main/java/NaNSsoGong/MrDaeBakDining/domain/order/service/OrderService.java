@@ -6,12 +6,13 @@ import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationReposito
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.service.FoodService;
+import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
+import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.*;
+import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
+import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
-import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
-import NaNSsoGong.MrDaeBakDining.domain.order.domain.*;
-import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDTO;
-import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,44 +28,102 @@ import java.util.Optional;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final FoodRepository foodRepository;
+    private final FoodService foodService;
     private final DecorationRepository decorationRepository;
     private final TablewareRepository tablewareRepository;
-    private final FoodService foodService;
+    private final MemberRepository memberRepository;
 
-    public Optional<Order> makeOrder(Member member, OrderDTO orderDTO) {
-        Order order = new Order();
-        order.setMember(member);
-        order.setAddress(new Address(
-                member.getAddress().getCity(),
-                member.getAddress().getStreet(),
-                member.getAddress().getZipcode()
-        ));
-        order.setOrderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        order.setOrderStatus(OrderStatus.ORDERED);
-        order.setOrderFoodList(makeOrderFoodList(order, orderDTO));
-        order.setOrderDecorationList(makeOrderDecorationList(order, orderDTO));
-        order.setOrderTablewareList(makeOrderTablewareList(order, orderDTO));
+    public Optional<Order> makeOrder(Member member, OrderDto orderDto) {
+        Order order = buildOrder(member, orderDto);
         Order savedOrder = orderRepository.save(order);
         member.getOrderList().add(savedOrder);
         return Optional.of(savedOrder);
     }
 
-    public Boolean isOderAble(Long orderId) {
+    public Optional<Order> cancelOrder(Long memberId, Long orderId) {
+        Optional<Member> foundMember = memberRepository.findById(memberId);
+        if (foundMember.isEmpty())
+            return Optional.empty();
+        List<Order> orderList = foundMember.get().getOrderList();
+        for (var order : orderList)
+            if (order.getId().equals(orderId)){
+                order.setOrderStatus(OrderStatus.CANCEL);
+                return Optional.of(order);
+            }
+        return Optional.empty();
+    }
+
+    public Boolean isMakeAbleOrder(Long orderId) {
         Optional<Order> foundOrder = orderRepository.findById(orderId);
         if (foundOrder.isEmpty())
             return false;
-        if (!isOrderAbleFoodList(foundOrder.get().getOrderFoodList()))
+        if (!isMakeAbleFoodList(foundOrder.get().getOrderFoodList()))
             return false;
-        if (!isOrderAbleDecorationList(foundOrder.get().getOrderDecorationList()))
+        if (!isMakeAbleDecorationList(foundOrder.get().getOrderDecorationList()))
             return false;
-        if (!isOrderAbleTablewareList(foundOrder.get().getOrderTablewareList()))
+        if (!isMakeAbleTablewareList(foundOrder.get().getOrderTablewareList()))
             return false;
         return true;
     }
 
-    private List<OrderFood> makeOrderFoodList(Order order, OrderDTO orderDTO) {
+    public void makeTableware(Long orderId) {
+        Optional<Order> foundOrder = orderRepository.findById(orderId);
+        if (foundOrder.isEmpty())
+            return;
+        List<OrderTableware> orderTablewareList = foundOrder.get().getOrderTablewareList();
+        for (var orderTableware : orderTablewareList) {
+            Long tablewareId = orderTableware.getTableware().getId();
+            Integer tablewareQuantity = orderTableware.getTablewareQuantity();
+            Tableware tableware = tablewareRepository.findById(tablewareId).get();
+            tableware.setStockQuantity(tableware.getStockQuantity() - tablewareQuantity);
+        }
+    }
+
+    public void makeDecoration(Long orderId) {
+        Optional<Order> foundOrder = orderRepository.findById(orderId);
+        if (foundOrder.isEmpty())
+            return;
+        List<OrderDecoration> orderDecorationList = foundOrder.get().getOrderDecorationList();
+        for (var orderDecoration : orderDecorationList) {
+            Long decorationId = orderDecoration.getDecoration().getId();
+            Integer decorationQuantity = orderDecoration.getDecorationQuantity();
+            Decoration decoration = decorationRepository.findById(decorationId).get();
+            decoration.setStockQuantity(decoration.getStockQuantity() - decorationQuantity);
+        }
+    }
+
+    public void makeFood(Long orderId) {
+        Optional<Order> foundOrder = orderRepository.findById(orderId);
+        if (foundOrder.isEmpty())
+            return;
+        List<OrderFood> orderFoodList = foundOrder.get().getOrderFoodList();
+        for (var orderFood : orderFoodList) {
+            Long foodId = orderFood.getFood().getId();
+            Integer foodQuantity = orderFood.getFoodQuantity();
+            while (foodQuantity-- != 0)
+                foodService.makeFood(foodId);
+        }
+    }
+
+    private Order buildOrder(Member member, OrderDto orderDto) {
+        Order order = new Order();
+        order.setMember(member);
+        order.setAddress(new Address(
+                orderDto.getAddress().getCity(),
+                orderDto.getAddress().getStreet(),
+                orderDto.getAddress().getZipcode()
+        ));
+        order.setOrderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        order.setOrderStatus(OrderStatus.ORDERED);
+        order.setOrderFoodList(makeOrderFoodList(order, orderDto));
+        order.setOrderDecorationList(makeOrderDecorationList(order, orderDto));
+        order.setOrderTablewareList(makeOrderTablewareList(order, orderDto));
+        return order;
+    }
+
+    private List<OrderFood> makeOrderFoodList(Order order, OrderDto orderDto) {
         var ret = new ArrayList<OrderFood>();
-        Map<Long, Integer> foodIdAndQuantity = orderDTO.getFoodIdAndQuantity();
+        Map<Long, Integer> foodIdAndQuantity = orderDto.getFoodIdAndQuantity();
         for (var foodId : foodIdAndQuantity.keySet()) {
             Optional<Food> foundFood = foodRepository.findById(foodId);
             if (foundFood.isEmpty())
@@ -78,7 +137,7 @@ public class OrderService {
         return ret;
     }
 
-    private List<OrderDecoration> makeOrderDecorationList(Order order, OrderDTO orderDTO) {
+    private List<OrderDecoration> makeOrderDecorationList(Order order, OrderDto orderDTO) {
         var ret = new ArrayList<OrderDecoration>();
         Map<Long, Integer> decorationIdAndQuantity = orderDTO.getDecorationIdAndQuantity();
         for (var decorationId : decorationIdAndQuantity.keySet()) {
@@ -94,7 +153,7 @@ public class OrderService {
         return ret;
     }
 
-    private List<OrderTableware> makeOrderTablewareList(Order order, OrderDTO orderDTO) {
+    private List<OrderTableware> makeOrderTablewareList(Order order, OrderDto orderDTO) {
         var ret = new ArrayList<OrderTableware>();
         Map<Long, Integer> tablewareIdAndQuantity = orderDTO.getTablewareIdAndQuantity();
         for (var tablewareId : tablewareIdAndQuantity.keySet()) {
@@ -110,7 +169,9 @@ public class OrderService {
         return ret;
     }
 
-    private Boolean isOrderAbleFoodList(List<OrderFood> orderFoodList) {
+
+
+    private Boolean isMakeAbleFoodList(List<OrderFood> orderFoodList) {
         for (var orderFood : orderFoodList) {
             Long foodId = orderFood.getFood().getId();
             if (!foodService.isMakeAble(foodId))
@@ -119,7 +180,7 @@ public class OrderService {
         return true;
     }
 
-    private Boolean isOrderAbleDecorationList(List<OrderDecoration> orderDecorationList) {
+    private Boolean isMakeAbleDecorationList(List<OrderDecoration> orderDecorationList) {
         for (var orderDecoration : orderDecorationList) {
             Optional<Decoration> foundDecoration = decorationRepository.findById(orderDecoration.getDecoration().getId());
             if (foundDecoration.isEmpty())
@@ -132,7 +193,7 @@ public class OrderService {
         return true;
     }
 
-    private Boolean isOrderAbleTablewareList(List<OrderTableware> tablewareList) {
+    private Boolean isMakeAbleTablewareList(List<OrderTableware> tablewareList) {
         for (var orderTableware : tablewareList) {
             Optional<Tableware> foundTableware = tablewareRepository.findById(orderTableware.getId());
             if (foundTableware.isEmpty())

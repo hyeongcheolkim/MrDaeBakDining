@@ -4,7 +4,7 @@ import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleTableware;
-import NaNSsoGong.MrDaeBakDining.domain.style.dto.StyleDTO;
+import NaNSsoGong.MrDaeBakDining.domain.style.dto.StyleDto;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,10 +21,10 @@ public class StyleService {
     private final StyleRepository styleRepository;
     private final TablewareRepository tablewareRepository;
 
-    public Optional<Style> makeStyle(StyleDTO styleDTO){
+    public Optional<Style> makeStyle(StyleDto styleDto){
         Style style = new Style();
-        style.setName(styleDTO.getName());
-        style.setStyleTablewareList(makeStyleTableware(style, styleDTO));
+        style.setName(styleDto.getName());
+        style.setStyleTablewareList(makeStyleTableware(style, styleDto));
         Style savedStyle = styleRepository.save(style);
         return Optional.of(savedStyle);
     }
@@ -40,7 +40,7 @@ public class StyleService {
         return ret;
     }
 
-    private List<StyleTableware> makeStyleTableware(Style style, StyleDTO styleDTO){
+    private List<StyleTableware> makeStyleTableware(Style style, StyleDto styleDTO){
         var ret = new ArrayList<StyleTableware>();
         Map<Long, Integer> tablewareIdAndQuantity = styleDTO.getTablewareIdAndQuantity();
         for(var tablewareId : tablewareIdAndQuantity.keySet()){
