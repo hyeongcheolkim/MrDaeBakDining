@@ -1,4 +1,4 @@
-package NaNSsoGong.MrDaeBakDining.domain.member.controller.form;
+package NaNSsoGong.MrDaeBakDining.domain.client.controller.form;
 
 import NaNSsoGong.MrDaeBakDining.domain.PageListRequest;
 import lombok.Data;
@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 @Data
-public class MemberPageListRequest extends PageListRequest {
+public class ClientPageListRequest extends PageListRequest {
     private Boolean enable = true;
 
     public PageRequest of(){

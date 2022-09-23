@@ -1,4 +1,4 @@
-package NaNSsoGong.MrDaeBakDining.domain.member.controller.form;
+package NaNSsoGong.MrDaeBakDining.domain.client.controller.form;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -21,7 +21,7 @@ public class StyleTableware {
     @JoinColumn(name="style_id")
     private Style style;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="item_id")
+    @JoinColumn(name="tableware_id")
     private Tableware tableware;
     private Integer tablewareQuantity;
 }

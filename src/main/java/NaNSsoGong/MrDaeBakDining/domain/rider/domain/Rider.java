@@ -1,5 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.rider.domain;
 
+import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.Order;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,15 +14,7 @@ import javax.persistence.*;
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
-public class Rider{
-    @Id
-    @GeneratedValue
-    @Column(name ="rider_id")
-    private Long id;
-    private String name;
-    private String loginId;
-    private String password;
-    private Boolean enable;
+public class Rider extends Member {
     @OneToOne(mappedBy = "rider", fetch = FetchType.LAZY)
     Order order;
 }

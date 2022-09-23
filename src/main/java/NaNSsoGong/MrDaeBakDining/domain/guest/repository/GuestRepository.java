@@ -8,5 +8,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface GuestRepository extends JpaRepository<Guest, Long> {
-    public Optional<Guest> findByUUID(UUID uuid);
+    public Optional<Guest> findByUuid(UUID uuid);
 }

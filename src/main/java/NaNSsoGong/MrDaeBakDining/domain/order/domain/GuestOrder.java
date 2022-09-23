@@ -1,7 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.domain;
 
 import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
-import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

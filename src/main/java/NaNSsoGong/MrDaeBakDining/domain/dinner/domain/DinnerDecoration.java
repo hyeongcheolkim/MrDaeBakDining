@@ -21,7 +21,7 @@ public class DinnerDecoration {
     @JoinColumn(name="dinner_id")
     private Dinner dinner;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="item_id")
+    @JoinColumn(name="decoration_id")
     private Decoration decoration;
     private Integer decorationQuantity;
 }

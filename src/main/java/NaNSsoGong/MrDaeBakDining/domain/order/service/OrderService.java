@@ -1,18 +1,19 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.service;
 
 import NaNSsoGong.MrDaeBakDining.domain.Address;
+import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
+import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.domain.Decoration;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.service.FoodService;
 import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
-import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
-import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
+import NaNSsoGong.MrDaeBakDining.domain.guest.repository.GuestRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.*;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.GuestOrderRepository;
-import NaNSsoGong.MrDaeBakDining.domain.order.repository.MemberOrderRepository;
+import NaNSsoGong.MrDaeBakDining.domain.order.repository.ClientOrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
@@ -34,19 +35,20 @@ public class OrderService {
     private final FoodService foodService;
     private final DecorationRepository decorationRepository;
     private final TablewareRepository tablewareRepository;
-    private final MemberRepository memberRepository;
-    private final MemberOrderRepository memberOrderRepository;
+    private final ClientOrderRepository clientOrderRepository;
     private final GuestOrderRepository guestOrderRepository;
+    private final GuestRepository guestRepository;
 
-    public Optional<MemberOrder> makeMemberOrder(Member member, OrderDto orderDto) {
-        MemberOrder memberOrder = buildOrder(member, orderDto);
-        MemberOrder savedMemberOrder = memberOrderRepository.save(memberOrder);
-        member.getMemberOrderList().add(savedMemberOrder);
-        return Optional.ofNullable(savedMemberOrder);
+    public Optional<ClientOrder> makeClientOrder(Client client, OrderDto orderDto) {
+        ClientOrder clientOrder = buildOrder(client, orderDto);
+        ClientOrder savedClientOrder = clientOrderRepository.save(clientOrder);
+        client.getClientOrderList().add(savedClientOrder);
+        return Optional.ofNullable(savedClientOrder);
     }
 
     public Optional<GuestOrder> makeGuestOrder(OrderDto orderDto) {
         Guest guest = new Guest();
+        Guest savedGuest = guestRepository.save(guest);
         GuestOrder guestOrder = buildOrder(guest, orderDto);
         GuestOrder savedGuestOrder = guestOrderRepository.save(guestOrder);
         guest.setGuestOrder(savedGuestOrder);
@@ -113,20 +115,20 @@ public class OrderService {
         }
     }
 
-    private MemberOrder buildOrder(Member member, OrderDto orderDto) {
-        MemberOrder memberOrder = new MemberOrder();
-        memberOrder.setMember(member);
-        memberOrder.setAddress(new Address(
+    private ClientOrder buildOrder(Client client, OrderDto orderDto) {
+        ClientOrder clientOrder = new ClientOrder();
+        clientOrder.setClient(client);
+        clientOrder.setAddress(new Address(
                 orderDto.getAddress().getCity(),
                 orderDto.getAddress().getStreet(),
                 orderDto.getAddress().getZipcode()
         ));
-        memberOrder.setOrderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        memberOrder.setOrderStatus(OrderStatus.ORDERED);
-        memberOrder.setOrderFoodList(makeOrderFoodList(memberOrder, orderDto));
-        memberOrder.setOrderDecorationList(makeOrderDecorationList(memberOrder, orderDto));
-        memberOrder.setOrderTablewareList(makeOrderTablewareList(memberOrder, orderDto));
-        return memberOrder;
+        clientOrder.setOrderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        clientOrder.setOrderStatus(OrderStatus.ORDERED);
+        clientOrder.setOrderFoodList(makeOrderFoodList(clientOrder, orderDto));
+        clientOrder.setOrderDecorationList(makeOrderDecorationList(clientOrder, orderDto));
+        clientOrder.setOrderTablewareList(makeOrderTablewareList(clientOrder, orderDto));
+        return clientOrder;
     }
 
     private GuestOrder buildOrder(Guest guest, OrderDto orderDto) {

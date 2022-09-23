@@ -2,12 +2,12 @@ package NaNSsoGong.MrDaeBakDining.domain.order.Controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.PageListRequest;
 import NaNSsoGong.MrDaeBakDining.domain.SessionConst;
-import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
+import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.order.Controller.form.CancelOrderRequest;
 import NaNSsoGong.MrDaeBakDining.domain.order.Controller.form.ChangeStatusRequest;
 import NaNSsoGong.MrDaeBakDining.domain.order.Controller.form.MakeOrderRequest;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.GuestOrder;
-import NaNSsoGong.MrDaeBakDining.domain.order.domain.MemberOrder;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.ClientOrder;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.Order;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
@@ -41,18 +41,18 @@ public class OrderRestController {
     }
 
     @PostMapping("/member-order")
-    public Long makeMemberOrder(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member member,
-                          @RequestBody MakeOrderRequest makeOrderRequest){
+    public Long makeClientOrder(@SessionAttribute(name = SessionConst.LOGIN_CLIENT, required = false) Client client,
+                                @RequestBody MakeOrderRequest makeOrderRequest){
         OrderDto orderDto = new OrderDto();
         orderDto.setFoodIdAndQuantity(makeOrderRequest.getFoodIdAndQuantity());
         orderDto.setDecorationIdAndQuantity(makeOrderRequest.getDecorationIdAndQuantity());
         orderDto.setTablewareIdAndQuantity(makeOrderRequest.getTablewareIdAndQuantity());
-        Optional<MemberOrder> order = orderService.makeMemberOrder(member, orderDto);
+        Optional<ClientOrder> order = orderService.makeClientOrder(client, orderDto);
         return 1L;
     }
 
     @PutMapping("/cancel-order")
-    public Long cancelOrder(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member member,
+    public Long cancelOrder(@SessionAttribute(name = SessionConst.LOGIN_CLIENT, required = false) Client client,
                             @RequestBody CancelOrderRequest cancelOrderRequest){
         Optional<Order> foundOrder = orderRepository.findById(cancelOrderRequest.getOrderId());
         if(foundOrder.isEmpty())

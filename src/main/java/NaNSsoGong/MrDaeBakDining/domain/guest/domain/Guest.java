@@ -1,16 +1,12 @@
 package NaNSsoGong.MrDaeBakDining.domain.guest.domain;
 
-import NaNSsoGong.MrDaeBakDining.domain.Address;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.GuestOrder;
-import NaNSsoGong.MrDaeBakDining.domain.order.domain.MemberOrder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity

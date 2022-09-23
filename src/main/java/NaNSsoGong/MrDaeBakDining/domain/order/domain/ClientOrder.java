@@ -1,6 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.domain;
 
-import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
+import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,8 +16,8 @@ import javax.persistence.ManyToOne;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class MemberOrder extends Order{
+public class ClientOrder extends Order{
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @JoinColumn(name = "client_id")
+    private Client client;
 }
