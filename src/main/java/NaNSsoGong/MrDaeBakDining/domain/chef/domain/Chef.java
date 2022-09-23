@@ -15,13 +15,13 @@ import javax.persistence.Id;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class Chef {
+public class Chef{
     @Id
     @GeneratedValue
     @Column(name="chef_id")
     private Long id;
+    private String name;
     private String loginId;
     private String password;
-    private String name;
     private Boolean enable;
 }

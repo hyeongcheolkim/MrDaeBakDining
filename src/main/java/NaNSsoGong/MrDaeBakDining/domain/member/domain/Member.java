@@ -1,6 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.member.domain;
 
 import NaNSsoGong.MrDaeBakDining.domain.Address;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.MemberOrder;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.Order;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,5 +32,5 @@ public class Member {
     @Embedded
     private Address address;
     @OneToMany(mappedBy = "member")
-    List<Order> orderList = new ArrayList<>();
+    List<MemberOrder> memberOrderList = new ArrayList<>();
 }

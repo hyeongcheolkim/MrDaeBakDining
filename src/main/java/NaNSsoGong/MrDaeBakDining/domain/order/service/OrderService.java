@@ -6,10 +6,13 @@ import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationReposito
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.service.FoodService;
+import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
 import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.*;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
+import NaNSsoGong.MrDaeBakDining.domain.order.repository.GuestOrderRepository;
+import NaNSsoGong.MrDaeBakDining.domain.order.repository.MemberOrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
@@ -32,25 +35,30 @@ public class OrderService {
     private final DecorationRepository decorationRepository;
     private final TablewareRepository tablewareRepository;
     private final MemberRepository memberRepository;
+    private final MemberOrderRepository memberOrderRepository;
+    private final GuestOrderRepository guestOrderRepository;
 
-    public Optional<Order> makeOrder(Member member, OrderDto orderDto) {
-        Order order = buildOrder(member, orderDto);
-        Order savedOrder = orderRepository.save(order);
-        member.getOrderList().add(savedOrder);
-        return Optional.of(savedOrder);
+    public Optional<MemberOrder> makeMemberOrder(Member member, OrderDto orderDto) {
+        MemberOrder memberOrder = buildOrder(member, orderDto);
+        MemberOrder savedMemberOrder = memberOrderRepository.save(memberOrder);
+        member.getMemberOrderList().add(savedMemberOrder);
+        return Optional.ofNullable(savedMemberOrder);
     }
 
-    public Optional<Order> cancelOrder(Long memberId, Long orderId) {
-        Optional<Member> foundMember = memberRepository.findById(memberId);
-        if (foundMember.isEmpty())
+    public Optional<GuestOrder> makeGuestOrder(OrderDto orderDto) {
+        Guest guest = new Guest();
+        GuestOrder guestOrder = buildOrder(guest, orderDto);
+        GuestOrder savedGuestOrder = guestOrderRepository.save(guestOrder);
+        guest.setGuestOrder(savedGuestOrder);
+        return Optional.ofNullable(savedGuestOrder);
+    }
+
+    public Optional<Order> cancelOrder(Long orderId) {
+        Optional<Order> foundOrder = orderRepository.findById(orderId);
+        if (foundOrder.isEmpty())
             return Optional.empty();
-        List<Order> orderList = foundMember.get().getOrderList();
-        for (var order : orderList)
-            if (order.getId().equals(orderId)){
-                order.setOrderStatus(OrderStatus.CANCEL);
-                return Optional.of(order);
-            }
-        return Optional.empty();
+        foundOrder.get().setOrderStatus(OrderStatus.CANCEL);
+        return foundOrder;
     }
 
     public Boolean isMakeAbleOrder(Long orderId) {
@@ -105,20 +113,36 @@ public class OrderService {
         }
     }
 
-    private Order buildOrder(Member member, OrderDto orderDto) {
-        Order order = new Order();
-        order.setMember(member);
-        order.setAddress(new Address(
+    private MemberOrder buildOrder(Member member, OrderDto orderDto) {
+        MemberOrder memberOrder = new MemberOrder();
+        memberOrder.setMember(member);
+        memberOrder.setAddress(new Address(
                 orderDto.getAddress().getCity(),
                 orderDto.getAddress().getStreet(),
                 orderDto.getAddress().getZipcode()
         ));
-        order.setOrderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        order.setOrderStatus(OrderStatus.ORDERED);
-        order.setOrderFoodList(makeOrderFoodList(order, orderDto));
-        order.setOrderDecorationList(makeOrderDecorationList(order, orderDto));
-        order.setOrderTablewareList(makeOrderTablewareList(order, orderDto));
-        return order;
+        memberOrder.setOrderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        memberOrder.setOrderStatus(OrderStatus.ORDERED);
+        memberOrder.setOrderFoodList(makeOrderFoodList(memberOrder, orderDto));
+        memberOrder.setOrderDecorationList(makeOrderDecorationList(memberOrder, orderDto));
+        memberOrder.setOrderTablewareList(makeOrderTablewareList(memberOrder, orderDto));
+        return memberOrder;
+    }
+
+    private GuestOrder buildOrder(Guest guest, OrderDto orderDto) {
+        GuestOrder guestOrder = new GuestOrder();
+        guestOrder.setGuest(guest);
+        guestOrder.setAddress(new Address(
+                orderDto.getAddress().getCity(),
+                orderDto.getAddress().getStreet(),
+                orderDto.getAddress().getZipcode()
+        ));
+        guestOrder.setOrderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        guestOrder.setOrderStatus(OrderStatus.ORDERED);
+        guestOrder.setOrderFoodList(makeOrderFoodList(guestOrder, orderDto));
+        guestOrder.setOrderDecorationList(makeOrderDecorationList(guestOrder, orderDto));
+        guestOrder.setOrderTablewareList(makeOrderTablewareList(guestOrder, orderDto));
+        return guestOrder;
     }
 
     private List<OrderFood> makeOrderFoodList(Order order, OrderDto orderDto) {
@@ -168,8 +192,6 @@ public class OrderService {
         }
         return ret;
     }
-
-
 
     private Boolean isMakeAbleFoodList(List<OrderFood> orderFoodList) {
         for (var orderFood : orderFoodList) {

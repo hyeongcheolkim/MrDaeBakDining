@@ -1,7 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.domain;
 
 import NaNSsoGong.MrDaeBakDining.domain.Address;
-import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,14 +18,13 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Table(name="ord")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn
 public class Order {
     @Id
     @GeneratedValue
     @Column(name="order_id")
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
     @Embedded
     private Address address;
     private LocalDateTime orderTime;

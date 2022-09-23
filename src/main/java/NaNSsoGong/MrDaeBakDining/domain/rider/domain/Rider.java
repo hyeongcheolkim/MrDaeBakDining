@@ -13,15 +13,15 @@ import javax.persistence.*;
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
-public class Rider {
+public class Rider{
     @Id
     @GeneratedValue
-    @Column(name="rider_id")
+    @Column(name ="rider_id")
     private Long id;
+    private String name;
     private String loginId;
     private String password;
-    private String name;
-    private Boolean Enable;
+    private Boolean enable;
     @OneToOne(mappedBy = "rider", fetch = FetchType.LAZY)
     Order order;
 }

@@ -11,6 +11,7 @@ import NaNSsoGong.MrDaeBakDining.domain.food.service.FoodService;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.MemberOrder;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.service.RecipeService;
@@ -19,7 +20,6 @@ import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository
 import NaNSsoGong.MrDaeBakDining.domain.tableware.service.TablewareService;
 import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.domain.member.domain.MemberGrade;
-import NaNSsoGong.MrDaeBakDining.domain.order.domain.Order;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -191,7 +191,7 @@ class OrderServiceTest {
         orderDTO.setDecorationIdAndQuantity(decorationIdAndQuantity);
         orderDTO.setTablewareIdAndQuantity(tablewareIdAndQuantity);
 
-        Optional<Order> order = orderService.makeOrder(member1, orderDTO);
+        Optional<MemberOrder> order = orderService.makeMemberOrder(member1, orderDTO);
         assertThat(order).isPresent();
     }
 
@@ -216,7 +216,7 @@ class OrderServiceTest {
         orderDTO.setDecorationIdAndQuantity(decorationIdAndQuantity);
         orderDTO.setTablewareIdAndQuantity(tablewareIdAndQuantity);
 
-        Optional<Order> order = orderService.makeOrder(member1, orderDTO);
+        Optional<MemberOrder> order = orderService.makeMemberOrder(member1, orderDTO);
 
         decoration1.setStockQuantity(0);
         Boolean orderAble = orderService.isMakeAbleOrder(order.get().getId());
@@ -244,7 +244,7 @@ class OrderServiceTest {
         orderDTO.setDecorationIdAndQuantity(decorationIdAndQuantity);
         orderDTO.setTablewareIdAndQuantity(tablewareIdAndQuantity);
 
-        Optional<Order> order = orderService.makeOrder(member1, orderDTO);
+        Optional<MemberOrder> order = orderService.makeMemberOrder(member1, orderDTO);
 
         tableware1.setStockQuantity(0);
         Boolean orderAble = orderService.isMakeAbleOrder(order.get().getId());
@@ -272,7 +272,7 @@ class OrderServiceTest {
         orderDTO.setDecorationIdAndQuantity(decorationIdAndQuantity);
         orderDTO.setTablewareIdAndQuantity(tablewareIdAndQuantity);
 
-        Optional<Order> order = orderService.makeOrder(member1, orderDTO);
+        Optional<MemberOrder> order = orderService.makeMemberOrder(member1, orderDTO);
 
         ingredientService.minusStockQuantity(ingredient1.getId(), ingredient1.getStockQuantity());
         Boolean orderAble = orderService.isMakeAbleOrder(order.get().getId());

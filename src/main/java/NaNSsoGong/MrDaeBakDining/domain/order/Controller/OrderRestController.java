@@ -6,6 +6,8 @@ import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.domain.order.Controller.form.CancelOrderRequest;
 import NaNSsoGong.MrDaeBakDining.domain.order.Controller.form.ChangeStatusRequest;
 import NaNSsoGong.MrDaeBakDining.domain.order.Controller.form.MakeOrderRequest;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.GuestOrder;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.MemberOrder;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.Order;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -27,14 +30,24 @@ public class OrderRestController {
     private final OrderRepository orderRepository;
     private final OrderService orderService;
 
-    @PostMapping("/make-order")
-    public Long makeOrder(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member member,
+    @PostMapping("/guest-order")
+    public UUID makeGuestOrder(@RequestBody MakeOrderRequest makeOrderRequest){
+        OrderDto orderDto = new OrderDto();
+        orderDto.setFoodIdAndQuantity(makeOrderRequest.getFoodIdAndQuantity());
+        orderDto.setDecorationIdAndQuantity(makeOrderRequest.getDecorationIdAndQuantity());
+        orderDto.setTablewareIdAndQuantity(makeOrderRequest.getTablewareIdAndQuantity());
+        Optional<GuestOrder> madeGuestOrder = orderService.makeGuestOrder(orderDto);
+        return madeGuestOrder.get().getGuest().getUuid();
+    }
+
+    @PostMapping("/member-order")
+    public Long makeMemberOrder(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member member,
                           @RequestBody MakeOrderRequest makeOrderRequest){
         OrderDto orderDto = new OrderDto();
         orderDto.setFoodIdAndQuantity(makeOrderRequest.getFoodIdAndQuantity());
         orderDto.setDecorationIdAndQuantity(makeOrderRequest.getDecorationIdAndQuantity());
         orderDto.setTablewareIdAndQuantity(makeOrderRequest.getTablewareIdAndQuantity());
-        Optional<Order> order = orderService.makeOrder(member, orderDto);
+        Optional<MemberOrder> order = orderService.makeMemberOrder(member, orderDto);
         return 1L;
     }
 
@@ -46,7 +59,7 @@ public class OrderRestController {
             return 1L;
         if(!foundOrder.get().getOrderStatus().equals(OrderStatus.ORDERED))
             return 1L;
-        orderService.cancelOrder(member.getId(), cancelOrderRequest.getOrderId());
+        orderService.cancelOrder(cancelOrderRequest.getOrderId());
         return 1L;
     }
 
