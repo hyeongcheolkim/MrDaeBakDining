@@ -33,10 +33,6 @@ public class Order {
     private Rider rider;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderDecoration> orderDecorationList = new ArrayList<>();
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private  List<OrderFood> orderFoodList = new ArrayList<>();
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderTableware> orderTablewareList = new ArrayList<>();
+    @OneToMany(mappedBy = "order")
+    List<OrderSheet> orderSheetList = new ArrayList<>();
 }

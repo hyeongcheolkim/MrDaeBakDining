@@ -1,6 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.domain;
 
-import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
+import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,15 +13,15 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class OrderTableware {
+public class OrderSheetFood {
     @Id
     @GeneratedValue
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    Order order;
+    @JoinColumn(name = "order_sheet_id")
+    OrderSheet orderSheet;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tableware_id")
-    Tableware tableware;
-    Integer tablewareQuantity;
+    @JoinColumn(name = "food_id")
+    Food food;
+    Integer foodQuantity;
 }

@@ -13,13 +13,13 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class OrderDecoration {
+public class OrderSheetDecoration {
     @Id
     @GeneratedValue
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    Order order;
+    @JoinColumn(name = "order_sheet_id")
+    OrderSheet orderSheet;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "decoration_id")
     Decoration decoration;
