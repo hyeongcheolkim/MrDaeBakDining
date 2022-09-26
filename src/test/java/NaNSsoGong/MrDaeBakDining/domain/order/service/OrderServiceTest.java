@@ -5,6 +5,10 @@ import NaNSsoGong.MrDaeBakDining.domain.client.service.ClientService;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.domain.Decoration;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationRepository;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.service.DecorationService;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerDecoration;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerFood;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.FoodCategory;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
@@ -15,12 +19,16 @@ import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientReposito
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.ClientOrder;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.GuestOrder;
+import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderSheetDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.GuestOrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.service.RecipeService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.rider.service.RiderService;
+import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
+import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleTableware;
+import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.service.TablewareService;
@@ -35,7 +43,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -75,6 +86,10 @@ class OrderServiceTest {
     RiderService riderService;
     @Autowired
     GuestOrderRepository guestOrderRepository;
+    @Autowired
+    DinnerRepository dinnerRepository;
+    @Autowired
+    StyleRepository styleRepository;
 
     Client client1;
     Client client2;
@@ -103,6 +118,9 @@ class OrderServiceTest {
 
     Rider rider;
     Guest guest;
+
+    Dinner dinner;
+    Style style;
 
 
     @BeforeEach
@@ -193,12 +211,35 @@ class OrderServiceTest {
         rider.setLoginId("deliver");
         rider.setPassword("121212");
         riderService.sign(rider);
+
+        style = new Style();
+        style.setName("스타일");
+        StyleTableware styleTableware = new StyleTableware();
+        styleTableware.setTableware(tableware1);
+        styleTableware.setStyle(style);
+        styleTableware.setTablewareQuantity(3);
+        style.setStyleTablewareList(List.of(styleTableware));
+        styleRepository.save(style);
+
+        dinner = new Dinner();
+        dinner.setName("디너");
+        DinnerFood dinnerFood = new DinnerFood();
+        dinnerFood.setDinner(dinner);
+        dinnerFood.setFood(food1);
+        dinnerFood.setFoodQuantity(3);
+        dinnerRepository.save(dinner);
+
+        DinnerDecoration dinnerDecoration = new DinnerDecoration();
+        dinnerDecoration.setDinner(dinner);
+        dinnerDecoration.setDecoration(decoration1);
+        dinnerDecoration.setDecorationQuantity(3);
+        dinner.setDinnerFoodList(List.of(dinnerFood));
+        dinner.setDinnerDecorationList(List.of(dinnerDecoration));
     }
 
     @Test
     void makeOrder() {
-        OrderDto orderDTO = new OrderDto();
-        orderDTO.setAddress(client1.getAddress());
+        OrderSheetDto orderSheetDto = new OrderSheetDto();
         Map<Long, Integer> foodIdAndQuantity = new HashMap<>();
         Map<Long, Integer> decorationIdAndQuantity = new HashMap<>();
         Map<Long, Integer> tablewareIdAndQuantity = new HashMap<>();
@@ -211,149 +252,39 @@ class OrderServiceTest {
 
         tablewareIdAndQuantity.put(tableware1.getId(), 1);
         tablewareIdAndQuantity.put(tableware2.getId(), 1);
+        orderSheetDto.setDinnerId(dinner.getId());
+        orderSheetDto.setStyleId(style.getId());
+        orderSheetDto.setFoodIdAndQuantity(foodIdAndQuantity);
+        orderSheetDto.setDecorationIdAndQuantity(decorationIdAndQuantity);
+        orderSheetDto.setTablewareIdAndQuantity(tablewareIdAndQuantity);
 
-        orderDTO.setFoodIdAndQuantity(foodIdAndQuantity);
-        orderDTO.setDecorationIdAndQuantity(decorationIdAndQuantity);
-        orderDTO.setTablewareIdAndQuantity(tablewareIdAndQuantity);
+        OrderDto orderDto = new OrderDto();
+        orderDto.setAddress(client1.getAddress());
+        orderDto.setOrderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        orderDto.setOrderSheetDtoList(List.of(orderSheetDto));
 
-        Optional<ClientOrder> order = orderService.makeClientOrder(client1, orderDTO);
+        Optional<ClientOrder> order = orderService.makeClientOrder(client1, orderDto);
         assertThat(order).isPresent();
     }
 
     @Test
     void 데코레이션부족할때주문불가판정() {
-        OrderDto orderDTO = new OrderDto();
-        orderDTO.setAddress(client1.getAddress());
-        Map<Long, Integer> foodIdAndQuantity = new HashMap<>();
-        Map<Long, Integer> decorationIdAndQuantity = new HashMap<>();
-        Map<Long, Integer> tablewareIdAndQuantity = new HashMap<>();
-
-        foodIdAndQuantity.put(food1.getId(), 1);
-        foodIdAndQuantity.put(food2.getId(), 1);
-
-        decorationIdAndQuantity.put(decoration1.getId(), 1);
-        decorationIdAndQuantity.put(decoration2.getId(), 1);
-
-        tablewareIdAndQuantity.put(tableware1.getId(), 1);
-        tablewareIdAndQuantity.put(tableware2.getId(), 1);
-
-        orderDTO.setFoodIdAndQuantity(foodIdAndQuantity);
-        orderDTO.setDecorationIdAndQuantity(decorationIdAndQuantity);
-        orderDTO.setTablewareIdAndQuantity(tablewareIdAndQuantity);
-
-        Optional<ClientOrder> order = orderService.makeClientOrder(client1, orderDTO);
-
-        decoration1.setStockQuantity(0);
-        Boolean orderAble = orderService.isMakeAbleOrder(order.get().getId());
-        assertThat(orderAble).isFalse();
     }
 
     @Test
     void 테이블웨어부족할때주문불가판정() {
-        OrderDto orderDTO = new OrderDto();
-        orderDTO.setAddress(client1.getAddress());
-        Map<Long, Integer> foodIdAndQuantity = new HashMap<>();
-        Map<Long, Integer> decorationIdAndQuantity = new HashMap<>();
-        Map<Long, Integer> tablewareIdAndQuantity = new HashMap<>();
-
-        foodIdAndQuantity.put(food1.getId(), 1);
-        foodIdAndQuantity.put(food2.getId(), 1);
-
-        decorationIdAndQuantity.put(decoration1.getId(), 1);
-        decorationIdAndQuantity.put(decoration2.getId(), 1);
-
-        tablewareIdAndQuantity.put(tableware1.getId(), 1);
-        tablewareIdAndQuantity.put(tableware2.getId(), 1);
-
-        orderDTO.setFoodIdAndQuantity(foodIdAndQuantity);
-        orderDTO.setDecorationIdAndQuantity(decorationIdAndQuantity);
-        orderDTO.setTablewareIdAndQuantity(tablewareIdAndQuantity);
-
-        Optional<ClientOrder> order = orderService.makeClientOrder(client1, orderDTO);
-
-        tableware1.setStockQuantity(0);
-        Boolean orderAble = orderService.isMakeAbleOrder(order.get().getId());
-        assertThat(orderAble).isFalse();
     }
 
     @Test
     void 음식재료부족할때주문불가판정() {
-        OrderDto orderDTO = new OrderDto();
-        orderDTO.setAddress(client1.getAddress());
-        Map<Long, Integer> foodIdAndQuantity = new HashMap<>();
-        Map<Long, Integer> decorationIdAndQuantity = new HashMap<>();
-        Map<Long, Integer> tablewareIdAndQuantity = new HashMap<>();
-
-        foodIdAndQuantity.put(food1.getId(), 1);
-        foodIdAndQuantity.put(food2.getId(), 1);
-
-        decorationIdAndQuantity.put(decoration1.getId(), 1);
-        decorationIdAndQuantity.put(decoration2.getId(), 1);
-
-        tablewareIdAndQuantity.put(tableware1.getId(), 1);
-        tablewareIdAndQuantity.put(tableware2.getId(), 1);
-
-        orderDTO.setFoodIdAndQuantity(foodIdAndQuantity);
-        orderDTO.setDecorationIdAndQuantity(decorationIdAndQuantity);
-        orderDTO.setTablewareIdAndQuantity(tablewareIdAndQuantity);
-
-        Optional<ClientOrder> order = orderService.makeClientOrder(client1, orderDTO);
-
-        ingredientService.minusStockQuantity(ingredient1.getId(), ingredient1.getStockQuantity());
-        Boolean orderAble = orderService.isMakeAbleOrder(order.get().getId());
-        assertThat(orderAble).isFalse();
     }
 
 
     @Test
-    void 배달원정상할당(){
-        OrderDto orderDTO = new OrderDto();
-        orderDTO.setAddress(client1.getAddress());
-        Map<Long, Integer> foodIdAndQuantity = new HashMap<>();
-        Map<Long, Integer> decorationIdAndQuantity = new HashMap<>();
-        Map<Long, Integer> tablewareIdAndQuantity = new HashMap<>();
-
-        foodIdAndQuantity.put(food1.getId(), 1);
-        foodIdAndQuantity.put(food2.getId(), 1);
-
-        decorationIdAndQuantity.put(decoration1.getId(), 1);
-        decorationIdAndQuantity.put(decoration2.getId(), 1);
-
-        tablewareIdAndQuantity.put(tableware1.getId(), 1);
-        tablewareIdAndQuantity.put(tableware2.getId(), 1);
-
-        orderDTO.setFoodIdAndQuantity(foodIdAndQuantity);
-        orderDTO.setDecorationIdAndQuantity(decorationIdAndQuantity);
-        orderDTO.setTablewareIdAndQuantity(tablewareIdAndQuantity);
-
-        Optional<ClientOrder> order = orderService.makeClientOrder(client1, orderDTO);
-        order.get().setRider(rider);
-        assertThat(order.get().getRider().getId()).isEqualTo(rider.getId());
+    void 배달원정상할당() {
     }
 
     @Test
-    void GUEST로정상주문(){
-        OrderDto orderDTO = new OrderDto();
-        orderDTO.setAddress(client1.getAddress());
-        Map<Long, Integer> foodIdAndQuantity = new HashMap<>();
-        Map<Long, Integer> decorationIdAndQuantity = new HashMap<>();
-        Map<Long, Integer> tablewareIdAndQuantity = new HashMap<>();
-
-        foodIdAndQuantity.put(food1.getId(), 1);
-        foodIdAndQuantity.put(food2.getId(), 1);
-
-        decorationIdAndQuantity.put(decoration1.getId(), 1);
-        decorationIdAndQuantity.put(decoration2.getId(), 1);
-
-        tablewareIdAndQuantity.put(tableware1.getId(), 1);
-        tablewareIdAndQuantity.put(tableware2.getId(), 1);
-
-        orderDTO.setFoodIdAndQuantity(foodIdAndQuantity);
-        orderDTO.setDecorationIdAndQuantity(decorationIdAndQuantity);
-        orderDTO.setTablewareIdAndQuantity(tablewareIdAndQuantity);
-
-        Optional<GuestOrder> guestOrder = orderService.makeGuestOrder(orderDTO);
-        long count = guestOrderRepository.count();
-        assertThat(count).isEqualTo(1);
+    void GUEST로정상주문() {
     }
 }

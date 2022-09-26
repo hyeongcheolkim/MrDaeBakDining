@@ -6,4 +6,6 @@ public enum FoodCategory {
     MEAT,
     SALAD,
     COFFEE,
+    SIGNATURE,
+    SIDE,
 }
