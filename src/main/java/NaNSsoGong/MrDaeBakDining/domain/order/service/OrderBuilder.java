@@ -27,12 +27,10 @@ public class OrderBuilder {
     private final OrderSheetRepository orderSheetRepository;
     private final ItemRepository itemRepository;
 
-    public Order buildOrder(Order order, OrderDto orderDto) {
-        if (orderDto.getAddress() != null)
-            order.setAddress(orderDto.getAddress());
+    public void buildOrder(Order order, OrderDto orderDto) {
+        order.setAddress(orderDto.getAddress());
         order.setOrderStatus(decideOrderedOrReserved(orderDto.getOrderTime()));
         order.setOrderSheetList(buildOrderSheetList(order, orderDto));
-        return order;
     }
 
     private OrderStatus decideOrderedOrReserved(LocalDateTime orderTime) {
@@ -74,14 +72,14 @@ public class OrderBuilder {
         return ret;
     }
 
-    private List<OrderSheetItem> buildOrderSheetItemList(OrderSheet orderSheet, OrderDto orderDto){
+    private List<OrderSheetItem> buildOrderSheetItemList(OrderSheet orderSheet, OrderDto orderDto) {
         var ret = new ArrayList<OrderSheetItem>();
         List<OrderSheetDto> orderSheetDtoList = orderDto.getOrderSheetDtoList();
-        for(var orderSheetDto : orderSheetDtoList){
+        for (var orderSheetDto : orderSheetDtoList) {
             OrderSheetItem orderSheetItem = new OrderSheetItem();
             orderSheetItem.setOrderSheet(orderSheet);
             Map<Long, Integer> itemIdAndQuantity = orderSheetDto.getItemIdAndQuantity();
-            for(var itemId:itemIdAndQuantity.keySet()){
+            for (var itemId : itemIdAndQuantity.keySet()) {
                 orderSheetItem.setItem(itemRepository.findById(itemId).get());
                 orderSheetItem.setItemQuantity(itemIdAndQuantity.get(itemId));
             }

@@ -18,18 +18,16 @@ public class RecipeService {
     private final FoodRepository foodRepository;
     private final IngredientRepository ingredientRepository;
 
-    public Optional<Recipe> makeRecipe(Long foodId, Long ingredientId, Integer ingredientQuantity){
+    public Long makeRecipe(Long foodId, Long ingredientId, Integer ingredientQuantity){
         Recipe recipe = new Recipe();
         Optional<Food> foundFood = foodRepository.findById(foodId);
         Optional<Ingredient> foundIngredient = ingredientRepository.findById(ingredientId);
-        if(foundFood.isEmpty() || foundIngredient.isEmpty())
-            return Optional.empty();
         recipe.setFood(foundFood.get());
         recipe.setIngredient(foundIngredient.get());
         recipe.setIngredientQuantity(ingredientQuantity);
         Recipe savedRecipe = recipeRepository.save(recipe);
         foundFood.get().getRecipeList().add(savedRecipe);
         foundIngredient.get().getRecipeList().add(savedRecipe);
-        return Optional.of(savedRecipe);
+        return recipe.getId();
     }
 }

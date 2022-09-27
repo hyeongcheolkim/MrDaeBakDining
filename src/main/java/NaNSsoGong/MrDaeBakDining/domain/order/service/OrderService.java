@@ -20,19 +20,19 @@ public class OrderService {
     private final GuestOrderRepository guestOrderRepository;
     private final OrderBuilder orderBuilder;
 
-    public Optional<ClientOrder> makeClientOrder(Client client, OrderDto orderDto) {
+    public Long makeClientOrder(Client client, OrderDto orderDto) {
         ClientOrder clientOrder = new ClientOrder();
         clientOrder.setClient(client);
         clientOrderRepository.save(clientOrder);
         orderBuilder.buildOrder(clientOrder, orderDto);
-        return Optional.ofNullable(clientOrder);
+        return clientOrder.getId();
     }
 
-    public Optional<GuestOrder> makeGuestOrder(Guest guest, OrderDto orderDto) {
+    public Long makeGuestOrder(Guest guest, OrderDto orderDto) {
         GuestOrder guestOrder = new GuestOrder();
         guestOrder.setGuest(guest);
         guestOrderRepository.save(guestOrder);
         orderBuilder.buildOrder(guestOrder, orderDto);
-        return Optional.ofNullable(guestOrder);
+        return guestOrder.getId();
     }
 }

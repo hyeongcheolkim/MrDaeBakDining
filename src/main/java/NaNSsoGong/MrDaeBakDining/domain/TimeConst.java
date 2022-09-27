@@ -1,7 +1,5 @@
 package NaNSsoGong.MrDaeBakDining.domain;
 
-import java.time.LocalDateTime;
-
 public interface TimeConst {
     static final Integer OPEN_HOUR = 15;
     static final Integer OPEN_MINUTE = 30;

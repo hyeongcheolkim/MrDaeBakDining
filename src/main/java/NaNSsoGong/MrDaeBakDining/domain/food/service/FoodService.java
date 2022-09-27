@@ -31,18 +31,13 @@ public class FoodService {
         return true;
     }
 
-    public Optional<Food> makeFood(Long foodId){
+    public void makeFood(Long foodId){
         Optional<Food> foundFood = foodRepository.findById(foodId);
-        if(foundFood.isEmpty())
-            return Optional.empty();
-        if(!isMakeAble(foodId))
-            return Optional.empty();
         List<Recipe> recipeList = foundFood.get().getRecipeList();
         for(var recipe : recipeList){
             Ingredient ingredient = recipe.getIngredient();
             Integer ingredientQuantity = recipe.getIngredientQuantity();
             ingredientService.minusStockQuantity(ingredient.getId(), ingredientQuantity);
         }
-        return foundFood;
     }
 }

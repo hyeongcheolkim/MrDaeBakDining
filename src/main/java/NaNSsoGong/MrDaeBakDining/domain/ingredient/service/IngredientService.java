@@ -12,22 +12,16 @@ import java.util.Optional;
 public class IngredientService {
     private final IngredientRepository ingredientRepository;
 
-    public Optional<Ingredient> plusStockQuantity(Long ingredientId, Integer quantity) {
+    public void plusStockQuantity(Long ingredientId, Integer quantity) {
         Optional<Ingredient> foundIngredient = ingredientRepository.findById(ingredientId);
-        if (foundIngredient.isEmpty())
-            return Optional.empty();
         foundIngredient.get().setStockQuantity(foundIngredient.get().getStockQuantity() + quantity);
-        return Optional.of(foundIngredient.get());
     }
 
-    public Optional<Ingredient> minusStockQuantity(Long ingredientId, Integer quantity){
+    public void minusStockQuantity(Long ingredientId, Integer quantity){
         Optional<Ingredient> foundIngredient = ingredientRepository.findById(ingredientId);
-        if (foundIngredient.isEmpty())
-            return Optional.empty();
         Integer newStockQuantity = foundIngredient.get().getStockQuantity() - quantity;
         if(newStockQuantity < 0)
-            return Optional.empty();
+            return;
         foundIngredient.get().setStockQuantity(newStockQuantity);
-        return Optional.of(foundIngredient.get());
     }
 }

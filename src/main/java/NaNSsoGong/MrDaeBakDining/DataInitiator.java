@@ -5,12 +5,12 @@ import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;
 import NaNSsoGong.MrDaeBakDining.domain.chef.repository.ChefRepository;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.ClientGrade;
-import NaNSsoGong.MrDaeBakDining.domain.client.service.ClientService;
+import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.domain.Decoration;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationRepository;
-import NaNSsoGong.MrDaeBakDining.domain.decoration.service.DecorationService;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerItem;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerItemRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.FoodCategory;
@@ -21,6 +21,7 @@ import NaNSsoGong.MrDaeBakDining.domain.guest.repository.GuestRepository;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
+import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.ClientOrder;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.GuestOrder;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
@@ -32,13 +33,12 @@ import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.service.RecipeService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
-import NaNSsoGong.MrDaeBakDining.domain.rider.service.RiderService;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleItem;
+import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleItemRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
-import NaNSsoGong.MrDaeBakDining.domain.tableware.service.TablewareService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -59,17 +59,17 @@ public class DataInitiator {
     private final IngredientRepository ingredientRepository;
     private final OrderService orderService;
     private final OrderRepository orderRepository;
-    private final DecorationService decorationService;
-    private final TablewareService tablewareService;
     private final DecorationRepository decorationRepository;
     private final TablewareRepository tablewareRepository;
-    private final ClientService clientService;
-    private final RiderService riderService;
     private final GuestOrderRepository guestOrderRepository;
     private final DinnerRepository dinnerRepository;
     private final StyleRepository styleRepository;
     private final GuestRepository guestRepository;
     private final ChefRepository chefRepository;
+    private final ClientRepository clientRepository;
+    private final MemberRepository memberRepository;
+    private final DinnerItemRepository dinnerItemRepository;
+    private final StyleItemRepository styleItemRepository;
 
     public Client client1;
     public Client client2;
@@ -115,7 +115,7 @@ public class DataInitiator {
         client1.setPassword("meberApassword");
         client1.setEnable(true);
         client1.setClientGrade(ClientGrade.DIAMOND);
-        clientService.sign(client1);
+        memberRepository.save(client1);
 
         client2 = new Client();
         client2.setName("memberB");
@@ -125,7 +125,7 @@ public class DataInitiator {
         client2.setPassword("meberBpassword");
         client2.setEnable(true);
         client2.setClientGrade(ClientGrade.BRONZE);
-        clientService.sign(client2);
+        memberRepository.save(client2);
 
         guest = new Guest();
         guest.setCardNumber("2134123412341234");
@@ -191,23 +191,24 @@ public class DataInitiator {
         ingredientRepository.save(ingredient4);
         ingredientRepository.save(ingredient5);
 
-        recipe1 = recipeService.makeRecipe(food1.getId(), ingredient1.getId(), 1).get();
-        recipe2 = recipeService.makeRecipe(food1.getId(), ingredient2.getId(), 1).get();
-        recipe3 = recipeService.makeRecipe(food1.getId(), ingredient3.getId(), 2).get();
-        recipe4 = recipeService.makeRecipe(food2.getId(), ingredient4.getId(), 1).get();
-        recipe5 = recipeService.makeRecipe(food2.getId(), ingredient5.getId(), 1).get();
-        recipe6 = recipeService.makeRecipe(food2.getId(), ingredient2.getId(), 1).get();
+        recipe1 = recipeRepository.findById(recipeService.makeRecipe(food1.getId(), ingredient1.getId(), 1)).get();
+        recipe1 = recipeRepository.findById(recipeService.makeRecipe(food1.getId(), ingredient2.getId(), 2)).get();
+        recipe1 = recipeRepository.findById(recipeService.makeRecipe(food1.getId(), ingredient3.getId(), 1)).get();
+        recipe1 = recipeRepository.findById(recipeService.makeRecipe(food2.getId(), ingredient4.getId(), 1)).get();
+        recipe1 = recipeRepository.findById(recipeService.makeRecipe(food2.getId(), ingredient5.getId(), 1)).get();
+        recipe1 = recipeRepository.findById(recipeService.makeRecipe(food2.getId(), ingredient2.getId(), 1)).get();
 
         rider = new Rider();
         rider.setName("나배달원");
         rider.setEnable(true);
         rider.setLoginId("deliver");
         rider.setPassword("121212");
-        riderService.sign(rider);
+        memberRepository.save(rider);
 
         style = new Style();
         style.setName("스타일");
         StyleItem styleItem = new StyleItem();
+        styleItemRepository.save(styleItem);
         styleItem.setItem(tableware1);
         styleItem.setStyle(style);
         styleItem.setItemQuantity(3);
@@ -218,16 +219,18 @@ public class DataInitiator {
         dinner.setName("디너");
         dinnerRepository.save(dinner);
         DinnerItem dinnerItem1 = new DinnerItem();
+        dinnerItemRepository.save(dinnerItem1);
         dinnerItem1.setDinner(dinner);
         dinnerItem1.setItem(food1);
         dinnerItem1.setItemQuantity(3);
 
         DinnerItem dinnerItem2 = new DinnerItem();
+        dinnerItemRepository.save(dinnerItem2);
         dinnerItem2.setDinner(dinner);
         dinnerItem2.setItem(decoration1);
         dinnerItem2.setItemQuantity(3);
 
-        dinner.setItemDecorationList(List.of(dinnerItem1, dinnerItem2));
+        dinner.setDinnerItemList(List.of(dinnerItem1, dinnerItem2));
 
         OrderSheetDto orderSheetDto = new OrderSheetDto();
         Map<Long, Integer> itemIdAndQuantity = new HashMap<>();
@@ -251,6 +254,7 @@ public class DataInitiator {
         orderDto.setOrderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         orderDto.setOrderSheetDtoList(List.of(orderSheetDto));
 
-        clientOrder = orderService.makeClientOrder(client1, orderDto).get();
+        clientOrder = (ClientOrder) orderRepository.findById(orderService.makeClientOrder(client1, orderDto)).get();
+        guestOrder = (GuestOrder) orderRepository.findById(orderService.makeGuestOrder(guest, orderDto)).get();
     }
 }

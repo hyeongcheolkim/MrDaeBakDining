@@ -21,5 +21,5 @@ public class Dinner {
     private Long id;
     private String name;
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DinnerItem> itemDecorationList = new ArrayList<>();
+    private List<DinnerItem> dinnerItemList = new ArrayList<>();
 }
