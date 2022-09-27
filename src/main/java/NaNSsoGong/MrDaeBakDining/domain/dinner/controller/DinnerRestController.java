@@ -20,16 +20,6 @@ public class DinnerRestController {
     private final DinnerRepository dinnerRepository;
     private final DinnerService dinnerService;
 
-    @PostMapping("/save")
-    public Long save(SaveRequest saveRequest){
-        DinnerDto dinnerDto = new DinnerDto();
-        dinnerDto.setName(saveRequest.getName());
-        dinnerDto.setDecorationIdAndQuantity(saveRequest.getDecorationIdAndQuantity());
-        dinnerDto.setFoodIdAndQuantity(saveRequest.getFoodIdAndQuantity());
-        Optional<Dinner> dinner = dinnerService.makeDinner(dinnerDto);
-        return 1L;
-    }
-
     @GetMapping("/page-list")
     public Page<Dinner> pageList(@RequestBody PageListRequest pageListRequest){
         return dinnerRepository.findAll(pageListRequest.of());

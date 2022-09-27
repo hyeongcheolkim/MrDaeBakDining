@@ -29,7 +29,7 @@ public class Order {
     private Address address;
     private LocalDateTime orderTime;
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rider_id")
+    @JoinColumn(name = "member_id")
     private Rider rider;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;

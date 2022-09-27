@@ -10,7 +10,5 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OrderSheetDto {
     private Long styleId;
     private Long dinnerId;
-    private Map<Long, Integer> foodIdAndQuantity = new ConcurrentHashMap<>();
-    private Map<Long, Integer> decorationIdAndQuantity = new ConcurrentHashMap<>();
-    private Map<Long, Integer> TablewareIdAndQuantity = new ConcurrentHashMap<>();
+    private Map<Long, Integer> itemIdAndQuantity = new ConcurrentHashMap<>();
 }

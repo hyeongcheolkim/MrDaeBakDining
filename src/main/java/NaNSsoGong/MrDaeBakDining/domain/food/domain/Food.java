@@ -1,5 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.food.domain;
 
+import NaNSsoGong.MrDaeBakDining.domain.item.domain.Item;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,13 +16,9 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class Food {
-    @Id
-    @GeneratedValue
-    @Column(name="food_id")
-    private Long id;
-    private String name;
+public class Food extends Item {
     private Integer sellPrice;
+    private Boolean enable = true;
     @Enumerated(EnumType.STRING)
     private FoodCategory foodCategory;
     @OneToMany(mappedBy = "food")

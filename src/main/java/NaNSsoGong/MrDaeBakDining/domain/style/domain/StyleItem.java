@@ -1,6 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.style.domain;
 
-import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
+import NaNSsoGong.MrDaeBakDining.domain.item.domain.Item;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class StyleTableware {
+public class StyleItem {
     @Id
     @GeneratedValue
     private Long id;
@@ -21,7 +21,7 @@ public class StyleTableware {
     @JoinColumn(name="style_id")
     private Style style;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="tableware_id")
-    private Tableware tableware;
-    private Integer tablewareQuantity;
+    @JoinColumn(name="item_id")
+    private Item item;
+    private Integer itemQuantity;
 }

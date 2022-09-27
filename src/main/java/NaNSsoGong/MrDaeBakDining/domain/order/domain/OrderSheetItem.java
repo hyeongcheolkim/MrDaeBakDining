@@ -1,6 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.domain;
 
-import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
+import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
+import NaNSsoGong.MrDaeBakDining.domain.item.domain.Item;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class OrderSheetTableware {
+public class OrderSheetItem {
     @Id
     @GeneratedValue
     private Long id;
@@ -21,7 +22,7 @@ public class OrderSheetTableware {
     @JoinColumn(name = "order_sheet_id")
     OrderSheet orderSheet;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tableware_id")
-    Tableware tableware;
-    Integer tablewareQuantity;
+    @JoinColumn(name = "item_id")
+    Item item;
+    Integer itemQuantity;
 }

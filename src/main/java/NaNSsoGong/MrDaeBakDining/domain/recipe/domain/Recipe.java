@@ -19,7 +19,7 @@ public class Recipe {
     @GeneratedValue
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "food_id")
+    @JoinColumn(name = "item_id")
     private Food food;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredient_id")

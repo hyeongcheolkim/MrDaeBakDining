@@ -1,5 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.decoration.domain;
 
+import NaNSsoGong.MrDaeBakDining.domain.item.domain.Item;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,11 +13,6 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class Decoration {
-    @Id
-    @GeneratedValue
-    @Column(name = "decoration_id")
-    private Long id;
-    private String name;
+public class Decoration extends Item {
     private Integer stockQuantity;
 }

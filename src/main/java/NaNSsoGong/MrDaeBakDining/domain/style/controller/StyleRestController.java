@@ -20,15 +20,6 @@ public class StyleRestController {
     private final StyleRepository styleRepository;
     private final StyleService styleService;
 
-    @PostMapping("/save")
-    public Long save(SaveRequest saveRequest){
-        StyleDto styleDto = new StyleDto();
-        styleDto.setName(saveRequest.getName());
-        styleDto.setTablewareIdAndQuantity(saveRequest.getTablewareIdAndQuantity());
-        Optional<Style> style = styleService.makeStyle(styleDto);
-        return 1L;
-    }
-
     @GetMapping("page-list")
     public Page<Style> pageList(@RequestBody PageListRequest pageListRequest){
         return styleRepository.findAll(pageListRequest.of());

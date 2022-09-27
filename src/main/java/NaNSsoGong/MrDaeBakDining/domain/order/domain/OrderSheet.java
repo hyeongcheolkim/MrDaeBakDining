@@ -31,9 +31,5 @@ public class OrderSheet {
     @JoinColumn(name = "dinner_id")
     private Dinner dinner;
     @OneToMany(mappedBy = "orderSheet", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderSheetDecoration> orderSheetDecorationList = new ArrayList<>();
-    @OneToMany(mappedBy = "orderSheet", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderSheetFood> orderSheetFoodList = new ArrayList<>();
-    @OneToMany(mappedBy = "orderSheet", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderSheetTableware> orderTablewareList = new ArrayList<>();
+    private List<OrderSheetItem> orderItemList = new ArrayList<>();
 }

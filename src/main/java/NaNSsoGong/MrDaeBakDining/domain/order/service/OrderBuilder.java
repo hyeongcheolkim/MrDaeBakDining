@@ -1,15 +1,16 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.service;
 
 import NaNSsoGong.MrDaeBakDining.domain.TimeConst;
-import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
-import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
-import NaNSsoGong.MrDaeBakDining.domain.order.domain.*;
+import NaNSsoGong.MrDaeBakDining.domain.item.repository.ItemRepository;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.Order;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderSheet;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderSheetItem;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderSheetDto;
-import NaNSsoGong.MrDaeBakDining.domain.order.repository.*;
+import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderSheetRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
-import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -21,16 +22,10 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class OrderBuilder {
-    private final FoodRepository foodRepository;
-    private final DecorationRepository decorationRepository;
-    private final TablewareRepository tablewareRepository;
     private final DinnerRepository dinnerRepository;
     private final StyleRepository styleRepository;
-    private final OrderRepository orderRepository;
     private final OrderSheetRepository orderSheetRepository;
-    private final OrderSheetFoodRepository orderSheetFoodRepository;
-    private final OrderSheetTablewareRepository orderSheetTablewareRepository;
-    private final OrderSheetDecorationRepository orderSheetDecorationRepository;
+    private final ItemRepository itemRepository;
 
     public Order buildOrder(Order order, OrderDto orderDto) {
         if (orderDto.getAddress() != null)
@@ -73,52 +68,24 @@ public class OrderBuilder {
             orderSheet.setOrder(order);
             orderSheet.setDinner(dinnerRepository.findById(orderSheetDto.getDinnerId()).get());
             orderSheet.setStyle(styleRepository.findById(orderSheetDto.getStyleId()).get());
-            orderSheet.setOrderSheetDecorationList(buildOrderSheetDecorationList(orderSheet, orderSheetDto));
-            orderSheet.setOrderSheetFoodList(buildOrderSheetFoodList(orderSheet, orderSheetDto));
-            orderSheet.setOrderTablewareList(buildOrderSheetTablewareList(orderSheet, orderSheetDto));
+            orderSheet.setOrderItemList(buildOrderSheetItemList(orderSheet, orderDto));
             ret.add(orderSheet);
         }
         return ret;
     }
 
-    private List<OrderSheetDecoration> buildOrderSheetDecorationList(OrderSheet orderSheet, OrderSheetDto orderSheetDto) {
-        var ret = new ArrayList<OrderSheetDecoration>();
-        Map<Long, Integer> decorationIdAndQuantity = orderSheetDto.getDecorationIdAndQuantity();
-        for (var decorationId : decorationIdAndQuantity.keySet()) {
-            OrderSheetDecoration orderSheetDecoration = new OrderSheetDecoration();
-            orderSheetDecorationRepository.save(orderSheetDecoration);
-            orderSheetDecoration.setOrderSheet(orderSheet);
-            orderSheetDecoration.setDecoration(decorationRepository.findById(decorationId).get());
-            orderSheetDecoration.setDecorationQuantity(decorationIdAndQuantity.get(decorationId));
-            ret.add(orderSheetDecoration);
-        }
-        return ret;
-    }
-
-    private List<OrderSheetFood> buildOrderSheetFoodList(OrderSheet orderSheet, OrderSheetDto orderSheetDto) {
-        var ret = new ArrayList<OrderSheetFood>();
-        Map<Long, Integer> foodIdAndQuantity = orderSheetDto.getFoodIdAndQuantity();
-        for (var foodId : foodIdAndQuantity.keySet()) {
-            OrderSheetFood orderSheetFood = new OrderSheetFood();
-            orderSheetFoodRepository.save(orderSheetFood);
-            orderSheetFood.setOrderSheet(orderSheet);
-            orderSheetFood.setFood(foodRepository.findById(foodId).get());
-            orderSheetFood.setFoodQuantity(foodIdAndQuantity.get(foodId));
-            ret.add(orderSheetFood);
-        }
-        return ret;
-    }
-
-    private List<OrderSheetTableware> buildOrderSheetTablewareList(OrderSheet orderSheet, OrderSheetDto orderSheetDto) {
-        var ret = new ArrayList<OrderSheetTableware>();
-        Map<Long, Integer> tablewareIdAndQuantity = orderSheetDto.getTablewareIdAndQuantity();
-        for (var tablewareId : tablewareIdAndQuantity.keySet()) {
-            OrderSheetTableware orderSheetTableware = new OrderSheetTableware();
-            orderSheetTablewareRepository.save(orderSheetTableware);
-            orderSheetTableware.setOrderSheet(orderSheet);
-            orderSheetTableware.setTableware(tablewareRepository.findById(tablewareId).get());
-            orderSheetTableware.setTablewareQuantity(tablewareIdAndQuantity.get(tablewareId));
-            ret.add(orderSheetTableware);
+    private List<OrderSheetItem> buildOrderSheetItemList(OrderSheet orderSheet, OrderDto orderDto){
+        var ret = new ArrayList<OrderSheetItem>();
+        List<OrderSheetDto> orderSheetDtoList = orderDto.getOrderSheetDtoList();
+        for(var orderSheetDto : orderSheetDtoList){
+            OrderSheetItem orderSheetItem = new OrderSheetItem();
+            orderSheetItem.setOrderSheet(orderSheet);
+            Map<Long, Integer> itemIdAndQuantity = orderSheetDto.getItemIdAndQuantity();
+            for(var itemId:itemIdAndQuantity.keySet()){
+                orderSheetItem.setItem(itemRepository.findById(itemId).get());
+                orderSheetItem.setItemQuantity(itemIdAndQuantity.get(itemId));
+            }
+            ret.add(orderSheetItem);
         }
         return ret;
     }

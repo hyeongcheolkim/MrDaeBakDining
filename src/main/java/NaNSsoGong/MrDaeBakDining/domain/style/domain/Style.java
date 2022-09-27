@@ -20,6 +20,6 @@ public class Style {
     @Column(name="style_id")
     private Long id;
     private String name;
-    @OneToMany(mappedBy = "style", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StyleTableware> styleTablewareList = new ArrayList<>();
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StyleItem> styleItemList = new ArrayList<>();
 }

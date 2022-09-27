@@ -1,6 +1,10 @@
-package NaNSsoGong.MrDaeBakDining.domain.order.service;
+package NaNSsoGong.MrDaeBakDining;
 
 import NaNSsoGong.MrDaeBakDining.domain.Address;
+import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;
+import NaNSsoGong.MrDaeBakDining.domain.chef.repository.ChefRepository;
+import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
+import NaNSsoGong.MrDaeBakDining.domain.client.domain.ClientGrade;
 import NaNSsoGong.MrDaeBakDining.domain.client.service.ClientService;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.domain.Decoration;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationRepository;
@@ -13,12 +17,17 @@ import NaNSsoGong.MrDaeBakDining.domain.food.domain.FoodCategory;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.service.FoodService;
 import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
+import NaNSsoGong.MrDaeBakDining.domain.guest.repository.GuestRepository;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.ClientOrder;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.GuestOrder;
+import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderSheetDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.GuestOrderRepository;
+import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
+import NaNSsoGong.MrDaeBakDining.domain.order.service.OrderService;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.service.RecipeService;
@@ -30,98 +39,74 @@ import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.service.TablewareService;
-import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
-import NaNSsoGong.MrDaeBakDining.domain.client.domain.ClientGrade;
-import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
-import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+@Component
+@RequiredArgsConstructor
+public class DataInitiator {
+    private final FoodService foodService;
+    private final FoodRepository foodRepository;
+    private final IngredientService ingredientService;
+    private final RecipeService recipeService;
+    private final RecipeRepository recipeRepository;
+    private final IngredientRepository ingredientRepository;
+    private final OrderService orderService;
+    private final OrderRepository orderRepository;
+    private final DecorationService decorationService;
+    private final TablewareService tablewareService;
+    private final DecorationRepository decorationRepository;
+    private final TablewareRepository tablewareRepository;
+    private final ClientService clientService;
+    private final RiderService riderService;
+    private final GuestOrderRepository guestOrderRepository;
+    private final DinnerRepository dinnerRepository;
+    private final StyleRepository styleRepository;
+    private final GuestRepository guestRepository;
+    private final ChefRepository chefRepository;
 
-@SpringBootTest
-@Transactional
-class OrderServiceTest {
+    public Client client1;
+    public Client client2;
 
-    @Autowired
-    FoodService foodService;
-    @Autowired
-    FoodRepository foodRepository;
-    @Autowired
-    IngredientService ingredientService;
-    @Autowired
-    RecipeService recipeService;
-    @Autowired
-    RecipeRepository recipeRepository;
-    @Autowired
-    IngredientRepository ingredientRepository;
-    @Autowired
-    OrderService orderService;
-    @Autowired
-    OrderRepository orderRepository;
-    @Autowired
-    DecorationService decorationService;
-    @Autowired
-    TablewareService tablewareService;
-    @Autowired
-    DecorationRepository decorationRepository;
-    @Autowired
-    TablewareRepository tablewareRepository;
-    @Autowired
-    ClientService clientService;
-    @Autowired
-    RiderService riderService;
-    @Autowired
-    GuestOrderRepository guestOrderRepository;
-    @Autowired
-    DinnerRepository dinnerRepository;
-    @Autowired
-    StyleRepository styleRepository;
+    public Food food1;
+    public Food food2;
 
-    Client client1;
-    Client client2;
+    public Decoration decoration1;
+    public Decoration decoration2;
 
-    Food food1;
-    Food food2;
+    public Tableware tableware1;
+    public Tableware tableware2;
 
-    Decoration decoration1;
-    Decoration decoration2;
+    public Ingredient ingredient1;
+    public Ingredient ingredient2;
+    public Ingredient ingredient3;
+    public Ingredient ingredient4;
+    public Ingredient ingredient5;
 
-    Tableware tableware1;
-    Tableware tableware2;
+    public Recipe recipe1;
+    public Recipe recipe2;
+    public Recipe recipe3;
+    public Recipe recipe4;
+    public Recipe recipe5;
+    public Recipe recipe6;
 
-    Ingredient ingredient1;
-    Ingredient ingredient2;
-    Ingredient ingredient3;
-    Ingredient ingredient4;
-    Ingredient ingredient5;
+    public Rider rider;
+    public Guest guest;
+    public Chef chef;
 
-    Recipe recipe1;
-    Recipe recipe2;
-    Recipe recipe3;
-    Recipe recipe4;
-    Recipe recipe5;
-    Recipe recipe6;
+    public Dinner dinner;
+    public Style style;
 
-    Rider rider;
-    Guest guest;
+    public ClientOrder clientOrder;
+    public GuestOrder guestOrder;
 
-    Dinner dinner;
-    Style style;
-
-
-    @BeforeEach
-    void init() {
+    public void init() {
         client1 = new Client();
         client1.setName("memberA");
         client1.setAddress(new Address("seoul", "mangu", "12345"));
@@ -141,6 +126,17 @@ class OrderServiceTest {
         client2.setEnable(true);
         client2.setClientGrade(ClientGrade.BRONZE);
         clientService.sign(client2);
+
+        guest = new Guest();
+        guest.setCardNumber("2134123412341234");
+        guestRepository.save(guest);
+
+        chef = new Chef();
+        chef.setEnable(true);
+        chef.setName("나쉐프");
+        chef.setLoginId("CHEFLOGIN");
+        chef.setPassword("chefchef");
+        chefRepository.save(chef);
 
         decoration1 = new Decoration();
         decoration1.setName("하트장식");
@@ -232,10 +228,7 @@ class OrderServiceTest {
         dinnerItem2.setItemQuantity(3);
 
         dinner.setItemDecorationList(List.of(dinnerItem1, dinnerItem2));
-    }
 
-    @Test
-    void makeOrder() {
         OrderSheetDto orderSheetDto = new OrderSheetDto();
         Map<Long, Integer> itemIdAndQuantity = new HashMap<>();
 
@@ -258,28 +251,6 @@ class OrderServiceTest {
         orderDto.setOrderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         orderDto.setOrderSheetDtoList(List.of(orderSheetDto));
 
-        Optional<ClientOrder> order = orderService.makeClientOrder(client1, orderDto);
-        assertThat(order).isPresent();
-    }
-
-    @Test
-    void 데코레이션부족할때주문불가판정() {
-    }
-
-    @Test
-    void 테이블웨어부족할때주문불가판정() {
-    }
-
-    @Test
-    void 음식재료부족할때주문불가판정() {
-    }
-
-
-    @Test
-    void 배달원정상할당() {
-    }
-
-    @Test
-    void GUEST로정상주문() {
+        clientOrder = orderService.makeClientOrder(client1, orderDto).get();
     }
 }
