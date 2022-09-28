@@ -4,17 +4,16 @@ import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.ClientOrder;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.GuestOrder;
-import NaNSsoGong.MrDaeBakDining.domain.order.domain.Order;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.ClientOrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.GuestOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderService {
     private final ClientOrderRepository clientOrderRepository;
     private final GuestOrderRepository guestOrderRepository;

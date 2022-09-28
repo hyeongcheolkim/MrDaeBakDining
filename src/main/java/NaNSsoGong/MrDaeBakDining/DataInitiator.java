@@ -24,6 +24,7 @@ import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
 import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.ClientOrder;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.GuestOrder;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderSheetDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.GuestOrderRepository;
@@ -41,7 +42,9 @@ import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -103,8 +106,17 @@ public class DataInitiator {
     public Dinner dinner;
     public Style style;
 
+    public OrderSheetDto orderSheetDto;
+
+    public OrderDto orderDto;
+
     public ClientOrder clientOrder;
     public GuestOrder guestOrder;
+
+//    @PostConstruct
+    void postConstructInit(){
+        this.init();
+    }
 
     public void init() {
         client1 = new Client();
@@ -206,6 +218,7 @@ public class DataInitiator {
         memberRepository.save(rider);
 
         style = new Style();
+        styleRepository.save(style);
         style.setName("스타일");
         StyleItem styleItem = new StyleItem();
         styleItemRepository.save(styleItem);
@@ -213,11 +226,10 @@ public class DataInitiator {
         styleItem.setStyle(style);
         styleItem.setItemQuantity(3);
         style.setStyleItemList(List.of(styleItem));
-        styleRepository.save(style);
 
         dinner = new Dinner();
-        dinner.setName("디너");
         dinnerRepository.save(dinner);
+        dinner.setName("디너");
         DinnerItem dinnerItem1 = new DinnerItem();
         dinnerItemRepository.save(dinnerItem1);
         dinnerItem1.setDinner(dinner);
@@ -232,7 +244,7 @@ public class DataInitiator {
 
         dinner.setDinnerItemList(List.of(dinnerItem1, dinnerItem2));
 
-        OrderSheetDto orderSheetDto = new OrderSheetDto();
+        orderSheetDto = new OrderSheetDto();
         Map<Long, Integer> itemIdAndQuantity = new HashMap<>();
 
         itemIdAndQuantity.put(food1.getId(), 1);
@@ -249,12 +261,15 @@ public class DataInitiator {
 
         orderSheetDto.setItemIdAndQuantity(itemIdAndQuantity);
 
-        OrderDto orderDto = new OrderDto();
+        orderDto = new OrderDto();
         orderDto.setAddress(client1.getAddress());
         orderDto.setOrderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         orderDto.setOrderSheetDtoList(List.of(orderSheetDto));
+        orderDto.setOrderStatus(OrderStatus.ORDERED);
 
         clientOrder = (ClientOrder) orderRepository.findById(orderService.makeClientOrder(client1, orderDto)).get();
         guestOrder = (GuestOrder) orderRepository.findById(orderService.makeGuestOrder(guest, orderDto)).get();
     }
+
+
 }

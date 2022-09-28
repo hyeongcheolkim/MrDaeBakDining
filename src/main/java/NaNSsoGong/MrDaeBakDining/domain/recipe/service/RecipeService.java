@@ -8,6 +8,7 @@ import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ public class RecipeService {
     private final FoodRepository foodRepository;
     private final IngredientRepository ingredientRepository;
 
+    @Transactional
     public Long makeRecipe(Long foodId, Long ingredientId, Integer ingredientQuantity){
         Recipe recipe = new Recipe();
         Optional<Food> foundFood = foodRepository.findById(foodId);

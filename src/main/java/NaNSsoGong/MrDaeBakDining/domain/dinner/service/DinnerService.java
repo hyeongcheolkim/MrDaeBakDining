@@ -13,6 +13,7 @@ import NaNSsoGong.MrDaeBakDining.domain.item.domain.Item;
 import NaNSsoGong.MrDaeBakDining.domain.item.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -23,6 +24,7 @@ public class DinnerService {
     private final ItemRepository itemRepository;
     private final DinnerItemRepository dinnerItemRepository;
 
+    @Transactional
     public Long makeDinner(DinnerDto dinnerDto) {
         Dinner dinner = new Dinner();
         dinnerRepository.save(dinner);
