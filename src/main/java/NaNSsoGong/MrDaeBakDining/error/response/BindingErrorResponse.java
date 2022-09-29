@@ -1,4 +1,4 @@
-package NaNSsoGong.MrDaeBakDining.exception.response;
+package NaNSsoGong.MrDaeBakDining.error.response;
 
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +10,7 @@ import java.util.Map;
 @Data
 @Builder
 public class BindingErrorResponse {
+    private final String exceptionType = "system";
     private String exceptionName;
     private List<Map<String,Object>> fieldErrors = new ArrayList<>();
     private List<Map<String,Object>> globalErrors = new ArrayList<>();

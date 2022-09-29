@@ -113,7 +113,7 @@ public class DataInitiator {
     public ClientOrder clientOrder;
     public GuestOrder guestOrder;
 
-//    @PostConstruct
+    @PostConstruct
     void postConstructInit(){
         this.init();
     }
@@ -124,7 +124,7 @@ public class DataInitiator {
         client1.setAddress(new Address("seoul", "mangu", "12345"));
         client1.setCardNumber("1234123412341234");
         client1.setLoginId("memberAId");
-        client1.setPassword("meberApassword");
+        client1.setPassword("!meberApassword12");
         client1.setEnable(true);
         client1.setClientGrade(ClientGrade.DIAMOND);
         memberRepository.save(client1);
@@ -134,7 +134,7 @@ public class DataInitiator {
         client2.setAddress(new Address("suncheon", "shindae", "33321"));
         client2.setCardNumber("1111222233334444");
         client2.setLoginId("memberBId");
-        client2.setPassword("meberBpassword");
+        client2.setPassword("!meberBpassword12");
         client2.setEnable(true);
         client2.setClientGrade(ClientGrade.BRONZE);
         memberRepository.save(client2);
@@ -147,7 +147,7 @@ public class DataInitiator {
         chef.setEnable(true);
         chef.setName("나쉐프");
         chef.setLoginId("CHEFLOGIN");
-        chef.setPassword("chefchef");
+        chef.setPassword("!chefchef123");
         chefRepository.save(chef);
 
         decoration1 = new Decoration();
@@ -214,7 +214,7 @@ public class DataInitiator {
         rider.setName("나배달원");
         rider.setEnable(true);
         rider.setLoginId("deliver");
-        rider.setPassword("121212");
+        rider.setPassword("!rider121212");
         memberRepository.save(rider);
 
         style = new Style();

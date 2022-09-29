@@ -1,6 +1,8 @@
 package NaNSsoGong.MrDaeBakDining.domain.member.controller.exception;
 
-public class LoginFailException extends RuntimeException{
+import NaNSsoGong.MrDaeBakDining.error.exception.BusinessException;
+
+public class LoginFailException extends BusinessException {
     public LoginFailException() {
         super();
     }

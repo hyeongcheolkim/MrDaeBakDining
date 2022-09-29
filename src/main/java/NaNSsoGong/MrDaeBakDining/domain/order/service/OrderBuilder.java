@@ -29,6 +29,7 @@ public class OrderBuilder {
     public void buildOrder(Order order, OrderDto orderDto) {
         order.setAddress(orderDto.getAddress());
         order.setOrderStatus(orderDto.getOrderStatus());
+        order.setOrderTime(orderDto.getOrderTime());
         if(order.getOrderStatus().equals(OrderStatus.RESERVED))
             saveReservedTime(order, orderDto);
         order.setOrderSheetList(buildOrderSheetList(order, orderDto));
@@ -50,7 +51,7 @@ public class OrderBuilder {
             orderSheet.setOrder(order);
             orderSheet.setDinner(dinnerRepository.findById(orderSheetDto.getDinnerId()).get());
             orderSheet.setStyle(styleRepository.findById(orderSheetDto.getStyleId()).get());
-            orderSheet.setOrderItemList(buildOrderSheetItemList(orderSheet, orderDto));
+            orderSheet.setOrderSheetItemList(buildOrderSheetItemList(orderSheet, orderDto));
             ret.add(orderSheet);
         }
         return ret;

@@ -1,18 +1,19 @@
-package NaNSsoGong.MrDaeBakDining.domain.member.controller;
+package NaNSsoGong.MrDaeBakDining.error;
 
-import NaNSsoGong.MrDaeBakDining.exception.response.RuntimeErrorResponse;
-import NaNSsoGong.MrDaeBakDining.domain.member.controller.exception.LoginFailException;
+import NaNSsoGong.MrDaeBakDining.error.exception.BusinessException;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class MemberRestControllerAdvice {
+public class GlobalBusinessErrorAdvice {
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler
-    public RuntimeErrorResponse loginFailException(LoginFailException ex){
-        return RuntimeErrorResponse.builder()
+    public BusinessErrorResponse businessException(BusinessException ex){
+        return BusinessErrorResponse.builder()
                 .exceptionName(ex.getClass().getSimpleName())
                 .message(ex.getMessage())
                 .build();

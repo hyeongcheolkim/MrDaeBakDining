@@ -20,6 +20,7 @@ public class Guest {
     @Column(name = "guest_id")
     private Long id;
     private UUID uuid = UUID.randomUUID();
+    private String name;
     private String cardNumber;
     @OneToOne(mappedBy = "guest", fetch = FetchType.LAZY)
     GuestOrder guestOrder;
