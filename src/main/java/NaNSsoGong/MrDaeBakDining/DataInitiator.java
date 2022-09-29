@@ -113,7 +113,7 @@ public class DataInitiator {
     public ClientOrder clientOrder;
     public GuestOrder guestOrder;
 
-    @PostConstruct
+//    @PostConstruct
     void postConstructInit(){
         this.init();
     }
