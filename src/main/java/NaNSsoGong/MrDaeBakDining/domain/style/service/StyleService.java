@@ -1,8 +1,5 @@
 package NaNSsoGong.MrDaeBakDining.domain.style.service;
 
-import NaNSsoGong.MrDaeBakDining.domain.decoration.domain.Decoration;
-import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
-import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerItem;
 import NaNSsoGong.MrDaeBakDining.domain.item.domain.Item;
 import NaNSsoGong.MrDaeBakDining.domain.item.repository.ItemRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
@@ -31,7 +28,7 @@ public class StyleService {
         return style.getId();
     }
 
-    public Map<Long, Integer> TablewareIdAndQuantity(Long styleId) {
+    public Map<Long, Integer> tablewareIdAndQuantity(Long styleId) {
         var ret = new HashMap<Long, Integer>();
         Optional<Style> foundStyle = styleRepository.findById(styleId);
         if (foundStyle.isEmpty())

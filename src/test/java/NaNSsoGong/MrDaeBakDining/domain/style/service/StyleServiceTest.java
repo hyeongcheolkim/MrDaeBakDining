@@ -33,7 +33,7 @@ class StyleServiceTest {
     @Test
     void 스타일로부터tablewareIdAndQuantity정상반환() {
         Style style = dataInitiator.style;
-        Map<Long, Integer> tablewareIdAndQuantity = styleService.TablewareIdAndQuantity(style.getId());
+        Map<Long, Integer> tablewareIdAndQuantity = styleService.tablewareIdAndQuantity(style.getId());
         List<StyleItem> styleItemList = style.getStyleItemList();
         for (var styleItem : styleItemList) {
             if (!(styleItem.getItem() instanceof Food))
