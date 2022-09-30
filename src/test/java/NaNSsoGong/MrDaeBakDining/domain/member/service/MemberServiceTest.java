@@ -1,6 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.member.service;
 
 import NaNSsoGong.MrDaeBakDining.DataInitiator;
+import NaNSsoGong.MrDaeBakDining.domain.DataInitiatorForTest;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 class MemberServiceTest {
     @Autowired
-    DataInitiator dataInitiator;
+    DataInitiatorForTest dataInitiator;
     @Autowired
     MemberService memberService;
     @Autowired

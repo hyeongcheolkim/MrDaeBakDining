@@ -1,23 +1,26 @@
 package NaNSsoGong.MrDaeBakDining.domain.ingredient.service;
 
 import NaNSsoGong.MrDaeBakDining.DataInitiator;
+import NaNSsoGong.MrDaeBakDining.domain.DataInitiatorForTest;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
 class IngredientServiceTest {
     @Autowired
-    DataInitiator dataInitiator;
+    DataInitiatorForTest dataInitiator;
     @Autowired
     IngredientService ingredientService;
 
     @BeforeEach
+        @Rollback(value = false)
     void init() {
         dataInitiator.dataInit();
     }

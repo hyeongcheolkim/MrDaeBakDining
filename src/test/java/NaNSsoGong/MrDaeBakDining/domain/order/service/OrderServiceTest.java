@@ -1,6 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.service;
 
 import NaNSsoGong.MrDaeBakDining.DataInitiator;
+import NaNSsoGong.MrDaeBakDining.domain.DataInitiatorForTest;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderReservedTime;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
@@ -22,7 +23,7 @@ class OrderServiceTest {
     @Autowired
     OrderService orderService;
     @Autowired
-    DataInitiator dataInitiator;
+    DataInitiatorForTest dataInitiator;
     @Autowired
     OrderReservedTimeRepository orderReservedTimeRepository;
 

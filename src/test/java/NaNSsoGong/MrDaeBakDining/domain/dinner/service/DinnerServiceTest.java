@@ -1,6 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.dinner.service;
 
 import NaNSsoGong.MrDaeBakDining.DataInitiator;
+import NaNSsoGong.MrDaeBakDining.domain.DataInitiatorForTest;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.domain.Decoration;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerItem;
@@ -9,7 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -22,7 +25,7 @@ import static org.assertj.core.api.Assertions.*;
 @Slf4j
 class DinnerServiceTest {
     @Autowired
-    DataInitiator dataInitiator;
+    DataInitiatorForTest dataInitiator;
     @Autowired
     DinnerService dinnerService;
 

@@ -1,6 +1,5 @@
-package NaNSsoGong.MrDaeBakDining;
+package NaNSsoGong.MrDaeBakDining.domain;
 
-import NaNSsoGong.MrDaeBakDining.domain.Address;
 import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;
 import NaNSsoGong.MrDaeBakDining.domain.chef.repository.ChefRepository;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
@@ -52,8 +51,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-@Transactional
-public class DataInitiator {
+public class DataInitiatorForTest {
     private final FoodService foodService;
     private final FoodRepository foodRepository;
     private final IngredientService ingredientService;
@@ -113,7 +111,6 @@ public class DataInitiator {
     public ClientOrder clientOrder;
     public GuestOrder guestOrder;
 
-    @Transactional
     public void factoryInit() {
         for (int i = 0; i < 100; ++i) {
             var client = new Client();
@@ -262,7 +259,6 @@ public class DataInitiator {
         }
     }
 
-    @Transactional
     public void dataInit() {
         client1 = new Client();
         client1.setName("ClientA");

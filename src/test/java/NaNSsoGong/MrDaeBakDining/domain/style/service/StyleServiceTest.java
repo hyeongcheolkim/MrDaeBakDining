@@ -1,6 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.style.service;
 
 import NaNSsoGong.MrDaeBakDining.DataInitiator;
+import NaNSsoGong.MrDaeBakDining.domain.DataInitiatorForTest;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleItem;
@@ -21,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class StyleServiceTest {
     @Autowired
-    DataInitiator dataInitiator;
+    DataInitiatorForTest dataInitiator;
     @Autowired
     StyleService styleService;
 
