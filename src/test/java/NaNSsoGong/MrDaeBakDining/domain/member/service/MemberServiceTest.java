@@ -3,19 +3,15 @@ package NaNSsoGong.MrDaeBakDining.domain.member.service;
 import NaNSsoGong.MrDaeBakDining.DataInitiator;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
-import lombok.RequiredArgsConstructor;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -29,7 +25,7 @@ class MemberServiceTest {
 
     @BeforeEach
     void init() {
-        dataInitiator.init();
+        dataInitiator.dataInit();
     }
 
     @Test

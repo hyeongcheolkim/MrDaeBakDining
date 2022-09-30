@@ -27,7 +27,7 @@ class StyleServiceTest {
 
     @BeforeEach
     void init() {
-        dataInitiator.init();
+        dataInitiator.dataInit();
     }
 
     @Test

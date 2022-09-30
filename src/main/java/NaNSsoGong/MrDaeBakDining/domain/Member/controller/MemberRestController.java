@@ -11,16 +11,22 @@ import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoLoginMemberException;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.List;
 import java.util.Optional;
 
 import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.*;
@@ -29,10 +35,12 @@ import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
 @Slf4j
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
 public class MemberRestController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
 
+    @Operation(summary = "로그인", description = "세션이 필요 없습니다")
     @PostMapping("/login")
     public ResponseEntity<MemberLoginResponse> login(@RequestBody @Validated final MemberLoginRequest memberLoginRequest, HttpServletRequest request) {
         Optional<Long> id = memberService.login(memberLoginRequest.getLoginId(), memberLoginRequest.getPassword());
@@ -48,7 +56,6 @@ public class MemberRestController {
         MemberLoginResponse memberLoginResponse = new MemberLoginResponse();
         HttpSession session = request.getSession(true);
         session.setMaxInactiveInterval(1800);
-        session.setAttribute(LOGIN_MEMBER, foundMember.getId());
 
         if (foundMember instanceof Client) {
             session.setAttribute(LOGIN_CLIENT, foundMember.getId());
@@ -68,30 +75,36 @@ public class MemberRestController {
                 .body(memberLoginResponse);
     }
 
+    @Operation(summary = "로그아웃", description = "로그인된 상태에서만 로그아웃할 수 있습니다, 즉 세션이 필수입니다")
     @PostMapping("/logout")
-    public ResponseEntity logout(HttpServletRequest request) {
+    public ResponseEntity<String> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session == null)
             throw new LogoutFailException("로그인상태가 아니므로 로그아웃할 수 없습니다");
         session.invalidate();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body("로그아웃완료");
     }
 
+    @Operation(summary = "회원탈퇴", description = "member.enable를 false로 바꿉니다, 정보가 삭제되는 것은 아닙니다")
+    @Transactional
     @PutMapping("/signout")
-    public ResponseEntity signout(@SessionAttribute(name = LOGIN_CLIENT, required = false) final Optional<Long> clientId,
-                                  @SessionAttribute(name = LOGIN_CHEF, required = false) final Optional<Long> chefId,
-                                  @SessionAttribute(name = LOGIN_RIDER, required = false) final Optional<Long> riderId,
+    public ResponseEntity<String> signout(@Parameter(name = "clientId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_CLIENT, required = false) Long clientId,
+                                  @Parameter(name = "chefId", hidden = true, allowEmptyValue = true)@SessionAttribute(name = LOGIN_CHEF, required = false) Long chefId,
+                                  @Parameter(name = "riderId", hidden = true, allowEmptyValue = true)@SessionAttribute(name = LOGIN_RIDER, required = false) Long riderId,
                                   HttpServletRequest request) {
-        if (clientId.isEmpty() && chefId.isEmpty() && riderId.isEmpty())
+        if (clientId == null && chefId == null && riderId == null)
             throw new NoLoginMemberException("로그인하지 않는 멤버의 접근입니다");
         Long memberId = null;
-        for (var id : List.of(clientId, chefId, riderId))
-            if (id.isPresent())
-                memberId = id.get();
+        if(clientId != null)
+            memberId = clientId;
+        else if(chefId != null)
+            memberId = chefId;
+        else if(riderId != null)
+            memberId = riderId;
         Member foundMember = memberRepository.findById(memberId).get();
         foundMember.setEnable(false);
         request.getSession().invalidate();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body("탈퇴완료");
     }
 }
 

@@ -1,14 +1,12 @@
 package NaNSsoGong.MrDaeBakDining.error;
 
 import NaNSsoGong.MrDaeBakDining.error.exception.BusinessException;
-import NaNSsoGong.MrDaeBakDining.error.response.BindingErrorResponse;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
-import NaNSsoGong.MrDaeBakDining.error.response.MethodArgumentTypeMismatchErrorResponse;
-import NaNSsoGong.MrDaeBakDining.error.response.RequestMethodErrorResponse;
+import NaNSsoGong.MrDaeBakDining.error.response.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -66,8 +64,16 @@ public class GlobalSystemErrorAdvice {
     }
 
     @ExceptionHandler
-    public MethodArgumentTypeMismatchErrorResponse methodArgumentTypeMismatchErrorResponse(MethodArgumentTypeMismatchException ex){
+    public MethodArgumentTypeMismatchErrorResponse methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex){
         return MethodArgumentTypeMismatchErrorResponse.builder()
+                .exceptionName(ex.getClass().getSimpleName())
+                .message(ex.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler
+    public ServletRequestBindingError servletRequestBindingException(ServletRequestBindingException ex){
+        return ServletRequestBindingError.builder()
                 .exceptionName(ex.getClass().getSimpleName())
                 .message(ex.getMessage())
                 .build();

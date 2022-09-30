@@ -28,7 +28,7 @@ class OrderServiceTest {
 
     @BeforeEach
     void init() {
-        dataInitiator.init();
+        dataInitiator.dataInit();
     }
 
     @Test
@@ -37,7 +37,7 @@ class OrderServiceTest {
         OrderDto orderDto = dataInitiator.orderDto;
         orderDto.setOrderStatus(OrderStatus.RESERVED);
         orderDto.setReserveTime(reservedTime);
-        Long id = orderService.makeGuestOrder(dataInitiator.guest, orderDto);
+        Long id = orderService.makeGuestOrder(dataInitiator.guest.getId(), orderDto);
         Optional<OrderReservedTime> foundTime = orderReservedTimeRepository.findById(id);
         assertThat(foundTime).isPresent();
         assertThat(foundTime.get().getReservedTime()).isEqualTo(reservedTime);

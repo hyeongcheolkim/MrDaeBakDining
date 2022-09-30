@@ -24,4 +24,9 @@ public class Guest {
     private String cardNumber;
     @OneToOne(mappedBy = "guest", fetch = FetchType.LAZY)
     GuestOrder guestOrder;
+
+    public Guest(String name, String cardNumber){
+        this.name = name;
+        this.cardNumber = cardNumber;
+    }
 }

@@ -6,7 +6,6 @@ import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerItem;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -30,7 +28,7 @@ class DinnerServiceTest {
 
     @BeforeEach
     void init() {
-        dataInitiator.init();
+        dataInitiator.dataInit();
     }
 
     @Test

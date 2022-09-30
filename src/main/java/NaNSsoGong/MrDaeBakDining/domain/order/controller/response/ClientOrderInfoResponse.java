@@ -42,7 +42,9 @@ public class ClientOrderInfoResponse {
     static public class OrderSheetResponse {
         private Long orderSheetId;
         private Long styleId;
+        private String styleName;
         private Long dinnerId;
+        private String dinnerName;
         private List<OrderSheetItemResponse> orderSheetItemResponseList = new ArrayList<>();
         public OrderSheetResponse(OrderSheet orderSheet){
             this.orderSheetId = orderSheet.getId();
@@ -51,6 +53,8 @@ public class ClientOrderInfoResponse {
             this.orderSheetItemResponseList = orderSheet.getOrderSheetItemList().stream()
                     .map(OrderSheetItemResponse::new)
                     .collect(Collectors.toList());
+            this.styleName = orderSheet.getStyle().getName();
+            this.dinnerName = orderSheet.getDinner().getName();
         }
     }
 
