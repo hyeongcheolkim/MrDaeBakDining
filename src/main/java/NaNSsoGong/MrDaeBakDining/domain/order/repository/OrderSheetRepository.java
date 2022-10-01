@@ -13,6 +13,6 @@ import java.util.Optional;
 public interface OrderSheetRepository extends JpaRepository<OrderSheet, Long> {
     @Query("select distinct os from OrderSheet os " +
             "where os.id in (:idList)")
-    @EntityGraph(attributePaths = {"style", "dinner"})
-    List<OrderSheet> findByIdIn(@Param(value = "idList") List<Long> idList);
+//    @EntityGraph(attributePaths = {"style", "dinner"})
+    List<OrderSheet> findAllByIdIn(@Param(value = "idList") List<Long> idList);
 }

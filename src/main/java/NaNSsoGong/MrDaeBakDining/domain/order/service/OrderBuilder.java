@@ -30,7 +30,7 @@ public class OrderBuilder {
         order.setAddress(orderDto.getAddress());
         order.setOrderStatus(orderDto.getOrderStatus());
         order.setOrderTime(orderDto.getOrderTime());
-        if(order.getOrderStatus().equals(OrderStatus.RESERVED))
+        if (order.getOrderStatus().equals(OrderStatus.RESERVED))
             saveReservedTime(order, orderDto);
         order.setOrderSheetList(buildOrderSheetList(order, orderDto));
     }
@@ -51,25 +51,23 @@ public class OrderBuilder {
             orderSheet.setOrder(order);
             orderSheet.setDinner(dinnerRepository.findById(orderSheetDto.getDinnerId()).get());
             orderSheet.setStyle(styleRepository.findById(orderSheetDto.getStyleId()).get());
-            orderSheet.setOrderSheetItemList(buildOrderSheetItemList(orderSheet, orderDto));
+            buildOrderSheetItemList(orderSheet, orderDto);
             ret.add(orderSheet);
         }
         return ret;
     }
 
-    private List<OrderSheetItem> buildOrderSheetItemList(OrderSheet orderSheet, OrderDto orderDto) {
-        var ret = new ArrayList<OrderSheetItem>();
+    private void buildOrderSheetItemList(OrderSheet orderSheet, OrderDto orderDto) {
         List<OrderSheetDto> orderSheetDtoList = orderDto.getOrderSheetDtoList();
         for (var orderSheetDto : orderSheetDtoList) {
-            OrderSheetItem orderSheetItem = new OrderSheetItem();
-            orderSheetItem.setOrderSheet(orderSheet);
             Map<Long, Integer> itemIdAndQuantity = orderSheetDto.getItemIdAndQuantity();
             for (var itemId : itemIdAndQuantity.keySet()) {
+                OrderSheetItem orderSheetItem = new OrderSheetItem();
+                orderSheetItem.setOrderSheet(orderSheet);
                 orderSheetItem.setItem(itemRepository.findById(itemId).get());
                 orderSheetItem.setItemQuantity(itemIdAndQuantity.get(itemId));
+                orderSheet.getOrderSheetItemList().add(orderSheetItem);
             }
-            ret.add(orderSheetItem);
         }
-        return ret;
     }
 }

@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
 //    @EntityGraph(attributePaths = {"recipeList"})
 //    Optional<Ingredient> findById(Long id);
+    Optional<Ingredient> findByName(String name);
+    Page<Ingredient> findAll(Pageable pageable);
 }

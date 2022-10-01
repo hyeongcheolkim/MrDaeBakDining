@@ -14,6 +14,6 @@ import java.util.List;
 public interface ClientOrderRepository extends JpaRepository<ClientOrder, Long> {
     @Query("select distinct co from ClientOrder co " +
             "where co.client.id = (:clientId)")
-    @EntityGraph(attributePaths = {"rider", "client"})
+//    @EntityGraph(attributePaths = {"rider", "client"})
     Page<ClientOrder> findAllByClientId(@Param(value = "clientId")Long clientId, Pageable pageable);
 }

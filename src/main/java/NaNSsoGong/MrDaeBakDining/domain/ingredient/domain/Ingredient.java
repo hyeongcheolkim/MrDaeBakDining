@@ -22,7 +22,7 @@ public class Ingredient {
     private Long id;
     private String name;
     private Integer stockQuantity;
-    @OneToMany(mappedBy = "ingredient")
+    @OneToMany(mappedBy = "ingredient", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Recipe> recipeList = new ArrayList<>();
 
     private void setRecipeList(){}

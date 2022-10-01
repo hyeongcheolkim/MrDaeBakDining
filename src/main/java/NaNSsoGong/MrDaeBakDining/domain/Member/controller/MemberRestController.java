@@ -106,5 +106,12 @@ public class MemberRestController {
         request.getSession().invalidate();
         return ResponseEntity.ok().body("탈퇴완료");
     }
+
+    @Operation(summary = "아이디 중복체크")
+    @GetMapping("/valid-id")
+    public ResponseEntity<Boolean> isLoginIdAvailable(@RequestParam String loginId){
+        Boolean loginIdAvailable = memberService.isLoginIdAvailable(loginId);
+        return ResponseEntity.ok().body(loginIdAvailable);
+    }
 }
 

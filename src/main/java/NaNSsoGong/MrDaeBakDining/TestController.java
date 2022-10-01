@@ -19,7 +19,7 @@ public class TestController {
     private final DataInitiator dataInitiator;
     static private Boolean flag = true;
 
-    @Operation(summary = "스몰데이터 생성", description = "다른 api의 기본값들을 사용하려면 먼저 호출해야합니다")
+    @Operation(summary = "테스트데이터 생성", description = "다른 api의 기본값들을 사용하려면 먼저 호출해야합니다")
     @PostMapping("/data-init")
     public String dataInit() {
         if (flag) {
@@ -30,7 +30,7 @@ public class TestController {
         return "already initiated";
     }
 
-    @Operation(summary = "빅데이터 생성", description = "다른 api의 기본값들과 무관합니다")
+    @Operation(summary = "빅사이즈 더미데이터 생성", description = "다른 api의 기본값들과 무관합니다")
     @PostMapping("/factory-init")
     public String dataFactoryInit() {
         if (flag) {

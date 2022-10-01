@@ -11,17 +11,4 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class IngredientService {
     private final IngredientRepository ingredientRepository;
-
-    public void plusStockQuantity(Long ingredientId, Integer quantity) {
-        Optional<Ingredient> foundIngredient = ingredientRepository.findById(ingredientId);
-        foundIngredient.get().setStockQuantity(foundIngredient.get().getStockQuantity() + quantity);
-    }
-
-    public void minusStockQuantity(Long ingredientId, Integer quantity){
-        Optional<Ingredient> foundIngredient = ingredientRepository.findById(ingredientId);
-        Integer newStockQuantity = foundIngredient.get().getStockQuantity() - quantity;
-        if(newStockQuantity < 0)
-            return;
-        foundIngredient.get().setStockQuantity(newStockQuantity);
-    }
 }

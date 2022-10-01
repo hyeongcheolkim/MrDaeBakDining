@@ -127,6 +127,7 @@ public class DataInitiator {
             memberRepository.save(client);
 
             var guest = new Guest();
+            guest.setName("나손님"+i);
             guest.setCardNumber("213412341234123" + i);
             guestRepository.save(guest);
 
@@ -285,6 +286,7 @@ public class DataInitiator {
         memberRepository.save(client2);
 
         guest = new Guest();
+        guest.setName("나손님");
         guest.setCardNumber("2134123412341234");
         guestRepository.save(guest);
 
