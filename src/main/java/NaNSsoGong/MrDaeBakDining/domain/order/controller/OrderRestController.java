@@ -116,7 +116,7 @@ public class OrderRestController {
 
     @Operation(summary = "주문상태 후보값리스트조회", description = "OrderStatus.values()를 조회합니다")
     @GetMapping("/status/list")
-    public ResponseEntity<Map<String, Object>> orderStatusList(){
+    public ResponseEntity<Map<String, Object>> orderStatusList() {
         Map<String, Object> ret = new HashMap<>();
         ret.put("status", OrderStatus.values());
         return ResponseEntity.ok().body(ret);
@@ -132,9 +132,7 @@ public class OrderRestController {
         HashMap<String, Object> ret = new HashMap<>();
         ret.put("orderId", orderId);
 
-        return ResponseEntity
-                .ok()
-                .body(ret);
+        return ResponseEntity.ok().body(ret);
     }
 
     @Operation(summary = "게스트 주문", description = "세션이 필요 없습니다")
@@ -150,19 +148,17 @@ public class OrderRestController {
         ret.put("orderId", orderId);
         ret.put("UUID", guest.getUuid());
 
-        return ResponseEntity
-                .ok()
-                .body(ret);
+        return ResponseEntity.ok().body(ret);
     }
 
     @Operation(summary = "주문상태 변경")
     @Transactional
     @PutMapping("/status")
-    public ResponseEntity changeOrderStatus(@RequestBody @Validated ChangeOrderStatusRequest changeOrderStatusRequest){
+    public ResponseEntity changeOrderStatus(@RequestBody @Validated ChangeOrderStatusRequest changeOrderStatusRequest) {
         Long orderId = changeOrderStatusRequest.getOrderId();
         OrderStatus orderStatus = changeOrderStatusRequest.getOrderStatus();
         Optional<Order> foundOrder = orderRepository.findById(orderId);
-        if(foundOrder.isEmpty())
+        if (foundOrder.isEmpty())
             throw new NoExistEntityException("존재하지 않는 주문입니다");
         foundOrder.get().setOrderStatus(orderStatus);
         return ResponseEntity.ok().body("주문상태변경완료");
@@ -171,12 +167,12 @@ public class OrderRestController {
     @Operation(summary = "라이더 변경", description = "변경기능이지만, 배정 기능처럼 사용할 수 있습니다")
     @Transactional
     @PutMapping("/rider")
-    public ResponseEntity changeRider(@RequestBody @Validated ChangeRiderRequest changeRiderRequest){
+    public ResponseEntity changeRider(@RequestBody @Validated ChangeRiderRequest changeRiderRequest) {
         Optional<Rider> foundRider = riderRepository.findById(changeRiderRequest.getRiderId());
         Optional<Order> foundOrder = orderRepository.findById(changeRiderRequest.getOrderId());
-        if(foundRider.isEmpty())
+        if (foundRider.isEmpty())
             throw new NoExistEntityException("존재하지 않는 라이더입니다");
-        if(foundOrder.isEmpty())
+        if (foundOrder.isEmpty())
             throw new NoExistEntityException("존재하지 않는 주문입니다");
         foundOrder.get().setRider(foundRider.get());
         return ResponseEntity.ok().body("라이더변경완료");
