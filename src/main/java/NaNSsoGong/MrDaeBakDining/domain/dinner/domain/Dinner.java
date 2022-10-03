@@ -20,6 +20,6 @@ public class Dinner {
     @Column(name="dinner_id")
     private Long id;
     private String name;
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DinnerItem> dinnerItemList = new ArrayList<>();
+    @OneToMany(mappedBy = "dinner")
+    List<DinnerItem> dinnerItemList = new ArrayList<>();
 }

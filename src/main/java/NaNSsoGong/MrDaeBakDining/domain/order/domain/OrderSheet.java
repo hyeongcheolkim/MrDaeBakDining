@@ -31,5 +31,5 @@ public class OrderSheet {
     @JoinColumn(name = "dinner_id")
     private Dinner dinner;
     @OneToMany(mappedBy = "orderSheet", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderSheetItem> orderSheetItemList = new ArrayList<>();
+    private List<FoodDifference> foodDifferenceList = new ArrayList<>();
 }

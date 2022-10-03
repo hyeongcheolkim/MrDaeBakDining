@@ -14,15 +14,17 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class OrderSheetItem {
+@Table(name = "order_sheet_food")
+public class FoodDifference {
     @Id
     @GeneratedValue
+    @Column(name = "order_sheet_food_id")
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_sheet_id")
     OrderSheet orderSheet;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
-    Item item;
-    Integer itemQuantity;
+    Food food;
+    Integer foodQuantity;
 }

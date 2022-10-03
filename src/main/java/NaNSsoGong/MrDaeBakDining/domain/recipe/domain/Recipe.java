@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"item_id", "ingredient_id"}))
+@Table(name = "recipe", uniqueConstraints = @UniqueConstraint(columnNames = {"item_id", "ingredient_id"}))
 public class Recipe {
     @Id
     @GeneratedValue

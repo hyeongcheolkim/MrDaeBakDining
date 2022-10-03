@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,13 +58,13 @@ public class MemberRestController {
         HttpSession session = request.getSession(true);
         session.setMaxInactiveInterval(1800);
 
-        if (foundMember instanceof Client) {
+        if (Client.class.isAssignableFrom(Hibernate.getClass(foundMember))) {
             session.setAttribute(LOGIN_CLIENT, foundMember.getId());
             memberLoginResponse.setMemberType(LOGIN_CLIENT);
-        } else if (foundMember instanceof Chef) {
+        } else if (Chef.class.isAssignableFrom(Hibernate.getClass(foundMember))) {
             session.setAttribute(LOGIN_CHEF, foundMember.getId());
             memberLoginResponse.setMemberType(LOGIN_CHEF);
-        } else if (foundMember instanceof Rider) {
+        } else if (Rider.class.isAssignableFrom(Hibernate.getClass(foundMember))) {
             session.setAttribute(LOGIN_RIDER, foundMember.getId());
             memberLoginResponse.setMemberType(LOGIN_RIDER);
         }

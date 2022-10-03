@@ -14,5 +14,4 @@ import javax.persistence.*;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class Decoration extends Item {
-    private Integer stockQuantity;
 }

@@ -1,6 +1,5 @@
 package NaNSsoGong.MrDaeBakDining.domain.style.service;
 
-import NaNSsoGong.MrDaeBakDining.DataInitiator;
 import NaNSsoGong.MrDaeBakDining.domain.DataInitiatorForTest;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
@@ -34,7 +33,7 @@ class StyleServiceTest {
     @Test
     void 스타일로부터tablewareIdAndQuantity정상반환() {
         Style style = dataInitiator.style;
-        Map<Long, Integer> tablewareIdAndQuantity = styleService.tablewareIdAndQuantity(style.getId());
+        Map<Long, Integer> tablewareIdAndQuantity = styleService.toTablewareIdAndQuantity(style.getId());
         List<StyleItem> styleItemList = style.getStyleItemList();
         for (var styleItem : styleItemList) {
             if (!(styleItem.getItem() instanceof Food))

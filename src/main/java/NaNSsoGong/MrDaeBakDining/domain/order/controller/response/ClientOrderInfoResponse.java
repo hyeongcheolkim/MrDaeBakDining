@@ -3,7 +3,7 @@ package NaNSsoGong.MrDaeBakDining.domain.order.controller.response;
 import NaNSsoGong.MrDaeBakDining.domain.Address;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.ClientOrder;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderSheet;
-import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderSheetItem;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.FoodDifference;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus;
 import lombok.Data;
 
@@ -45,13 +45,13 @@ public class ClientOrderInfoResponse {
         private String styleName;
         private Long dinnerId;
         private String dinnerName;
-        private List<OrderSheetItemResponse> orderSheetItemResponseList = new ArrayList<>();
+        private List<OrderSheetFoodResponse> FoodDifferenceList = new ArrayList<>();
         public OrderSheetResponse(OrderSheet orderSheet){
             this.orderSheetId = orderSheet.getId();
             this.styleId = orderSheet.getStyle().getId();
             this.dinnerId = orderSheet.getDinner().getId();
-            this.orderSheetItemResponseList = orderSheet.getOrderSheetItemList().stream()
-                    .map(OrderSheetItemResponse::new)
+            this.FoodDifferenceList = orderSheet.getFoodDifferenceList().stream()
+                    .map(OrderSheetFoodResponse::new)
                     .collect(Collectors.toList());
             this.styleName = orderSheet.getStyle().getName();
             this.dinnerName = orderSheet.getDinner().getName();
@@ -59,16 +59,16 @@ public class ClientOrderInfoResponse {
     }
 
     @Data
-    static public class OrderSheetItemResponse {
+    static public class OrderSheetFoodResponse {
         private Long orderSheetItemId;
-        Long itemId;
-        String itemName;
-        Integer itemQuantity;
-        public OrderSheetItemResponse(OrderSheetItem orderSheetItem){
-            this.orderSheetItemId = orderSheetItem.getId();
-            this.itemId = orderSheetItem.getItem().getId();
-            this.itemName = orderSheetItem.getItem().getName();
-            this.itemQuantity = orderSheetItem.getItemQuantity();
+        Long foodId;
+        String foodName;
+        Integer foodQuantity;
+        public OrderSheetFoodResponse(FoodDifference foodDifference){
+            this.orderSheetItemId = foodDifference.getId();
+            this.foodId = foodDifference.getFood().getId();
+            this.foodName = foodDifference.getFood().getName();
+            this.foodQuantity = foodDifference.getFoodQuantity();
         }
     }
 }

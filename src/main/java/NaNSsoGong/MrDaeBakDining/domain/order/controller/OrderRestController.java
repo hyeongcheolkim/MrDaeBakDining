@@ -1,13 +1,12 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.controller;
 
+import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
 import NaNSsoGong.MrDaeBakDining.domain.guest.repository.GuestRepository;
-import NaNSsoGong.MrDaeBakDining.domain.order.controller.request.ChangeOrderStatusRequest;
-import NaNSsoGong.MrDaeBakDining.domain.order.controller.request.ChangeRiderRequest;
-import NaNSsoGong.MrDaeBakDining.domain.order.controller.request.GuestOrderRequest;
-import NaNSsoGong.MrDaeBakDining.domain.order.controller.request.OrderRequest;
+import NaNSsoGong.MrDaeBakDining.domain.order.controller.request.*;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.ClientOrderInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.GuestOrderInfoResponse;
+import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.OrderUpdateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.*;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.ClientOrderRepository;
@@ -26,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -59,10 +59,10 @@ public class OrderRestController {
         if (foundOrder.isEmpty())
             throw new NoExistEntityException("존재하지 않는 orderId 입니다");
 
-        if (foundOrder.get() instanceof ClientOrder)
+        if (ClientOrder.class.isAssignableFrom(Hibernate.getClass(foundOrder.get())))
             return ResponseEntity.ok()
                     .body(clientOrderInfoResponse((ClientOrder) foundOrder.get()));
-        else if (foundOrder.get() instanceof GuestOrder)
+        else if (GuestOrder.class.isAssignableFrom(Hibernate.getClass(foundOrder.get())))
             return ResponseEntity.ok()
                     .body(guestOrderInfoResponse((GuestOrder) foundOrder.get()));
         else
@@ -86,9 +86,9 @@ public class OrderRestController {
     public Page<Object> orderInfoList(Pageable pageable) {
         Page<Order> orderList = orderRepository.findAll(pageable);
         return orderList.map(e -> {
-            if (e instanceof ClientOrder)
+            if (ClientOrder.class.isAssignableFrom(Hibernate.getClass(e)))
                 return clientOrderInfoResponse((ClientOrder) e);
-            else if (e instanceof GuestOrder)
+            else if (GuestOrder.class.isAssignableFrom(Hibernate.getClass(e)))
                 return guestOrderInfoResponse((GuestOrder) e);
             else
                 throw new NoExistEntityException("존재하는 주문이나 주문자가 식별되지 않습니다");
@@ -176,6 +176,18 @@ public class OrderRestController {
             throw new NoExistEntityException("존재하지 않는 주문입니다");
         foundOrder.get().setRider(foundRider.get());
         return ResponseEntity.ok().body("라이더변경완료");
+    }
+
+    @Operation(summary = "주문변경", description = "orderSheetId로 요청해야합니다. orderId아님")
+    @Transactional
+    @PutMapping("/{orderSheetId}")
+    public ResponseEntity<OrderUpdateResponse> orderUpdate(@PathVariable(name = "orderSheetId") Long orderSheetId,
+                                                           @RequestBody OrderSheetRequest orderSheetRequest){
+        Optional<OrderSheet> foundOrderSheet = orderSheetRepository.findById(orderSheetId);
+        if (foundOrderSheet.isEmpty())
+            throw new NoExistEntityException("존재하지 않는 오더시트 입니다");
+        Long updatedOrderSheetId = orderService.updateOrderSheet(orderSheetId, orderSheetRequest.toOrderSheetDto());
+        return ResponseEntity.ok().body(new OrderUpdateResponse(updatedOrderSheetId));
     }
 
     private ClientOrderInfoResponse clientOrderInfoResponse(ClientOrder clientOrder) {

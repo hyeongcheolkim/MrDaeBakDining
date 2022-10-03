@@ -41,7 +41,6 @@ import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -136,22 +135,18 @@ public class DataInitiatorForTest {
 
             var decoration1 = new Decoration();
             decoration1.setName("하트장식" + i);
-            decoration1.setStockQuantity(5);
             decorationRepository.save(decoration1);
 
             var decoration2 = new Decoration();
             decoration2.setName("달빛장식" + i);
-            decoration2.setStockQuantity(5);
             decorationRepository.save(decoration2);
 
             var tableware1 = new Tableware();
             tableware1.setName("와인잔" + i);
-            tableware1.setStockQuantity(5);
             tablewareRepository.save(tableware1);
 
             var tableware2 = new Tableware();
             tableware2.setName("냅킨" + i);
-            tableware2.setStockQuantity(5);
             tablewareRepository.save(tableware2);
 
             var food1 = new Food();
@@ -234,17 +229,12 @@ public class DataInitiatorForTest {
             itemIdAndQuantity.put(food1.getId(), 1);
             itemIdAndQuantity.put(food2.getId(), 1);
 
-            itemIdAndQuantity.put(decoration1.getId(), 1);
-            itemIdAndQuantity.put(decoration2.getId(), 1);
-
-            itemIdAndQuantity.put(tableware1.getId(), 1);
-            itemIdAndQuantity.put(tableware2.getId(), 1);
 
             for (int j = 0; j < 10; ++j) {
                 var orderSheetDto = OrderSheetDto.builder()
                         .dinnerId(dinner.getId())
                         .styleId(style.getId())
-                        .itemIdAndQuantity(itemIdAndQuantity)
+                        .foodIdAndDifference(itemIdAndQuantity)
                         .build();
 
                 var orderDto = OrderDto.builder()
@@ -293,22 +283,18 @@ public class DataInitiatorForTest {
 
         decoration1 = new Decoration();
         decoration1.setName("하트장식");
-        decoration1.setStockQuantity(5);
         decorationRepository.save(decoration1);
 
         decoration2 = new Decoration();
         decoration2.setName("달빛장식");
-        decoration2.setStockQuantity(5);
         decorationRepository.save(decoration2);
 
         tableware1 = new Tableware();
         tableware1.setName("와인잔");
-        tableware1.setStockQuantity(5);
         tablewareRepository.save(tableware1);
 
         tableware2 = new Tableware();
         tableware2.setName("냅킨");
-        tableware2.setStockQuantity(5);
         tablewareRepository.save(tableware2);
 
         food1 = new Food();
@@ -391,17 +377,11 @@ public class DataInitiatorForTest {
         itemIdAndQuantity.put(food1.getId(), 1);
         itemIdAndQuantity.put(food2.getId(), 1);
 
-        itemIdAndQuantity.put(decoration1.getId(), 1);
-        itemIdAndQuantity.put(decoration2.getId(), 1);
-
-        itemIdAndQuantity.put(tableware1.getId(), 1);
-        itemIdAndQuantity.put(tableware2.getId(), 1);
-
 
         orderSheetDto = OrderSheetDto.builder()
                 .dinnerId(dinner.getId())
                 .styleId(style.getId())
-                .itemIdAndQuantity(itemIdAndQuantity)
+                .foodIdAndDifference(itemIdAndQuantity)
                 .build();
 
         orderDto = OrderDto.builder()

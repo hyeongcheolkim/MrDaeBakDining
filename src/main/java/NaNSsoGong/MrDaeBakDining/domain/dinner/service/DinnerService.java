@@ -12,10 +12,12 @@ import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.item.domain.Item;
 import NaNSsoGong.MrDaeBakDining.domain.item.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -33,30 +35,31 @@ public class DinnerService {
         return dinner.getId();
     }
 
-    public Map<Long, Integer> FoodIdAndQuantity(Long dinnerId) {
-        var ret = new HashMap<Long, Integer>();
+    @Transactional
+    public Map<Long, Integer> toFoodIdAndQuantity(Long dinnerId) {
+        var ret = new ConcurrentHashMap<Long, Integer>();
         Optional<Dinner> foundDinner = dinnerRepository.findById(dinnerId);
         if (foundDinner.isEmpty())
             return ret;
         List<DinnerItem> dinnerItemList = foundDinner.get().getDinnerItemList();
         for (var dinnerItem : dinnerItemList) {
             Item item = dinnerItem.getItem();
-            if (!(item instanceof Food))
+            if (!(Food.class.isAssignableFrom(Hibernate.getClass(item))))
                 continue;
             ret.put(item.getId(), dinnerItem.getItemQuantity());
         }
         return ret;
     }
 
-    public Map<Long, Integer> DecorationIdAndQuantity(Long dinnerId) {
-        var ret = new HashMap<Long, Integer>();
+    public Map<Long, Integer> toDecorationIdAndQuantity(Long dinnerId) {
+        var ret = new ConcurrentHashMap<Long, Integer>();
         Optional<Dinner> foundDinner = dinnerRepository.findById(dinnerId);
         if (foundDinner.isEmpty())
             return ret;
         List<DinnerItem> dinnerItemList = foundDinner.get().getDinnerItemList();
         for (var dinnerItem : dinnerItemList) {
             Item item = dinnerItem.getItem();
-            if (!(item instanceof Decoration))
+            if (!(Decoration.class.isAssignableFrom(Hibernate.getClass(item))))
                 continue;
             ret.put(item.getId(), dinnerItem.getItemQuantity());
         }

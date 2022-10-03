@@ -9,6 +9,7 @@ import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleItemRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,7 +29,7 @@ public class StyleService {
         return style.getId();
     }
 
-    public Map<Long, Integer> tablewareIdAndQuantity(Long styleId) {
+    public Map<Long, Integer> toTablewareIdAndQuantity(Long styleId) {
         var ret = new HashMap<Long, Integer>();
         Optional<Style> foundStyle = styleRepository.findById(styleId);
         if (foundStyle.isEmpty())
@@ -36,7 +37,7 @@ public class StyleService {
         List<StyleItem> styleItemList = foundStyle.get().getStyleItemList();
         for (var dinnerItem : styleItemList) {
             Item item = dinnerItem.getItem();
-            if (!(item instanceof Tableware))
+            if (!(Tableware.class.isAssignableFrom(Hibernate.getClass(item))))
                 continue;
             ret.put(item.getId(), dinnerItem.getItemQuantity());
         }

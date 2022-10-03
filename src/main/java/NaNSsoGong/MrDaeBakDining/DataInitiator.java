@@ -52,7 +52,6 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-@Transactional
 public class DataInitiator {
     private final FoodService foodService;
     private final FoodRepository foodRepository;
@@ -140,22 +139,18 @@ public class DataInitiator {
 
             var decoration1 = new Decoration();
             decoration1.setName("하트장식" + i);
-            decoration1.setStockQuantity(5);
             decorationRepository.save(decoration1);
 
             var decoration2 = new Decoration();
             decoration2.setName("달빛장식" + i);
-            decoration2.setStockQuantity(5);
             decorationRepository.save(decoration2);
 
             var tableware1 = new Tableware();
             tableware1.setName("와인잔" + i);
-            tableware1.setStockQuantity(5);
             tablewareRepository.save(tableware1);
 
             var tableware2 = new Tableware();
             tableware2.setName("냅킨" + i);
-            tableware2.setStockQuantity(5);
             tablewareRepository.save(tableware2);
 
             var food1 = new Food();
@@ -238,17 +233,12 @@ public class DataInitiator {
             itemIdAndQuantity.put(food1.getId(), 1);
             itemIdAndQuantity.put(food2.getId(), 1);
 
-            itemIdAndQuantity.put(decoration1.getId(), 1);
-            itemIdAndQuantity.put(decoration2.getId(), 1);
-
-            itemIdAndQuantity.put(tableware1.getId(), 1);
-            itemIdAndQuantity.put(tableware2.getId(), 1);
 
             for (int j = 0; j < 10; ++j) {
                 var orderSheetDto = OrderSheetDto.builder()
                         .dinnerId(dinner.getId())
                         .styleId(style.getId())
-                        .itemIdAndQuantity(itemIdAndQuantity)
+                        .foodIdAndDifference(itemIdAndQuantity)
                         .build();
 
                 var orderDto = OrderDto.builder()
@@ -299,22 +289,18 @@ public class DataInitiator {
 
         decoration1 = new Decoration();
         decoration1.setName("하트장식");
-        decoration1.setStockQuantity(5);
         decorationRepository.save(decoration1);
 
         decoration2 = new Decoration();
         decoration2.setName("달빛장식");
-        decoration2.setStockQuantity(5);
         decorationRepository.save(decoration2);
 
         tableware1 = new Tableware();
         tableware1.setName("와인잔");
-        tableware1.setStockQuantity(5);
         tablewareRepository.save(tableware1);
 
         tableware2 = new Tableware();
         tableware2.setName("냅킨");
-        tableware2.setStockQuantity(5);
         tablewareRepository.save(tableware2);
 
         food1 = new Food();
@@ -366,7 +352,7 @@ public class DataInitiator {
 
         style = new Style();
         styleRepository.save(style);
-        style.setName("스타일");
+        style.setName("디럭스");
         StyleItem styleItem = new StyleItem();
         styleItemRepository.save(styleItem);
         styleItem.setItem(tableware1);
@@ -376,7 +362,8 @@ public class DataInitiator {
 
         dinner = new Dinner();
         dinnerRepository.save(dinner);
-        dinner.setName("디너");
+        dinner.setName("발렌타인디너");
+
         DinnerItem dinnerItem1 = new DinnerItem();
         dinnerItemRepository.save(dinnerItem1);
         dinnerItem1.setDinner(dinner);
@@ -391,23 +378,18 @@ public class DataInitiator {
 
         dinner.getDinnerItemList().add(dinnerItem1);
         dinner.getDinnerItemList().add(dinnerItem2);
-
+//
         Map<Long, Integer> itemIdAndQuantity = new HashMap<>();
 
         itemIdAndQuantity.put(food1.getId(), 1);
         itemIdAndQuantity.put(food2.getId(), 1);
 
-        itemIdAndQuantity.put(decoration1.getId(), 1);
-        itemIdAndQuantity.put(decoration2.getId(), 1);
-
-        itemIdAndQuantity.put(tableware1.getId(), 1);
-        itemIdAndQuantity.put(tableware2.getId(), 1);
-
+        dinnerRepository.save(dinner);
 
         orderSheetDto = OrderSheetDto.builder()
                 .dinnerId(dinner.getId())
                 .styleId(style.getId())
-                .itemIdAndQuantity(itemIdAndQuantity)
+                .foodIdAndDifference(itemIdAndQuantity)
                 .build();
 
         orderDto = OrderDto.builder()

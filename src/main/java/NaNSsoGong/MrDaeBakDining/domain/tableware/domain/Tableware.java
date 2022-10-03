@@ -14,5 +14,4 @@ import javax.persistence.*;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class Tableware extends Item {
-    private Integer stockQuantity;
 }
