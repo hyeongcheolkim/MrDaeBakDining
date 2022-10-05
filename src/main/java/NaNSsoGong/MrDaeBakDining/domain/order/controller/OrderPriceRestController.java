@@ -12,6 +12,7 @@ import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
+@Tag(name = "order", description = "order기능에 관한 api집합입니다")
 @RestController
 @RequestMapping("/api/order")
 @RequiredArgsConstructor

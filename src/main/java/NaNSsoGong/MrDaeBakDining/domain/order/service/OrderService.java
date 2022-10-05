@@ -25,9 +25,6 @@ public class OrderService {
     private final ClientOrderRepository clientOrderRepository;
     private final GuestOrderRepository guestOrderRepository;
     private final OrderBuilder orderBuilder;
-    private final ClientRepository clientRepository;
-    private final GuestRepository guestRepository;
-    private final OrderSheetRepository orderSheetRepository;
     private final OrderSheetService orderSheetService;
 
     public ClientOrder makeClientOrder(Client client, OrderDto orderDto) {

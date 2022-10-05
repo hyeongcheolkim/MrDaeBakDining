@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 import static NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus.values;
 import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_CLIENT;
 
+@Tag(name = "order", description = "order기능에 관한 api집합입니다")
 @RestController
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
