@@ -20,16 +20,16 @@ public class RecipeService {
     private final IngredientRepository ingredientRepository;
 
     @Transactional
-    public Long makeRecipe(Long foodId, Long ingredientId, Integer ingredientQuantity){
+    public Recipe makeRecipe(Food food, Ingredient ingredient, Integer ingredientQuantity){
         Recipe recipe = new Recipe();
-        Optional<Food> foundFood = foodRepository.findById(foodId);
-        Optional<Ingredient> foundIngredient = ingredientRepository.findById(ingredientId);
-        recipe.setFood(foundFood.get());
-        recipe.setIngredient(foundIngredient.get());
+        recipe.setFood(food);
+        recipe.setIngredient(ingredient);
         recipe.setIngredientQuantity(ingredientQuantity);
         Recipe savedRecipe = recipeRepository.save(recipe);
-        foundFood.get().getRecipeList().add(savedRecipe);
-        foundIngredient.get().getRecipeList().add(savedRecipe);
-        return recipe.getId();
+
+        food.getRecipeList().add(savedRecipe);
+        ingredient.getRecipeList().add(savedRecipe);
+
+        return recipe;
     }
 }

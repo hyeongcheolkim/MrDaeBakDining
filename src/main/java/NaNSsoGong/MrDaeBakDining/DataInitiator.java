@@ -9,8 +9,8 @@ import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.domain.Decoration;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
-import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerItem;
-import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerItemRepository;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerDecoration;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerFood;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.FoodCategory;
@@ -35,8 +35,7 @@ import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.service.RecipeService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
-import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleItem;
-import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleItemRepository;
+import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleTableware;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
@@ -70,8 +69,6 @@ public class DataInitiator {
     private final ChefRepository chefRepository;
     private final ClientRepository clientRepository;
     private final MemberRepository memberRepository;
-    private final DinnerItemRepository dinnerItemRepository;
-    private final StyleItemRepository styleItemRepository;
 
     public Client client1;
     public Client client2;
@@ -186,12 +183,12 @@ public class DataInitiator {
             ingredientRepository.save(ingredient4);
             ingredientRepository.save(ingredient5);
 
-            recipeRepository.findById(recipeService.makeRecipe(food1.getId(), ingredient1.getId(), 1)).get();
-            recipeRepository.findById(recipeService.makeRecipe(food1.getId(), ingredient2.getId(), 2)).get();
-            recipeRepository.findById(recipeService.makeRecipe(food1.getId(), ingredient3.getId(), 1)).get();
-            recipeRepository.findById(recipeService.makeRecipe(food2.getId(), ingredient4.getId(), 1)).get();
-            recipeRepository.findById(recipeService.makeRecipe(food2.getId(), ingredient5.getId(), 1)).get();
-            recipeRepository.findById(recipeService.makeRecipe(food2.getId(), ingredient2.getId(), 1)).get();
+            recipeService.makeRecipe(food1, ingredient1, 1);
+            recipeService.makeRecipe(food1, ingredient2, 2);
+            recipeService.makeRecipe(food1, ingredient3, 1);
+            recipeService.makeRecipe(food2, ingredient4, 1);
+            recipeService.makeRecipe(food2, ingredient5, 1);
+            recipeService.makeRecipe(food2, ingredient2, 1);
 
             var rider = new Rider();
             rider.setName("나배달원" + i);
@@ -203,30 +200,26 @@ public class DataInitiator {
             var style = new Style();
             styleRepository.save(style);
             style.setName("스타일" + i);
-            var styleItem = new StyleItem();
-            styleItemRepository.save(styleItem);
-            styleItem.setItem(tableware1);
+            var styleItem = new StyleTableware();
+            styleItem.setTableware(tableware1);
             styleItem.setStyle(style);
-            styleItem.setItemQuantity(3);
-            style.getStyleItemList().add(styleItem);
+            style.getStyleTablewareList().add(styleItem);
 
             var dinner = new Dinner();
             dinnerRepository.save(dinner);
             dinner.setName("디너" + i);
-            var dinnerItem1 = new DinnerItem();
-            dinnerItemRepository.save(dinnerItem1);
+
+            var dinnerItem1 = new DinnerFood();
             dinnerItem1.setDinner(dinner);
-            dinnerItem1.setItem(food1);
-            dinnerItem1.setItemQuantity(3);
+            dinnerItem1.setFood(food1);
+            dinnerItem1.setFoodQuantity(3);
 
-            var dinnerItem2 = new DinnerItem();
-            dinnerItemRepository.save(dinnerItem2);
+            var dinnerItem2 = new DinnerDecoration();
             dinnerItem2.setDinner(dinner);
-            dinnerItem2.setItem(decoration1);
-            dinnerItem2.setItemQuantity(3);
+            dinnerItem2.setDecoration(decoration1);
 
-            dinner.getDinnerItemList().add(dinnerItem1);
-            dinner.getDinnerItemList().add(dinnerItem2);
+            dinner.getDinnerFoodList().add(dinnerItem1);
+            dinner.getDinnerDecorationList().add(dinnerItem2);
 
             Map<Long, Integer> itemIdAndQuantity = new HashMap<>();
 
@@ -247,8 +240,8 @@ public class DataInitiator {
                         .orderSheetDtoList(List.of(orderSheetDto))
                         .orderStatus(OrderStatus.ORDERED)
                         .build();
-                clientOrder = (ClientOrder) orderRepository.findById(orderService.makeClientOrder(client.getId(), orderDto)).get();
-                guestOrder = (GuestOrder) orderRepository.findById(orderService.makeGuestOrder(guest.getId(), orderDto)).get();
+                clientOrder = orderService.makeClientOrder(client, orderDto);
+                guestOrder = orderService.makeGuestOrder(guest, orderDto);
             }
         }
     }
@@ -336,12 +329,12 @@ public class DataInitiator {
         ingredientRepository.save(ingredient4);
         ingredientRepository.save(ingredient5);
 
-        recipe1 = recipeRepository.findById(recipeService.makeRecipe(food1.getId(), ingredient1.getId(), 1)).get();
-        recipe1 = recipeRepository.findById(recipeService.makeRecipe(food1.getId(), ingredient2.getId(), 2)).get();
-        recipe1 = recipeRepository.findById(recipeService.makeRecipe(food1.getId(), ingredient3.getId(), 1)).get();
-        recipe1 = recipeRepository.findById(recipeService.makeRecipe(food2.getId(), ingredient4.getId(), 1)).get();
-        recipe1 = recipeRepository.findById(recipeService.makeRecipe(food2.getId(), ingredient5.getId(), 1)).get();
-        recipe1 = recipeRepository.findById(recipeService.makeRecipe(food2.getId(), ingredient2.getId(), 1)).get();
+        recipeService.makeRecipe(food1, ingredient1, 1);
+        recipeService.makeRecipe(food1, ingredient2, 2);
+        recipeService.makeRecipe(food1, ingredient3, 1);
+        recipeService.makeRecipe(food2, ingredient4, 1);
+        recipeService.makeRecipe(food2, ingredient5, 1);
+        recipeService.makeRecipe(food2, ingredient2, 1);
 
         rider = new Rider();
         rider.setName("나배달원");
@@ -353,31 +346,26 @@ public class DataInitiator {
         style = new Style();
         styleRepository.save(style);
         style.setName("디럭스");
-        StyleItem styleItem = new StyleItem();
-        styleItemRepository.save(styleItem);
-        styleItem.setItem(tableware1);
-        styleItem.setStyle(style);
-        styleItem.setItemQuantity(3);
-        style.getStyleItemList().add(styleItem);
+        StyleTableware styleTableware = new StyleTableware();
+        styleTableware.setTableware(tableware1);
+        styleTableware.setStyle(style);
+        style.getStyleTablewareList().add(styleTableware);
 
         dinner = new Dinner();
         dinnerRepository.save(dinner);
         dinner.setName("발렌타인디너");
 
-        DinnerItem dinnerItem1 = new DinnerItem();
-        dinnerItemRepository.save(dinnerItem1);
-        dinnerItem1.setDinner(dinner);
-        dinnerItem1.setItem(food1);
-        dinnerItem1.setItemQuantity(3);
+        DinnerFood dinnerFood1 = new DinnerFood();
+        dinnerFood1.setDinner(dinner);
+        dinnerFood1.setFood(food1);
+        dinnerFood1.setFoodQuantity(3);
 
-        DinnerItem dinnerItem2 = new DinnerItem();
-        dinnerItemRepository.save(dinnerItem2);
-        dinnerItem2.setDinner(dinner);
-        dinnerItem2.setItem(decoration1);
-        dinnerItem2.setItemQuantity(3);
+        DinnerDecoration dinnerFood2 = new DinnerDecoration();
+        dinnerFood2.setDinner(dinner);
+        dinnerFood2.setDecoration(decoration1);
 
-        dinner.getDinnerItemList().add(dinnerItem1);
-        dinner.getDinnerItemList().add(dinnerItem2);
+        dinner.getDinnerFoodList().add(dinnerFood1);
+        dinner.getDinnerDecorationList().add(dinnerFood2);
 //
         Map<Long, Integer> itemIdAndQuantity = new HashMap<>();
 
@@ -400,8 +388,8 @@ public class DataInitiator {
                 .build();
 
 
-        clientOrder = (ClientOrder) orderRepository.findById(orderService.makeClientOrder(client1.getId(), orderDto)).get();
-        guestOrder = (GuestOrder) orderRepository.findById(orderService.makeGuestOrder(guest.getId(), orderDto)).get();
+        clientOrder = (ClientOrder) orderService.makeClientOrder(client1, orderDto);
+        guestOrder = (GuestOrder) orderService.makeGuestOrder(guest, orderDto);
     }
 
 

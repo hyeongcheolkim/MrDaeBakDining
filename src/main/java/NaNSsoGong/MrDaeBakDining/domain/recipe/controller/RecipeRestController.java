@@ -1,6 +1,8 @@
 package NaNSsoGong.MrDaeBakDining.domain.recipe.controller;
 
+import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
+import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.request.RecipeCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.request.RecipeUpdateRequest;
@@ -11,7 +13,11 @@ import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.service.RecipeService;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +31,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/recipe")
 @RequiredArgsConstructor
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
 public class RecipeRestController {
     private final RecipeRepository recipeRepository;
     private final RecipeService recipeService;
@@ -34,10 +41,10 @@ public class RecipeRestController {
     @Operation(summary = "레시피단건조회 by recipeId")
     @GetMapping("/{recipeId}")
     public ResponseEntity<RecipeInfoResponse> recipeInfo(@PathVariable(name = "recipeId") Long recipeId) {
-        Optional<Recipe> foundRecipe = recipeRepository.findById(recipeId);
-        if (foundRecipe.isEmpty())
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 레시피입니다");
-        return ResponseEntity.ok().body(new RecipeInfoResponse(foundRecipe.get()));
+        });
+        return ResponseEntity.ok().body(new RecipeInfoResponse(recipe));
     }
 
     @Operation(summary = "레시피 리스트조회")
@@ -50,41 +57,41 @@ public class RecipeRestController {
     @Transactional
     @PostMapping("")
     public ResponseEntity<RecipeCreateResponse> recipeCreate(@RequestBody @Validated RecipeCreateRequest recipeCreateRequest) {
-        Long foodId = recipeCreateRequest.getFoodId();
-        Long ingredientId = recipeCreateRequest.getIngredientId();
-        if (foodRepository.findById(foodId).isEmpty())
+        Food food = foodRepository.findById(recipeCreateRequest.getFoodId()).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 푸드입니다");
-        if (ingredientRepository.findById(ingredientId).isEmpty())
+        });
+        Ingredient ingredient = ingredientRepository.findById(recipeCreateRequest.getIngredientId()).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 재료입니다");
+        });
 
-        Optional<Recipe> foundRecipe = recipeRepository.findByFoodIdAndIngredientId(foodId, ingredientId);
-        if(foundRecipe.isPresent()){
+        Optional<Recipe> foundRecipe = recipeRepository.findByFoodIdAndIngredientId(food.getId(), ingredient.getId());
+        if (foundRecipe.isPresent()) {
             foundRecipe.get().setIngredientQuantity(recipeCreateRequest.getIngredientQuantity());
             return ResponseEntity.ok().body(new RecipeCreateResponse(foundRecipe.get().getId(), true));
         }
 
         Integer ingredientQuantity = recipeCreateRequest.getIngredientQuantity();
-        Long recipeId = recipeService.makeRecipe(foodId, ingredientId, ingredientQuantity);
-        return ResponseEntity.ok().body(new RecipeCreateResponse(recipeId, false));
+        Recipe recipe = recipeService.makeRecipe(food, ingredient, ingredientQuantity);
+        return ResponseEntity.ok().body(new RecipeCreateResponse(recipe.getId(), false));
     }
 
     @Operation(summary = "레시피업데이트")
     @Transactional
     @PutMapping("")
-    public ResponseEntity<RecipeUpdateResponse> recipeUpdate(@RequestBody @Validated RecipeUpdateRequest recipeUpdateRequest){
+    public ResponseEntity<RecipeUpdateResponse> recipeUpdate(@RequestBody @Validated RecipeUpdateRequest recipeUpdateRequest) {
         Long foodId = recipeUpdateRequest.getFoodId();
         Long ingredientId = recipeUpdateRequest.getIngredientId();
         Integer ingredientQuantity = recipeUpdateRequest.getIngredientQuantity();
-        Optional<Recipe> foundRecipe = recipeRepository.findByFoodIdAndIngredientId(foodId, ingredientId);
-        if(foundRecipe.isEmpty())
+        Recipe recipe = recipeRepository.findByFoodIdAndIngredientId(foodId, ingredientId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 레시피입니다");
-        foundRecipe.get().setIngredientQuantity(ingredientQuantity);
-        return ResponseEntity.ok().body(new RecipeUpdateResponse(foundRecipe.get().getId()));
+        });
+        recipe.setIngredientQuantity(ingredientQuantity);
+        return ResponseEntity.ok().body(new RecipeUpdateResponse(recipe.getId()));
     }
 
     @Operation(summary = "레시피삭제", description = "연관되어있는 푸드나 재료는 삭제되지 않습니다")
     @DeleteMapping("/{recipeId}")
-    public ResponseEntity recipeDelete(@PathVariable(name = "recipeId") Long recipeId){
+    public ResponseEntity recipeDelete(@PathVariable(name = "recipeId") Long recipeId) {
         recipeRepository.deleteById(recipeId);
         return ResponseEntity.ok().body("삭제완료");
     }

@@ -20,6 +20,10 @@ public class Dinner {
     @Column(name="dinner_id")
     private Long id;
     private String name;
-    @OneToMany(mappedBy = "dinner")
-    List<DinnerItem> dinnerItemList = new ArrayList<>();
+    @OneToMany(mappedBy = "dinner", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<DinnerFood> dinnerFoodList = new ArrayList<>();
+    @OneToMany(mappedBy = "dinner", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<DinnerDecoration> dinnerDecorationList = new ArrayList<>();
+    @OneToMany(mappedBy = "dinner", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<ExcludedStyle> excludedStyleList = new ArrayList<>();
 }

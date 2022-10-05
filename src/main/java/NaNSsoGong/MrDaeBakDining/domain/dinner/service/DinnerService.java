@@ -3,79 +3,110 @@ package NaNSsoGong.MrDaeBakDining.domain.dinner.service;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.domain.Decoration;
 import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
-import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerItem;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerDecoration;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerFood;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.ExcludedStyle;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.dto.DinnerDto;
-import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerItemRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
-import NaNSsoGong.MrDaeBakDining.domain.item.domain.Item;
-import NaNSsoGong.MrDaeBakDining.domain.item.repository.ItemRepository;
+import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
 public class DinnerService {
     private final DinnerRepository dinnerRepository;
-    private final ItemRepository itemRepository;
-    private final DinnerItemRepository dinnerItemRepository;
+    private final FoodRepository foodRepository;
+    private final DecorationRepository decorationRepository;
+    private final StyleRepository styleRepository;
 
     @Transactional
-    public Long makeDinner(DinnerDto dinnerDto) {
+    public Dinner makeDinner(DinnerDto dinnerDto) {
         Dinner dinner = new Dinner();
         dinnerRepository.save(dinner);
         dinner.setName(dinnerDto.getName());
-        dinner.setDinnerItemList(makeDinnerItemList(dinner, dinnerDto));
-        return dinner.getId();
+
+        List<DinnerFood> dinnerFoodList = makeDinnerFoodList(dinner, dinnerDto);
+        for(var dinnerFood : dinnerFoodList)
+            dinner.getDinnerFoodList().add(dinnerFood);
+
+        List<DinnerDecoration> dinnerDecorationList = makeDinnerDecorationList(dinner, dinnerDto);
+        for(var dinnerDecoration : dinnerDecorationList)
+            dinner.getDinnerDecorationList().add(dinnerDecoration);
+
+        List<ExcludedStyle> excludedStyleList = makeExcludedStyleList(dinner, dinnerDto);
+        for(var excludedStyle : excludedStyleList)
+            dinner.getExcludedStyleList().add(excludedStyle);
+
+        return dinner;
     }
 
-    @Transactional
-    public Map<Long, Integer> toFoodIdAndQuantity(Long dinnerId) {
-        var ret = new ConcurrentHashMap<Long, Integer>();
+    public Map<Food, Integer> toFoodAndQuantity(Long dinnerId) {
+        var ret = new ConcurrentHashMap<Food, Integer>();
         Optional<Dinner> foundDinner = dinnerRepository.findById(dinnerId);
         if (foundDinner.isEmpty())
             return ret;
-        List<DinnerItem> dinnerItemList = foundDinner.get().getDinnerItemList();
-        for (var dinnerItem : dinnerItemList) {
-            Item item = dinnerItem.getItem();
-            if (!(Food.class.isAssignableFrom(Hibernate.getClass(item))))
-                continue;
-            ret.put(item.getId(), dinnerItem.getItemQuantity());
+        List<DinnerFood> dinnerFoodList = foundDinner.get().getDinnerFoodList();
+        for (var dinnerFood : dinnerFoodList) {
+            Food food = dinnerFood.getFood();
+            ret.put(food, dinnerFood.getFoodQuantity());
         }
         return ret;
     }
 
-    public Map<Long, Integer> toDecorationIdAndQuantity(Long dinnerId) {
-        var ret = new ConcurrentHashMap<Long, Integer>();
+    public List<Decoration> toDecorationList(Long dinnerId) {
+        var ret = new ArrayList<Decoration>();
         Optional<Dinner> foundDinner = dinnerRepository.findById(dinnerId);
         if (foundDinner.isEmpty())
             return ret;
-        List<DinnerItem> dinnerItemList = foundDinner.get().getDinnerItemList();
-        for (var dinnerItem : dinnerItemList) {
-            Item item = dinnerItem.getItem();
-            if (!(Decoration.class.isAssignableFrom(Hibernate.getClass(item))))
-                continue;
-            ret.put(item.getId(), dinnerItem.getItemQuantity());
-        }
+        List<DinnerDecoration> dinnerDecorationList = foundDinner.get().getDinnerDecorationList();
+        for (var dinnerDecoration : dinnerDecorationList)
+            ret.add(dinnerDecoration.getDecoration());
         return ret;
     }
 
-    private List<DinnerItem> makeDinnerItemList(Dinner dinner, DinnerDto dinnerDto) {
-        var ret = new ArrayList<DinnerItem>();
-        Map<Long, Integer> itemIdAndQuantity = dinnerDto.getItemIdAndQuantity();
+    private List<DinnerFood> makeDinnerFoodList(Dinner dinner, DinnerDto dinnerDto) {
+        var ret = new ArrayList<DinnerFood>();
+        Map<Long, Integer> itemIdAndQuantity = dinnerDto.getFoodIdAndQuantity();
         for (var itemId : itemIdAndQuantity.keySet()) {
-            DinnerItem dinnerItem = new DinnerItem();
-            dinnerItemRepository.save(dinnerItem);
-            dinnerItem.setDinner(dinner);
-            dinnerItem.setItem(itemRepository.findById(itemId).get());
-            dinnerItem.setItemQuantity(itemIdAndQuantity.get(itemId));
-            ret.add(dinnerItem);
+            DinnerFood dinnerFood = new DinnerFood();
+            dinnerFood.setDinner(dinner);
+            dinnerFood.setFood(foodRepository.findById(itemId).get());
+            dinnerFood.setFoodQuantity(itemIdAndQuantity.get(itemId));
+            ret.add(dinnerFood);
+        }
+        return ret;
+    }
+
+    private List<DinnerDecoration> makeDinnerDecorationList(Dinner dinner, DinnerDto dinnerDto) {
+        var ret = new ArrayList<DinnerDecoration>();
+        List<Long> decorationIdList = dinnerDto.getDecorationIdList();
+        for (var decorationId : decorationIdList) {
+            DinnerDecoration dinnerDecoration = new DinnerDecoration();
+            dinnerDecoration.setDinner(dinner);
+            dinnerDecoration.setDecoration(decorationRepository.findById(decorationId).get());
+            ret.add(dinnerDecoration);
+        }
+        return ret;
+    }
+
+    private List<ExcludedStyle> makeExcludedStyleList(Dinner dinner, DinnerDto dinnerDto){
+        var ret = new ArrayList<ExcludedStyle>();
+        List<Long> excludedStyleIdList = dinnerDto.getExcludedStyleIdList();
+        for(var styleId : excludedStyleIdList){
+            ExcludedStyle excludedStyle = new ExcludedStyle();
+            excludedStyle.setStyle(styleRepository.findById(styleId).get());
+            excludedStyle.setDinner(dinner);
+            ret.add(excludedStyle);
         }
         return ret;
     }

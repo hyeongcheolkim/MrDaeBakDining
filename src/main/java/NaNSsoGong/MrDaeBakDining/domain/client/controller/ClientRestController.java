@@ -41,6 +41,10 @@ public class ClientRestController {
     public ResponseEntity<ClientSignResponse> sign(@RequestBody @Validated ClientSignRequest clientSignRequest) {
         if (!memberService.isLoginIdAvailable(clientSignRequest.getLoginId()))
             throw new SignFailException("아이디가 중복입니다");
+        if (clientSignRequest.getPersonalInformationCollectionAgreement() && clientSignRequest.getAddress() == null)
+            throw new SignFailException("정보제공에 동의했을경우, 주소를 필수로 입력해야 합니다");
+        if (clientSignRequest.getPersonalInformationCollectionAgreement() && clientSignRequest.getCardNumber().isEmpty())
+            throw new SignFailException("정보제공에 동의했을경우, 카드번호를 필수로 입력해야 합니다");
 
         Client client = clientSignRequest.toClient();
         Client savedClient = clientRepository.save(client);
@@ -49,22 +53,22 @@ public class ClientRestController {
 
     @Operation(summary = "회원정보조회 by clientId")
     @GetMapping("/{clientId}")
-    public ResponseEntity<ClientInfoResponse> clientInfoByClientId(@PathVariable(name = "clientId") Long clientId){
-        Optional<Client> foundClient = clientRepository.findById(clientId);
-        if(foundClient.isEmpty())
+    public ResponseEntity<ClientInfoResponse> clientInfoByClientId(@PathVariable(name = "clientId") Long clientId) {
+        Client client = clientRepository.findById(clientId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 클라이언트입니다");
-        return ResponseEntity.ok().body(new ClientInfoResponse(foundClient.get()));
+        });
+        return ResponseEntity.ok().body(new ClientInfoResponse(client));
     }
 
     @Operation(summary = "회원정보조회 by session")
     @GetMapping("")
     public ResponseEntity<ClientInfoResponse> clientInfoByClientSession(
             @Parameter(name = "clientId", hidden = true, allowEmptyValue = true)
-            @SessionAttribute(value = LOGIN_CLIENT) Long clientId){
-        Optional<Client> foundClient = clientRepository.findById(clientId);
-        if(foundClient.isEmpty())
+            @SessionAttribute(value = LOGIN_CLIENT) Long clientId) {
+        Client client = clientRepository.findById(clientId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 클라이언트입니다");
-        return ResponseEntity.ok().body(new ClientInfoResponse(foundClient.get()));
+        });
+        return ResponseEntity.ok().body(new ClientInfoResponse(client));
     }
 
 }

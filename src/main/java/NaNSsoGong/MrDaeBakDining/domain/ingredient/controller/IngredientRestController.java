@@ -10,7 +10,11 @@ import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientReposito
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
 import NaNSsoGong.MrDaeBakDining.error.exception.MinusQuantityException;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,22 +28,23 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/ingredient")
 @RequiredArgsConstructor
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
 public class IngredientRestController {
     private final IngredientService ingredientService;
     private final IngredientRepository ingredientRepository;
 
     @Operation(summary = "재료조회")
     @GetMapping("/{ingredientId}")
-    public ResponseEntity<IngredientInfoResponse> ingredientInfo(@PathVariable(name = "ingredientId") Long ingredientId){
-        Optional<Ingredient> foundIngredient = ingredientRepository.findById(ingredientId);
-        if(foundIngredient.isEmpty())
+    public ResponseEntity<IngredientInfoResponse> ingredientInfo(@PathVariable(name = "ingredientId") Long ingredientId) {
+        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 재료입니다");
-        return ResponseEntity.ok().body(new IngredientInfoResponse(foundIngredient.get()));
+        });
+        return ResponseEntity.ok().body(new IngredientInfoResponse(ingredient));
     }
 
     @Operation(summary = "재료리스트조회")
     @GetMapping("/list")
-    public Page<IngredientInfoResponse> ingredientInfoList(Pageable pageable){
+    public Page<IngredientInfoResponse> ingredientInfoList(Pageable pageable) {
         return ingredientRepository.findAll(pageable).map(IngredientInfoResponse::new);
     }
 
@@ -57,6 +62,7 @@ public class IngredientRestController {
             ingredientUpdate(foundIngredient.get().getId(), ingredientUpdateRequest);
             return ResponseEntity.ok().body(new IngredientCreateResponse(foundIngredient.get().getId(), true));
         }
+
         ingredient.setName(ingredientCreateRequest.getName());
         ingredient.setStockQuantity(ingredientCreateRequest.getStockQuantity());
         Ingredient savedIngredient = ingredientRepository.save(ingredient);
@@ -68,23 +74,23 @@ public class IngredientRestController {
     @PutMapping("/{ingredientId}")
     public ResponseEntity<IngredientUpdateResponse> ingredientUpdate(@PathVariable(name = "ingredientId") Long ingredientId,
                                                                      @RequestBody @Validated IngredientUpdateRequest ingredientUpdateRequest) {
-        Optional<Ingredient> foundIngredient = ingredientRepository.findById(ingredientId);
-        if(foundIngredient.isEmpty())
+        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 재료입니다");
-        Integer newQuantity = foundIngredient.get().getStockQuantity() + ingredientUpdateRequest.getQuantityDiff();
-        if(newQuantity < 0)
+        });
+        Integer newQuantity = ingredient.getStockQuantity() + ingredientUpdateRequest.getQuantityDiff();
+        if (newQuantity < 0)
             throw new MinusQuantityException("재료 수량은 0보다 작을 수 없습니다");
-        foundIngredient.get().setStockQuantity(newQuantity);
-        return ResponseEntity.ok().body(new IngredientUpdateResponse(foundIngredient.get().getId(), foundIngredient.get().getStockQuantity()));
+        ingredient.setStockQuantity(newQuantity);
+        return ResponseEntity.ok().body(new IngredientUpdateResponse(ingredient.getId(), ingredient.getStockQuantity()));
     }
 
     @Operation(summary = "재료삭제", description = "수량을 0으로 만드는게 아닌, DB에서의 완전삭제입니다. 연관되어있는 Recipe도 삭제됩니다")
     @Transactional
     @DeleteMapping("/{ingredientId}")
     public ResponseEntity ingredientDelete(@PathVariable(name = "ingredientId") Long ingredientId) {
-        Optional<Ingredient> foundIngredient = ingredientRepository.findById(ingredientId);
-        if (foundIngredient.isEmpty())
+        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 재료입니다");
+        });
         ingredientRepository.deleteById(ingredientId);
         return ResponseEntity.ok().body("삭제완료");
     }

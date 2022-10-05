@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 public class OrderRequest {
     @NotNull
     private Address address;
+    @NotNull
+    private OrderStatus orderStatus;
     @Nullable
     private LocalDateTime reservedTime;
     private List<OrderSheetRequest> orderSheetRequestList = new ArrayList<>();
@@ -24,7 +26,7 @@ public class OrderRequest {
     public OrderDto toOrderDto(){
         OrderDto ret = OrderDto.builder()
                 .address(this.address)
-                .orderStatus(OrderStatus.ORDERED)
+                .orderStatus(this.orderStatus)
                 .orderSheetDtoList(this.orderSheetRequestList.stream()
                         .map(OrderSheetRequest::toOrderSheetDto)
                         .collect(Collectors.toList()))

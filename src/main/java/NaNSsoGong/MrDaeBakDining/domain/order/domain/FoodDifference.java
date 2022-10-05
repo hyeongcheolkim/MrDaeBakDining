@@ -1,7 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.domain;
 
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
-import NaNSsoGong.MrDaeBakDining.domain.item.domain.Item;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +23,7 @@ public class FoodDifference {
     @JoinColumn(name = "order_sheet_id")
     OrderSheet orderSheet;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "food_id")
     Food food;
     Integer foodQuantity;
 }

@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ClientRepository extends JpaRepository<Client, Long> {
-    public List<Client> findAllByLoginId(String loginId);
-    Page<Client> findAllByEnable(Boolean enable, Pageable pageable);
-    @Query("select distinct c from Client c join fetch c.clientOrderList")
-    Optional<Client> findByIdWithOrderList(Long Id);
+    @Query("select c.id from Client c")
+    List<Long> clientIdList();
 }

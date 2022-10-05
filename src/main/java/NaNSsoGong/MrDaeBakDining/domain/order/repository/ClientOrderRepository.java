@@ -1,6 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.repository;
 
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.ClientOrder;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -15,5 +16,7 @@ public interface ClientOrderRepository extends JpaRepository<ClientOrder, Long> 
     @Query("select distinct co from ClientOrder co " +
             "where co.client.id = (:clientId)")
 //    @EntityGraph(attributePaths = {"rider", "client"})
-    Page<ClientOrder> findAllByClientId(@Param(value = "clientId")Long clientId, Pageable pageable);
+    Page<ClientOrder> findAllByClientId(@Param(value = "clientId") Long clientId, Pageable pageable);
+
+    Long countByClientIdAndOrderStatus(Long clientId, OrderStatus orderStatus);
 }

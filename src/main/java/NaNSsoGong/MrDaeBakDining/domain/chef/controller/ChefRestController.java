@@ -9,8 +9,12 @@ import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
 import NaNSsoGong.MrDaeBakDining.domain.session.SessionConst;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.error.exception.SignFailException;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +31,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_CLIENT
 @RequestMapping("/api/chef")
 @RequiredArgsConstructor
 @Slf4j
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
 public class ChefRestController {
     private final ChefRepository chefRepository;
     private final MemberService memberService;
@@ -46,10 +51,11 @@ public class ChefRestController {
     @Operation(summary = "회원정보조회 by chefId")
     @GetMapping("/{chefId}")
     public ResponseEntity<ChefInfoResponse> chefInfoByChefId(@PathVariable(name = "chefId") Long chefId) {
-        Optional<Chef> foundChef = chefRepository.findById(chefId);
-        if (foundChef.isEmpty())
+        Chef chef = chefRepository.findById(chefId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 chef입니다");
-        return ResponseEntity.ok().body(new ChefInfoResponse(foundChef.get()));
+        });
+
+        return ResponseEntity.ok().body(new ChefInfoResponse(chef));
     }
 
     @Operation(summary = "회원정보조회 by session")
@@ -57,9 +63,9 @@ public class ChefRestController {
     public ResponseEntity<ChefInfoResponse> chefInfoByChefSession(
             @Parameter(name = "chefId", hidden = true, allowEmptyValue = true)
             @SessionAttribute(value = LOGIN_CHEF) Long chefId) {
-        Optional<Chef> foundChef = chefRepository.findById(chefId);
-        if (foundChef.isEmpty())
+        Chef chef = chefRepository.findById(chefId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 chef입니다");
-        return ResponseEntity.ok().body(new ChefInfoResponse(foundChef.get()));
+        });
+        return ResponseEntity.ok().body(new ChefInfoResponse(chef));
     }
 }

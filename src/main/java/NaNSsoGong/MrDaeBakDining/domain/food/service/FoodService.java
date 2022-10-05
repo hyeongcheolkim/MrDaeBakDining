@@ -19,11 +19,8 @@ public class FoodService {
     private final FoodRepository foodRepository;
     private final IngredientRepository ingredientRepository;
 
-    public Boolean isMakeAble(Long foodId){
-        Optional<Food> foundFood = foodRepository.findById(foodId);
-        if(foundFood.isEmpty())
-            return false;
-        List<Recipe> recipeList = foundFood.get().getRecipeList();
+    public Boolean isMakeAble(Food food){
+        List<Recipe> recipeList = food.getRecipeList();
         for(var recipe : recipeList){
             Ingredient ingredient = recipe.getIngredient();
             Integer ingredientQuantity = recipe.getIngredientQuantity();
@@ -34,14 +31,12 @@ public class FoodService {
     }
 
     @Transactional
-    public void makeFood(Long foodId){
-        Optional<Food> foundFood = foodRepository.findById(foodId);
-        List<Recipe> recipeList = foundFood.get().getRecipeList();
+    public void makeFood(Food food){
+        List<Recipe> recipeList = food.getRecipeList();
         for(var recipe : recipeList){
             Ingredient ingredient = recipe.getIngredient();
             Integer ingredientQuantity = recipe.getIngredientQuantity();
-            Optional<Ingredient> foundIngredient = ingredientRepository.findById(ingredient.getId());
-            foundIngredient.get().setStockQuantity(foundIngredient.get().getStockQuantity() - ingredientQuantity);
+            ingredient.setStockQuantity(ingredient.getStockQuantity() - ingredientQuantity);
         }
     }
 }

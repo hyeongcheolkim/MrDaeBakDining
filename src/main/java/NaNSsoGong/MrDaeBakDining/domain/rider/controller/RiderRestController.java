@@ -9,8 +9,12 @@ import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.session.SessionConst;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.error.exception.SignFailException;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.*;
 @RestController
 @RequestMapping("/api/rider")
 @RequiredArgsConstructor
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
 public class RiderRestController {
     private final RiderRepository riderRepository;
     private final MemberService memberService;
@@ -43,10 +48,10 @@ public class RiderRestController {
     @Operation(summary = "회원정보조회 by riderId")
     @GetMapping("/{riderId}")
     public ResponseEntity<RiderInfoResponse> riderInfoByRiderId(@PathVariable(name = "riderId") Long riderId) {
-        Optional<Rider> foundRider = riderRepository.findById(riderId);
-        if (foundRider.isEmpty())
+        Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 rider입니다");
-        return ResponseEntity.ok().body(new RiderInfoResponse(foundRider.get()));
+        });
+        return ResponseEntity.ok().body(new RiderInfoResponse(rider));
     }
 
     @Operation(summary = "회원정보조회 by session")
@@ -54,9 +59,9 @@ public class RiderRestController {
     public ResponseEntity<RiderInfoResponse> riderInfoByRiderSession(
             @Parameter(name = "riderId", hidden = true, allowEmptyValue = true)
             @SessionAttribute(value = LOGIN_RIDER) Long riderId) {
-        Optional<Rider> foundRider = riderRepository.findById(riderId);
-        if (foundRider.isEmpty())
+        Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 rider입니다");
-        return ResponseEntity.ok().body(new RiderInfoResponse(foundRider.get()));
+        });
+        return ResponseEntity.ok().body(new RiderInfoResponse(rider));
     }
 }

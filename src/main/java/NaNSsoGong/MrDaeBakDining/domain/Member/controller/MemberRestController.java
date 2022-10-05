@@ -44,16 +44,16 @@ public class MemberRestController {
     @Operation(summary = "로그인", description = "세션이 필요 없습니다")
     @PostMapping("/login")
     public ResponseEntity<MemberLoginResponse> login(@RequestBody @Validated final MemberLoginRequest memberLoginRequest, HttpServletRequest request) {
-        Optional<Long> id = memberService.login(memberLoginRequest.getLoginId(), memberLoginRequest.getPassword());
+        Optional<Member> member = memberService.login(memberLoginRequest.getLoginId(), memberLoginRequest.getPassword());
 
-        if (id.isEmpty()) {
+        if (member.isEmpty()) {
             if (memberService.isLoginIdAvailable(memberLoginRequest.getLoginId()))
                 throw new LoginFailException("존재하지 않는 아이디입니다");
             else
                 throw new LoginFailException("비밀번호가 틀렸습니다");
         }
 
-        Member foundMember = memberRepository.findById(id.get()).get();
+        Member foundMember = member.get();
         MemberLoginResponse memberLoginResponse = new MemberLoginResponse();
         HttpSession session = request.getSession(true);
         session.setMaxInactiveInterval(1800);

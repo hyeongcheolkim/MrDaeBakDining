@@ -4,4 +4,5 @@ public enum ClientGrade {
     BRONZE,
     GOLD,
     DIAMOND,
+    CHALLENGER,
 }

@@ -28,11 +28,11 @@ public class Order {
     @Embedded
     private Address address;
     private LocalDateTime orderTime;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Rider rider;
-    @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
     @OneToMany(mappedBy = "order")
     List<OrderSheet> orderSheetList = new ArrayList<>();
 }

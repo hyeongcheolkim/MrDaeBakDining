@@ -9,6 +9,4 @@ import javax.validation.constraints.NotNull;
 public class ChangeRiderRequest {
     @NotNull
     private Long orderId;
-    @NotNull
-    private Long riderId;
 }

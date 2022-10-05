@@ -21,11 +21,11 @@ public class MemberService {
         return true;
     }
 
-    public Optional<Long> login(String loginId, String password) {
+    public Optional<Member> login(String loginId, String password) {
         List<Member> memberList = memberRepository.findAllByLoginId(loginId);
         for (var member : memberList)
             if (member.getEnable() && member.getPassword().equals(password))
-                return Optional.of(member.getId());
+                return Optional.of(member);
         return Optional.empty();
     }
 }

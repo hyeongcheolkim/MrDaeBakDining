@@ -15,6 +15,7 @@ import java.util.List;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class Client extends Member {
+    private Boolean personalInformationCollectionAgreement;
     private String cardNumber;
     @Enumerated(EnumType.STRING)
     private ClientGrade clientGrade;
