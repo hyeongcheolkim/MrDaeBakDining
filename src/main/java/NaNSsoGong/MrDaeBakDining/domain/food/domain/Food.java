@@ -22,7 +22,7 @@ public class Food{
     private Long id;
     private String name;
     private Integer sellPrice;
-    private Boolean enable;
+    private Boolean enable = true;
     private Boolean orderable;
     @Enumerated(EnumType.STRING)
     private FoodCategory foodCategory;

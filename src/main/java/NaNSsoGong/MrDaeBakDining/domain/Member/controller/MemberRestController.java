@@ -88,7 +88,7 @@ public class MemberRestController {
 
     @Operation(summary = "회원탈퇴", description = "member.enable를 false로 바꿉니다, 정보가 삭제되는 것은 아닙니다")
     @Transactional
-    @PutMapping("/signout")
+    @PatchMapping("/signout")
     public ResponseEntity<String> signout(@Parameter(name = "clientId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_CLIENT, required = false) Long clientId,
                                   @Parameter(name = "chefId", hidden = true, allowEmptyValue = true)@SessionAttribute(name = LOGIN_CHEF, required = false) Long chefId,
                                   @Parameter(name = "riderId", hidden = true, allowEmptyValue = true)@SessionAttribute(name = LOGIN_RIDER, required = false) Long riderId,

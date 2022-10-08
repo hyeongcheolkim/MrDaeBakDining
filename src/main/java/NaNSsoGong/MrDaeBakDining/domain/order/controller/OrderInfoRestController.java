@@ -132,9 +132,7 @@ public class OrderInfoRestController {
         List<Long> orderSheetIdList = clientOrder.getOrderSheetList().stream()
                 .map(OrderSheet::getId)
                 .collect(Collectors.toList());
-        log.info("clientOrderSheetIdList = {}", orderSheetIdList);
         List<OrderSheet> orderSheetList = orderSheetRepository.findAllByIdIn(orderSheetIdList);
-        log.info("orderSheetList = {}", orderSheetList.size());
         return new ClientOrderInfoResponse(clientOrder, orderSheetList);
     }
 
@@ -142,7 +140,6 @@ public class OrderInfoRestController {
         List<Long> orderSheetIdList = guestOrder.getOrderSheetList().stream()
                 .map(OrderSheet::getId)
                 .collect(Collectors.toList());
-        log.info("guestOrderSheetIdList = {}", orderSheetIdList);
         List<OrderSheet> orderSheetList = orderSheetRepository.findAllByIdIn(orderSheetIdList);
         return new GuestOrderInfoResponse(guestOrder, orderSheetList);
     }

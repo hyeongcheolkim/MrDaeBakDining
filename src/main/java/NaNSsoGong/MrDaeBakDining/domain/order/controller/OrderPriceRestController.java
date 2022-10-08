@@ -9,6 +9,7 @@ import NaNSsoGong.MrDaeBakDining.domain.order.service.OrderService;
 import NaNSsoGong.MrDaeBakDining.domain.order.service.OrderSheetService;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,6 +36,7 @@ public class OrderPriceRestController {
     private final OrderSheetRepository orderSheetRepository;
     private final OrderRepository orderRepository;
 
+    @Operation(summary = "오더시트의 할인전 가격을 반환합니다")
     @GetMapping("/sheet/{orderSheetId}")
     public ResponseEntity<OrderSheetPriceBeforeSaleResponse> orderSheetPriceBeforeSale(@PathVariable(name = "orderSheetId") Long orderSheetId) {
         OrderSheet orderSheet = orderSheetRepository.findById(orderSheetId).orElseThrow(() -> {

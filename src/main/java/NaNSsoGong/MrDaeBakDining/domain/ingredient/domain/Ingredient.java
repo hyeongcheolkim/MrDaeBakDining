@@ -20,9 +20,11 @@ public class Ingredient {
     @GeneratedValue
     @Column(name = "ingredient_id")
     private Long id;
+    @Column(unique = true)
     private String name;
+    private Boolean enable = true;
     private Integer stockQuantity;
-    @OneToMany(mappedBy = "ingredient", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "ingredient")
     private List<Recipe> recipeList = new ArrayList<>();
 
     private void setRecipeList(){}

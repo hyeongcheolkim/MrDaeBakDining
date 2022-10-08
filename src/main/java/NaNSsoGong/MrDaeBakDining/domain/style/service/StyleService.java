@@ -8,6 +8,7 @@ import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,26 +16,30 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class StyleService {
     private final StyleRepository styleRepository;
     private final TablewareRepository tablewareRepository;
 
     public Style makeStyle(StyleDto styleDto) {
-        Style style = new Style();
+        Style style = styleRepository.findByName(styleDto.getName()).orElseGet(Style::new);
+
         styleRepository.save(style);
         style.setName(styleDto.getName());
+        style.setSellPrice(styleDto.getSellPrice());
+
+        style.setEnable(true);
+        style.setOrderable(true);
+
         List<StyleTableware> styleTablewareList = makeStyleItemList(style, styleDto);
-        for (var styleItem : styleTablewareList)
-            style.getStyleTablewareList().add(styleItem);
+        for (var styleTableware : styleTablewareList)
+            style.getStyleTablewareList().add(styleTableware);
         return style;
     }
 
-    public List<Tableware> toTablewareList(Long styleId) {
+    public List<Tableware> toTablewareList(Style style) {
         var ret = new ArrayList<Tableware>();
-        Optional<Style> foundStyle = styleRepository.findById(styleId);
-        if (foundStyle.isEmpty())
-            return ret;
-        List<StyleTableware> styleTablewareList = foundStyle.get().getStyleTablewareList();
+        List<StyleTableware> styleTablewareList = style.getStyleTablewareList();
         for (var styleTableware : styleTablewareList)
             ret.add(styleTableware.getTableware());
         return ret;

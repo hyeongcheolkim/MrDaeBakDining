@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.DISABLE_COMPLETE;
+
 @RestController
 @RequestMapping("/api/ingredient")
 @RequiredArgsConstructor
@@ -42,27 +44,33 @@ public class IngredientRestController {
         return ResponseEntity.ok().body(new IngredientInfoResponse(ingredient));
     }
 
-    @Operation(summary = "재료리스트조회")
+    @Operation(summary = "재료리스트조회", description = "enable = true만 조회합니다")
     @GetMapping("/list")
     public Page<IngredientInfoResponse> ingredientInfoList(Pageable pageable) {
-        return ingredientRepository.findAll(pageable).map(IngredientInfoResponse::new);
+        return ingredientRepository
+                .findAllByEnable(true, pageable)
+                .map(IngredientInfoResponse::new);
     }
 
     @Operation(summary = "새로운 재료생성", description = "기존에 존재하던 재료와 이름이 같다면, 그 재료에 수량을 더합니다. 이경우 update=true입니다")
     @Transactional
     @PostMapping("")
     public ResponseEntity<IngredientCreateResponse> ingredientCreate(@RequestBody @Validated IngredientCreateRequest ingredientCreateRequest) {
-        Ingredient ingredient = new Ingredient();
         Optional<Ingredient> foundIngredient = ingredientRepository.findByName(ingredientCreateRequest.getName());
 
-        IngredientUpdateRequest ingredientUpdateRequest = new IngredientUpdateRequest();
-        ingredientUpdateRequest.setQuantityDiff(ingredientCreateRequest.getStockQuantity());
-
-        if (foundIngredient.isPresent()) {
+        Ingredient ingredient;
+        if (foundIngredient.isPresent() && foundIngredient.get().getEnable()) {
+            IngredientUpdateRequest ingredientUpdateRequest = new IngredientUpdateRequest();
+            ingredientUpdateRequest.setQuantityDiff(ingredientCreateRequest.getStockQuantity());
             ingredientUpdate(foundIngredient.get().getId(), ingredientUpdateRequest);
             return ResponseEntity.ok().body(new IngredientCreateResponse(foundIngredient.get().getId(), true));
         }
+        else if(foundIngredient.isPresent() && !foundIngredient.get().getEnable())
+            ingredient = foundIngredient.get();
+        else
+            ingredient = new Ingredient();
 
+        ingredient.setEnable(true);
         ingredient.setName(ingredientCreateRequest.getName());
         ingredient.setStockQuantity(ingredientCreateRequest.getStockQuantity());
         Ingredient savedIngredient = ingredientRepository.save(ingredient);
@@ -71,7 +79,7 @@ public class IngredientRestController {
 
     @Operation(summary = "수량 증감", description = "재고량을 0미만으로 만들 수 없다면 요청은 무시되고, Exception이 발생합니다")
     @Transactional
-    @PutMapping("/{ingredientId}")
+    @PatchMapping("/{ingredientId}")
     public ResponseEntity<IngredientUpdateResponse> ingredientUpdate(@PathVariable(name = "ingredientId") Long ingredientId,
                                                                      @RequestBody @Validated IngredientUpdateRequest ingredientUpdateRequest) {
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
@@ -84,14 +92,13 @@ public class IngredientRestController {
         return ResponseEntity.ok().body(new IngredientUpdateResponse(ingredient.getId(), ingredient.getStockQuantity()));
     }
 
-    @Operation(summary = "재료삭제", description = "수량을 0으로 만드는게 아닌, DB에서의 완전삭제입니다. 연관되어있는 Recipe도 삭제됩니다")
-    @Transactional
-    @DeleteMapping("/{ingredientId}")
-    public ResponseEntity ingredientDelete(@PathVariable(name = "ingredientId") Long ingredientId) {
+    @Operation(summary = "재료 비활성화", description = "enable = false")
+    @PatchMapping("/disable/{ingredientId}")
+    public ResponseEntity<String> ingredientDisable(@PathVariable(value = "ingredientId") Long ingredientId){
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 재료입니다");
         });
-        ingredientRepository.deleteById(ingredientId);
-        return ResponseEntity.ok().body("삭제완료");
+        ingredient.setEnable(false);
+        return ResponseEntity.ok().body(DISABLE_COMPLETE);
     }
 }

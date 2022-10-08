@@ -11,4 +11,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface DinnerRepository extends JpaRepository<Dinner, Long> {
+    Optional<Dinner> findByName(String name);
+    Page<Dinner> findAllByEnable(Boolean enable, Pageable pageable);
 }

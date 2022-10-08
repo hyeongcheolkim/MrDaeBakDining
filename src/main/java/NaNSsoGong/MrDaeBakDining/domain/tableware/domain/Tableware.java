@@ -20,5 +20,7 @@ public class Tableware {
     @GeneratedValue
     @Column(name = "tableware_id")
     private Long id;
+    @Column(unique = true)
     private String name;
+    private Boolean enable;
 }

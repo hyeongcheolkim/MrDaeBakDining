@@ -2,6 +2,8 @@ package NaNSsoGong.MrDaeBakDining.domain.order.controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
 import NaNSsoGong.MrDaeBakDining.domain.guest.repository.GuestRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.request.*;
@@ -13,6 +15,9 @@ import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderSheetRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.service.OrderService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
+import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
+import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
+import NaNSsoGong.MrDaeBakDining.error.exception.BusinessException;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoProperOrderStatusException;
 import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
@@ -49,6 +54,8 @@ public class OrderRestController {
     private final GuestRepository guestRepository;
     private final ClientRepository clientRepository;
     private final RiderRepository riderRepository;
+    private final DinnerRepository dinnerRepository;
+    private final StyleRepository styleRepository;
 
     @Operation(summary = "클라이언트 주문", description = "클라이언트 세션이 필요합니다")
     @PostMapping("/client")
@@ -91,7 +98,7 @@ public class OrderRestController {
 
     @Operation(summary = "주문상태 변경")
     @Transactional
-    @PutMapping("/status")
+    @PatchMapping("/status")
     public ResponseEntity changeOrderStatus(@RequestBody @Validated ChangeOrderStatusRequest changeOrderStatusRequest) {
         Long orderId = changeOrderStatusRequest.getOrderId();
         OrderStatus orderStatus = changeOrderStatusRequest.getOrderStatus();
@@ -105,7 +112,7 @@ public class OrderRestController {
 
     @Operation(summary = "라이더 변경 by riderId", description = "변경기능이지만, 배정 기능처럼 사용할 수 있습니다")
     @Transactional
-    @PutMapping("/rider/{riderId}")
+    @PatchMapping("/rider/{riderId}")
     public ResponseEntity changeRiderByRiderId(@PathVariable(value = "riderId") Long riderId,
                                                @RequestBody @Validated ChangeRiderRequest changeRiderRequest) {
         Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
@@ -121,7 +128,7 @@ public class OrderRestController {
 
     @Operation(summary = "라이더 변경 by Session", description = "변경기능이지만, 배정 기능처럼 사용할 수 있습니다")
     @Transactional
-    @PutMapping("/rider")
+    @PatchMapping("/rider")
     public ResponseEntity changeRiderBySession(@Parameter(name = "riderId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_RIDER) Long riderId,
                                                @RequestBody @Validated ChangeRiderRequest changeRiderRequest) {
         Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
@@ -153,5 +160,17 @@ public class OrderRestController {
             throw new NoProperOrderStatusException("OrderStatus가 주문이거나 예약이어야 합니다");
         if (orderRequest.getOrderStatus() == RESERVED && orderRequest.getReservedTime() == null)
             throw new NoProperOrderStatusException("OrderStatus가 RESERVED이면, reservedTime이 null일 수 없습니다");
+        for (var orderSheet : orderRequest.getOrderSheetRequestList()) {
+            Dinner dinner = dinnerRepository.findById(orderSheet.getDinnerId()).orElseThrow(() -> {
+                throw new NoExistEntityException("존재하지 않는 디너입니다");
+            });
+            Style style = styleRepository.findById(orderSheet.getStyleId()).orElseThrow(() -> {
+                throw new NoExistEntityException("존재하지 않는 스타일입니다");
+            });
+            if (dinner.getExcludedStyleList().contains(style))
+                throw new BusinessException(String.format(
+                        "dinnerId:%d에서 styleId:%d를 고를 수 없습니다", dinner.getId(), style.getId()
+                ));
+        }
     }
 }

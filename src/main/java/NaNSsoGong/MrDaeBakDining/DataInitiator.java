@@ -6,11 +6,9 @@ import NaNSsoGong.MrDaeBakDining.domain.chef.repository.ChefRepository;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.ClientGrade;
 import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
-import NaNSsoGong.MrDaeBakDining.domain.decoration.domain.Decoration;
-import NaNSsoGong.MrDaeBakDining.domain.decoration.repository.DecorationRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
-import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerDecoration;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerFood;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.ExcludedStyle;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.FoodCategory;
@@ -60,7 +58,6 @@ public class DataInitiator {
     private final IngredientRepository ingredientRepository;
     private final OrderService orderService;
     private final OrderRepository orderRepository;
-    private final DecorationRepository decorationRepository;
     private final TablewareRepository tablewareRepository;
     private final GuestOrderRepository guestOrderRepository;
     private final DinnerRepository dinnerRepository;
@@ -75,9 +72,6 @@ public class DataInitiator {
 
     public Food food1;
     public Food food2;
-
-    public Decoration decoration1;
-    public Decoration decoration2;
 
     public Tableware tableware1;
     public Tableware tableware2;
@@ -100,7 +94,9 @@ public class DataInitiator {
     public Chef chef;
 
     public Dinner dinner;
-    public Style style;
+
+    public Style style1;
+    public Style style2;
 
     public OrderSheetDto orderSheetDto;
 
@@ -133,14 +129,6 @@ public class DataInitiator {
             chef.setLoginId("ChefId1234" + i);
             chef.setPassword("!Chef12341234" + i);
             chefRepository.save(chef);
-
-            var decoration1 = new Decoration();
-            decoration1.setName("하트장식" + i);
-            decorationRepository.save(decoration1);
-
-            var decoration2 = new Decoration();
-            decoration2.setName("달빛장식" + i);
-            decorationRepository.save(decoration2);
 
             var tableware1 = new Tableware();
             tableware1.setName("와인잔" + i);
@@ -214,12 +202,8 @@ public class DataInitiator {
             dinnerItem1.setFood(food1);
             dinnerItem1.setFoodQuantity(3);
 
-            var dinnerItem2 = new DinnerDecoration();
-            dinnerItem2.setDinner(dinner);
-            dinnerItem2.setDecoration(decoration1);
 
             dinner.getDinnerFoodList().add(dinnerItem1);
-            dinner.getDinnerDecorationList().add(dinnerItem2);
 
             Map<Long, Integer> itemIdAndQuantity = new HashMap<>();
 
@@ -280,14 +264,6 @@ public class DataInitiator {
         chef.setPassword("!Chef12341234");
         chefRepository.save(chef);
 
-        decoration1 = new Decoration();
-        decoration1.setName("하트장식");
-        decorationRepository.save(decoration1);
-
-        decoration2 = new Decoration();
-        decoration2.setName("달빛장식");
-        decorationRepository.save(decoration2);
-
         tableware1 = new Tableware();
         tableware1.setName("와인잔");
         tablewareRepository.save(tableware1);
@@ -343,29 +319,44 @@ public class DataInitiator {
         rider.setPassword("!Rider12341234");
         memberRepository.save(rider);
 
-        style = new Style();
-        styleRepository.save(style);
-        style.setName("디럭스");
+        style1 = new Style();
+        styleRepository.save(style1);
+        style1.setName("디럭스");
+        style1.setEnable(true);
+        style1.setOrderable(true);
+        style1.setSellPrice(5000);
+
+        style2 = new Style();
+        styleRepository.save(style2);
+        style2.setName("그랜드");
+        style2.setEnable(true);
+        style2.setOrderable(true);
+        style2.setSellPrice(15000);
+
         StyleTableware styleTableware = new StyleTableware();
         styleTableware.setTableware(tableware1);
-        styleTableware.setStyle(style);
-        style.getStyleTablewareList().add(styleTableware);
+        styleTableware.setStyle(style1);
+        style1.getStyleTablewareList().add(styleTableware);
 
         dinner = new Dinner();
         dinnerRepository.save(dinner);
         dinner.setName("발렌타인디너");
+        dinner.setDescription("발렌타인 장식과 같이 제공됩니다");
+        dinner.setEnable(true);
+        dinner.setOrderable(true);
+
+        ExcludedStyle excludedStyle = new ExcludedStyle();
+        excludedStyle.setStyle(style2);
+        excludedStyle.setDinner(dinner);
+
+        dinner.getExcludedStyleList().add(excludedStyle);
 
         DinnerFood dinnerFood1 = new DinnerFood();
         dinnerFood1.setDinner(dinner);
         dinnerFood1.setFood(food1);
         dinnerFood1.setFoodQuantity(3);
 
-        DinnerDecoration dinnerFood2 = new DinnerDecoration();
-        dinnerFood2.setDinner(dinner);
-        dinnerFood2.setDecoration(decoration1);
-
         dinner.getDinnerFoodList().add(dinnerFood1);
-        dinner.getDinnerDecorationList().add(dinnerFood2);
 //
         Map<Long, Integer> itemIdAndQuantity = new HashMap<>();
 
@@ -376,7 +367,7 @@ public class DataInitiator {
 
         orderSheetDto = OrderSheetDto.builder()
                 .dinnerId(dinner.getId())
-                .styleId(style.getId())
+                .styleId(style1.getId())
                 .foodIdAndDifference(itemIdAndQuantity)
                 .build();
 

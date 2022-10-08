@@ -19,9 +19,11 @@ public class Style {
     @GeneratedValue
     @Column(name="style_id")
     private Long id;
+    @Column(unique = true)
     private String name;
+    private Integer sellPrice;
+    private Boolean enable = true;
     private Boolean orderable;
-    private Boolean enable;
     @OneToMany(mappedBy = "style", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StyleTableware> styleTablewareList = new ArrayList<>();
 }

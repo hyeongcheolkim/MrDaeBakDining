@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +33,15 @@ public class FoodService {
     }
 
     @Transactional
-    public void makeFood(Food food){
+    public Map<Ingredient, Integer> makeFood(Food food){
+        var ret = new ConcurrentHashMap<Ingredient, Integer>();
         List<Recipe> recipeList = food.getRecipeList();
         for(var recipe : recipeList){
             Ingredient ingredient = recipe.getIngredient();
             Integer ingredientQuantity = recipe.getIngredientQuantity();
             ingredient.setStockQuantity(ingredient.getStockQuantity() - ingredientQuantity);
+            ret.put(ingredient, ingredientQuantity);
         }
+        return ret;
     }
 }
