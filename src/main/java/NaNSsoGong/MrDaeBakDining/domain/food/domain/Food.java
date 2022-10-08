@@ -1,5 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.food.domain;
 
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerFood;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -28,4 +29,6 @@ public class Food{
     private FoodCategory foodCategory;
     @OneToMany(mappedBy = "food")
     List<Recipe> recipeList = new ArrayList<>();
+    @OneToMany(mappedBy = "food")
+    List<DinnerFood> dinnerFoodList = new ArrayList<>();
 }

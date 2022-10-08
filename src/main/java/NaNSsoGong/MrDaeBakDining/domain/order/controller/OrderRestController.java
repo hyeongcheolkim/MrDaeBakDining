@@ -20,7 +20,7 @@ import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import NaNSsoGong.MrDaeBakDining.error.exception.BusinessException;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoProperOrderStatusException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -46,7 +46,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_RIDER;
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
 @Slf4j
-@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class OrderRestController {
     private final OrderService orderService;
     private final OrderSheetRepository orderSheetRepository;

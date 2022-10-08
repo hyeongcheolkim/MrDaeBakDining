@@ -1,19 +1,19 @@
 package NaNSsoGong.MrDaeBakDining.domain.food.service;
 
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
-import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,5 +43,11 @@ public class FoodService {
             ret.put(ingredient, ingredientQuantity);
         }
         return ret;
+    }
+
+    public Boolean isFoodNameExist(String name) {
+        return foodRepository.findAllByName(name).stream()
+                .map(Food::getEnable)
+                .anyMatch(e -> e == true);
     }
 }

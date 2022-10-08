@@ -11,7 +11,7 @@ import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoLoginMemberException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,7 +36,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
 @Slf4j
-@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class MemberRestController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
@@ -47,7 +47,7 @@ public class MemberRestController {
         Optional<Member> member = memberService.login(memberLoginRequest.getLoginId(), memberLoginRequest.getPassword());
 
         if (member.isEmpty()) {
-            if (memberService.isLoginIdAvailable(memberLoginRequest.getLoginId()))
+            if (memberService.isLoginIdExist(memberLoginRequest.getLoginId()))
                 throw new LoginFailException("존재하지 않는 아이디입니다");
             else
                 throw new LoginFailException("비밀번호가 틀렸습니다");
@@ -111,7 +111,7 @@ public class MemberRestController {
     @Operation(summary = "아이디 중복체크")
     @GetMapping("/valid-id")
     public ResponseEntity<Boolean> isLoginIdAvailable(@RequestParam String loginId){
-        Boolean loginIdAvailable = memberService.isLoginIdAvailable(loginId);
+        Boolean loginIdAvailable = memberService.isLoginIdExist(loginId);
         return ResponseEntity.ok().body(loginIdAvailable);
     }
 }

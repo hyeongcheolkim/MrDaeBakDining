@@ -29,12 +29,10 @@ public class DinnerInfoResponse {
         this.dinnerOrderable = dinner.getOrderable();
 
         this.dinnerFoodInfoResponseList = dinner.getDinnerFoodList().stream()
-                .filter(e -> e.getFood().getEnable())
                 .map(DinnerFoodInfoResponse::new)
                 .collect(Collectors.toList());
 
         this.excludedStyleInfoResponseList = dinner.getExcludedStyleList().stream()
-                .filter(e->e.getStyle().getEnable())
                 .map(ExcludedStyleInfoResponse::new)
                 .collect(Collectors.toList());
     }

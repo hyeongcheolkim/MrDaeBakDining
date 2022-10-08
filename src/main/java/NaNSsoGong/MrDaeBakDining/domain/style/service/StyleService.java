@@ -22,7 +22,7 @@ public class StyleService {
     private final TablewareRepository tablewareRepository;
 
     public Style makeStyle(StyleDto styleDto) {
-        Style style = styleRepository.findByName(styleDto.getName()).orElseGet(Style::new);
+        Style style = new Style();
 
         styleRepository.save(style);
         style.setName(styleDto.getName());
@@ -43,6 +43,12 @@ public class StyleService {
         for (var styleTableware : styleTablewareList)
             ret.add(styleTableware.getTableware());
         return ret;
+    }
+
+    public Boolean isStyleNameExist(String name) {
+        return styleRepository.findAllByName(name).stream()
+                .map(Style::getEnable)
+                .anyMatch(e -> e == true);
     }
 
     private List<StyleTableware> makeStyleItemList(Style style, StyleDto styleDto) {

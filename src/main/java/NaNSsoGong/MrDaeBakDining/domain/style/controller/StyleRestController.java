@@ -1,30 +1,25 @@
 package NaNSsoGong.MrDaeBakDining.domain.style.controller;
 
-import NaNSsoGong.MrDaeBakDining.domain.ResponseConst;
 import NaNSsoGong.MrDaeBakDining.domain.style.controller.request.StyleCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.style.controller.response.StyleCreateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.style.controller.response.StyleInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
-import NaNSsoGong.MrDaeBakDining.domain.style.dto.StyleDto;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.service.StyleService;
-import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
+import NaNSsoGong.MrDaeBakDining.error.exception.EntityCreateFailException;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
 
@@ -32,7 +27,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
 @RequestMapping("/api/style")
 @RequiredArgsConstructor
 @Slf4j
-@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class StyleRestController {
     private final StyleRepository styleRepository;
     private final StyleService styleService;
@@ -57,6 +52,9 @@ public class StyleRestController {
     @Operation(summary = "스타일 생성")
     @PostMapping("")
     public ResponseEntity<StyleCreateResponse> styleCreate(@RequestBody @Validated StyleCreateRequest styleCreateRequest) {
+        if(styleService.isStyleNameExist(styleCreateRequest.getName()))
+            throw new EntityCreateFailException();
+
         Style madeStyle = styleService.makeStyle(styleCreateRequest.toStyleDto());
         return ResponseEntity.ok().body(new StyleCreateResponse(madeStyle.getId()));
     }

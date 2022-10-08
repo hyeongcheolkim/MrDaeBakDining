@@ -8,14 +8,17 @@ import NaNSsoGong.MrDaeBakDining.domain.ingredient.controller.response.Ingredien
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
+import NaNSsoGong.MrDaeBakDining.error.exception.DisableEntityContainException;
+import NaNSsoGong.MrDaeBakDining.error.exception.EntityCreateFailException;
 import NaNSsoGong.MrDaeBakDining.error.exception.MinusQuantityException;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +27,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.DISABLE_COMPLETE;
 
 @RestController
 @RequestMapping("/api/ingredient")
 @RequiredArgsConstructor
-@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class IngredientRestController {
     private final IngredientService ingredientService;
     private final IngredientRepository ingredientRepository;
@@ -52,29 +56,19 @@ public class IngredientRestController {
                 .map(IngredientInfoResponse::new);
     }
 
-    @Operation(summary = "새로운 재료생성", description = "기존에 존재하던 재료와 이름이 같다면, 그 재료에 수량을 더합니다. 이경우 update=true입니다")
+    @Operation(summary = "새로운 재료생성")
     @Transactional
     @PostMapping("")
     public ResponseEntity<IngredientCreateResponse> ingredientCreate(@RequestBody @Validated IngredientCreateRequest ingredientCreateRequest) {
-        Optional<Ingredient> foundIngredient = ingredientRepository.findByName(ingredientCreateRequest.getName());
+        if(ingredientService.isIngredientNameExist(ingredientCreateRequest.getName()))
+            throw new EntityCreateFailException();
 
-        Ingredient ingredient;
-        if (foundIngredient.isPresent() && foundIngredient.get().getEnable()) {
-            IngredientUpdateRequest ingredientUpdateRequest = new IngredientUpdateRequest();
-            ingredientUpdateRequest.setQuantityDiff(ingredientCreateRequest.getStockQuantity());
-            ingredientUpdate(foundIngredient.get().getId(), ingredientUpdateRequest);
-            return ResponseEntity.ok().body(new IngredientCreateResponse(foundIngredient.get().getId(), true));
-        }
-        else if(foundIngredient.isPresent() && !foundIngredient.get().getEnable())
-            ingredient = foundIngredient.get();
-        else
-            ingredient = new Ingredient();
-
+        Ingredient ingredient = new Ingredient();
         ingredient.setEnable(true);
         ingredient.setName(ingredientCreateRequest.getName());
         ingredient.setStockQuantity(ingredientCreateRequest.getStockQuantity());
         Ingredient savedIngredient = ingredientRepository.save(ingredient);
-        return ResponseEntity.ok().body(new IngredientCreateResponse(savedIngredient.getId(), false));
+        return ResponseEntity.ok().body(new IngredientCreateResponse(savedIngredient.getId()));
     }
 
     @Operation(summary = "수량 증감", description = "재고량을 0미만으로 만들 수 없다면 요청은 무시되고, Exception이 발생합니다")
@@ -98,6 +92,15 @@ public class IngredientRestController {
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 재료입니다");
         });
+        if (!ingredient.getRecipeList().isEmpty())
+            throw new DisableEntityContainException(
+                    ingredient.getRecipeList().stream()
+                            .collect(Collectors.toMap(
+                                    i1 -> Hibernate.getClass(i1.getFood()).getSimpleName(),
+                                    i2 -> i2.getFood().getId()
+                            ))
+            );
+
         ingredient.setEnable(false);
         return ResponseEntity.ok().body(DISABLE_COMPLETE);
     }

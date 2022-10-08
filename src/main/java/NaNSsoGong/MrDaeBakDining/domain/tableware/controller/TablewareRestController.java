@@ -1,29 +1,33 @@
 package NaNSsoGong.MrDaeBakDining.domain.tableware.controller;
 
 
-import NaNSsoGong.MrDaeBakDining.domain.ResponseConst;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.controller.request.TablewareCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.controller.response.TablewareCreateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.controller.response.TablewareInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
-import NaNSsoGong.MrDaeBakDining.error.exception.BusinessException;
+import NaNSsoGong.MrDaeBakDining.domain.tableware.service.TablewareService;
+import NaNSsoGong.MrDaeBakDining.error.exception.DisableEntityContainException;
+import NaNSsoGong.MrDaeBakDining.error.exception.EntityCreateFailException;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ClassUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
 
@@ -31,10 +35,12 @@ import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
 @RequestMapping("/api/tableware")
 @RequiredArgsConstructor
 @Slf4j
-@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class TablewareRestController {
     private final TablewareRepository tablewareRepository;
+    private final TablewareService tablewareService;
 
+    @Operation(summary = "테이블웨어리스트 조회 By TablewareId")
     @GetMapping("/{tablewareId}")
     public ResponseEntity<TablewareInfoResponse> tablewareInfoByTablewareId(@PathVariable(value = "tablewareId") Long tablewareId) {
         Tableware tableware = tablewareRepository.findById(tablewareId).orElseThrow(() -> {
@@ -43,7 +49,7 @@ public class TablewareRestController {
         return ResponseEntity.ok().body(new TablewareInfoResponse(tableware));
     }
 
-    @Operation(summary="테이블웨어리스트 조회", description = "enable = true만 조회합니다")
+    @Operation(summary = "테이블웨어리스트 조회", description = "enable = true만 조회합니다")
     @GetMapping("/list")
     public Page<TablewareInfoResponse> tablewareInfoList(Pageable pageable) {
         return tablewareRepository
@@ -51,13 +57,15 @@ public class TablewareRestController {
                 .map(TablewareInfoResponse::new);
     }
 
-    @Operation(summary="테이블웨어 생성", description = "기존 같은 이름의 테이블 웨어가 이미 존재한다면, enable = true로 바꿉니다")
+    @Operation(summary = "테이블웨어 생성", description = "기존 같은 이름의 테이블 웨어가 이미 존재한다면, enable = true로 바꿉니다")
     @Transactional
     @PostMapping("")
     public ResponseEntity<TablewareCreateResponse> tablewareCreate(@RequestBody @Validated TablewareCreateRequest tablewareCreateRequest) {
         String name = tablewareCreateRequest.getName();
-        Tableware tableware = tablewareRepository.findByName(name).orElseGet(Tableware::new);
+        if (tablewareService.isTablewareNameExist(name))
+            throw new EntityCreateFailException();
 
+        Tableware tableware = new Tableware();
         Tableware savedTableware = tablewareRepository.save(tableware);
         tableware.setEnable(true);
         tableware.setName(name);
@@ -68,11 +76,32 @@ public class TablewareRestController {
     @Operation(summary = "테이블웨어 비활성화", description = "enable = false")
     @Transactional
     @PatchMapping("//disable/{tablewareId}")
-    public ResponseEntity<String> talbewareDisable(@PathVariable(value = "tablewareId") Long tablewareId){
+    public ResponseEntity<String> talbewareDisable(@PathVariable(value = "tablewareId") Long tablewareId) {
         Tableware tableware = tablewareRepository.findById(tablewareId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 테이블웨어입니다");
         });
+        if (!tableware.getStyleTablewareList().isEmpty())
+            throw new DisableEntityContainException(
+                    tableware.getStyleTablewareList().stream()
+                            .collect(Collectors.toMap(
+                                    i1 -> Hibernate.getClass(i1.getStyle()).getSimpleName(),
+                                    i2 -> i2.getStyle().getId()
+                            ))
+            );
         tableware.setEnable(false);
         return ResponseEntity.ok().body(DISABLE_COMPLETE);
+    }
+
+    @Operation(summary = "테이블웨어업데이트")
+    @Transactional
+    @PutMapping("/{tablewareId}")
+    public ResponseEntity<TablewareCreateResponse> tablewareUpdateByTablewareId
+            (@PathVariable(value = "tablewareId") Long tablewareId,
+             @RequestBody @Validated TablewareCreateRequest tablewareCreateRequest) {
+        Tableware tableware = tablewareRepository.findById(tablewareId).orElseThrow(() -> {
+            throw new NoExistEntityException("존재하지 않는 테이블웨어입니다");
+        });
+        tableware.setName(tablewareCreateRequest.getName());
+        return ResponseEntity.ok().body(new TablewareCreateResponse(tableware.getId()));
     }
 }

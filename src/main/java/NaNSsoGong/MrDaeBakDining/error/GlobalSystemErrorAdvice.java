@@ -1,6 +1,5 @@
 package NaNSsoGong.MrDaeBakDining.error;
 
-import NaNSsoGong.MrDaeBakDining.error.exception.BusinessException;
 import NaNSsoGong.MrDaeBakDining.error.response.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +21,7 @@ public class GlobalSystemErrorAdvice {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler
-    public BindingErrorResponse methodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public BindingExceptionResponse methodArgumentNotValidException(MethodArgumentNotValidException ex) {
         List<Map<String, Object>> fieldErrors = ex.getFieldErrors().stream()
                 .map(e -> {
                     Map<String, Object> ret = new ConcurrentHashMap<>();
@@ -44,7 +42,7 @@ public class GlobalSystemErrorAdvice {
                 })
                 .collect(Collectors.toList());
 
-        return BindingErrorResponse.builder()
+        return BindingExceptionResponse.builder()
                 .exceptionName(ex.getClass().getSimpleName())
                 .fieldErrors(fieldErrors)
                 .globalErrors(globalErrors)
@@ -52,8 +50,8 @@ public class GlobalSystemErrorAdvice {
     }
 
     @ExceptionHandler
-    public RequestMethodErrorResponse httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex){
-        return RequestMethodErrorResponse.builder()
+    public RequestMethodExceptionResponse httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex){
+        return RequestMethodExceptionResponse.builder()
                 .exceptionName(ex.getClass().getSimpleName())
                 .method(ex.getMethod())
                 .message(ex.getMessage())
@@ -64,16 +62,16 @@ public class GlobalSystemErrorAdvice {
     }
 
     @ExceptionHandler
-    public MethodArgumentTypeMismatchErrorResponse methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex){
-        return MethodArgumentTypeMismatchErrorResponse.builder()
+    public MethodArgumentTypeMismatchExceptionResponse methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex){
+        return MethodArgumentTypeMismatchExceptionResponse.builder()
                 .exceptionName(ex.getClass().getSimpleName())
                 .message(ex.getMessage())
                 .build();
     }
 
     @ExceptionHandler
-    public ServletRequestBindingError servletRequestBindingException(ServletRequestBindingException ex){
-        return ServletRequestBindingError.builder()
+    public ServletRequestBindingExceptionResponse servletRequestBindingException(ServletRequestBindingException ex){
+        return ServletRequestBindingExceptionResponse.builder()
                 .exceptionName(ex.getClass().getSimpleName())
                 .message(ex.getMessage())
                 .build();

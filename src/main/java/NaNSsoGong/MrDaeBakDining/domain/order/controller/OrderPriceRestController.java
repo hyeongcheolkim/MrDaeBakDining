@@ -8,7 +8,7 @@ import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderSheetRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.service.OrderService;
 import NaNSsoGong.MrDaeBakDining.domain.order.service.OrderSheetService;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,14 +22,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
-
 @Tag(name = "order", description = "order기능에 관한 api집합입니다")
 @RestController
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
 @Slf4j
-@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class OrderPriceRestController {
     private final OrderSheetService orderSheetService;
     private final OrderService orderService;

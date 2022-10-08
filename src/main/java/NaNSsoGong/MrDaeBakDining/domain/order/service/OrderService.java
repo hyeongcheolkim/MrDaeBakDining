@@ -1,22 +1,21 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.service;
 
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
-import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
-import NaNSsoGong.MrDaeBakDining.domain.guest.repository.GuestRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.SalePolicy;
-import NaNSsoGong.MrDaeBakDining.domain.order.domain.*;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.ClientOrder;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.GuestOrder;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.Order;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderSheet;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderSheetDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.ClientOrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.GuestOrderRepository;
-import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderSheetRepository;
+import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +60,5 @@ public class OrderService {
                 .map(orderSheetService::orderSheetPriceBeforeSale)
                 .reduce(0, Integer::sum);
     }
-
 
 }

@@ -266,37 +266,46 @@ public class DataInitiator {
 
         tableware1 = new Tableware();
         tableware1.setName("와인잔");
+        tableware1.setEnable(true);
         tablewareRepository.save(tableware1);
 
         tableware2 = new Tableware();
         tableware2.setName("냅킨");
+        tableware2.setEnable(true);
         tablewareRepository.save(tableware2);
 
         food1 = new Food();
         food1.setName("스테이크");
         food1.setSellPrice(30000);
         food1.setFoodCategory(FoodCategory.MEAT);
+        food1.setEnable(true);
         foodRepository.save(food1);
 
         food2 = new Food();
         food2.setName("치킨");
         food2.setSellPrice(25000);
         food2.setFoodCategory(FoodCategory.MEAT);
+        food2.setEnable(true);
         foodRepository.save(food2);
 
         ingredient1 = new Ingredient();
+        ingredient1.setEnable(true);
         ingredient1.setName("소고기");
         ingredient1.setStockQuantity(5);
         ingredient2 = new Ingredient();
+        ingredient2.setEnable(true);
         ingredient2.setName("후추");
         ingredient2.setStockQuantity(5);
         ingredient3 = new Ingredient();
+        ingredient3.setEnable(true);
         ingredient3.setName("버터");
         ingredient3.setStockQuantity(5);
         ingredient4 = new Ingredient();
+        ingredient4.setEnable(true);
         ingredient4.setName("닭");
         ingredient4.setStockQuantity(5);
         ingredient5 = new Ingredient();
+        ingredient5.setEnable(true);
         ingredient5.setName("튀김가루");
         ingredient5.setStockQuantity(5);
         ingredientRepository.save(ingredient1);
@@ -325,6 +334,7 @@ public class DataInitiator {
         style1.setEnable(true);
         style1.setOrderable(true);
         style1.setSellPrice(5000);
+        style1.setEnable(true);
 
         style2 = new Style();
         styleRepository.save(style2);
@@ -332,6 +342,7 @@ public class DataInitiator {
         style2.setEnable(true);
         style2.setOrderable(true);
         style2.setSellPrice(15000);
+        style2.setEnable(true);
 
         StyleTableware styleTableware = new StyleTableware();
         styleTableware.setTableware(tableware1);

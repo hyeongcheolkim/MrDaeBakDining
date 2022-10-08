@@ -1,14 +1,14 @@
 package NaNSsoGong.MrDaeBakDining.domain.tableware.domain;
 
+import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleTableware;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,7 +20,8 @@ public class Tableware {
     @GeneratedValue
     @Column(name = "tableware_id")
     private Long id;
-    @Column(unique = true)
     private String name;
     private Boolean enable;
+    @OneToMany(mappedBy = "tableware")
+    private List<StyleTableware> styleTablewareList = new ArrayList<>();
 }

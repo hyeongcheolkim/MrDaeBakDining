@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Data
 @Builder
-public class BindingErrorResponse {
+public class BindingExceptionResponse {
     private final String exceptionType = "system";
     private String exceptionName;
     private List<Map<String,Object>> fieldErrors = new ArrayList<>();

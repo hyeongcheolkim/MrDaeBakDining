@@ -13,12 +13,10 @@ import java.util.Optional;
 public class MemberService {
     private final MemberRepository memberRepository;
 
-    public Boolean isLoginIdAvailable(String loginId) {
-        List<Member> memberList = memberRepository.findAllByLoginId(loginId);
-        for (var LoginAble : memberList)
-            if (LoginAble.getEnable())
-                return false;
-        return true;
+    public Boolean isLoginIdExist(String loginId) {
+        return memberRepository.findAllByLoginId(loginId).stream()
+                .map(Member::getEnable)
+                .anyMatch(e -> e == true);
     }
 
     public Optional<Member> login(String loginId, String password) {

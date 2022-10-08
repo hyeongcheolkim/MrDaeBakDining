@@ -12,8 +12,9 @@ import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.response.RecipeUpdateR
 import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.service.RecipeService;
+import NaNSsoGong.MrDaeBakDining.error.exception.EntityCreateFailException;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,7 +32,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/recipe")
 @RequiredArgsConstructor
-@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class RecipeRestController {
     private final RecipeRepository recipeRepository;
     private final RecipeService recipeService;
@@ -53,7 +54,7 @@ public class RecipeRestController {
         return recipeRepository.findAll(pageable).map(RecipeInfoResponse::new);
     }
 
-    @Operation(summary = "레시피 생성", description = "이미 존재하던 레시피면, ingredientQuantity를 업데이트합니다")
+    @Operation(summary = "레시피 생성")
     @Transactional
     @PostMapping("")
     public ResponseEntity<RecipeCreateResponse> recipeCreate(@RequestBody @Validated RecipeCreateRequest recipeCreateRequest) {
@@ -65,10 +66,8 @@ public class RecipeRestController {
         });
 
         Optional<Recipe> foundRecipe = recipeRepository.findByFoodIdAndIngredientId(food.getId(), ingredient.getId());
-        if (foundRecipe.isPresent()) {
-            foundRecipe.get().setIngredientQuantity(recipeCreateRequest.getIngredientQuantity());
-            return ResponseEntity.ok().body(new RecipeCreateResponse(foundRecipe.get().getId(), true));
-        }
+        if (foundRecipe.isPresent())
+            throw new EntityCreateFailException();
 
         Integer ingredientQuantity = recipeCreateRequest.getIngredientQuantity();
         Recipe recipe = recipeService.makeRecipe(food, ingredient, ingredientQuantity);

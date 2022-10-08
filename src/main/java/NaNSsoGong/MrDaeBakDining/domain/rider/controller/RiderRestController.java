@@ -6,10 +6,9 @@ import NaNSsoGong.MrDaeBakDining.domain.rider.controller.response.RiderInfoRespo
 import NaNSsoGong.MrDaeBakDining.domain.rider.controller.response.RiderSignResponse;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
-import NaNSsoGong.MrDaeBakDining.domain.session.SessionConst;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.error.exception.SignFailException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -21,14 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.*;
 
 @RestController
 @RequestMapping("/api/rider")
 @RequiredArgsConstructor
-@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class RiderRestController {
     private final RiderRepository riderRepository;
     private final MemberService memberService;
@@ -37,7 +34,7 @@ public class RiderRestController {
     @Transactional
     @PostMapping("/sign")
     public ResponseEntity<RiderSignResponse> sign(@RequestBody @Validated RiderSignRequest riderSignRequest) {
-        if (!memberService.isLoginIdAvailable(riderSignRequest.getLoginId()))
+        if (!memberService.isLoginIdExist(riderSignRequest.getLoginId()))
             throw new SignFailException("아이디가 중복입니다");
 
         Rider rider = riderSignRequest.toRider();

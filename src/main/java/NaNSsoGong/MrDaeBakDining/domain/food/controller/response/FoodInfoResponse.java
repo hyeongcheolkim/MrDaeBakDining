@@ -6,15 +6,17 @@ import lombok.Data;
 
 @Data
 public class FoodInfoResponse {
+    private Long foodId;
     private String foodName;
     private Integer foodSellPrice;
-    private Boolean foodOrderable;
     private FoodCategory foodCategory;
+    private Boolean foodOrderable;
 
     public FoodInfoResponse(Food food){
+        this.foodId = food.getId();
         this.foodName = food.getName();
         this.foodSellPrice = food.getSellPrice();
-        this.foodOrderable = food.getOrderable();
         this.foodCategory = food.getFoodCategory();
+        this.foodOrderable = food.getOrderable();
     }
 }

@@ -6,10 +6,9 @@ import NaNSsoGong.MrDaeBakDining.domain.client.controller.response.ClientSignRes
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
-import NaNSsoGong.MrDaeBakDining.domain.order.service.OrderService;
 import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.error.exception.SignFailException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessErrorResponse;
+import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -21,16 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.Optional;
-
 import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_CLIENT;
 
 @RestController
 @RequestMapping("/api/client")
 @RequiredArgsConstructor
-@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessErrorResponse.class)))
+@ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class ClientRestController {
     private final ClientRepository clientRepository;
     private final MemberService memberService;
@@ -39,7 +34,7 @@ public class ClientRestController {
     @Transactional
     @PostMapping("/sign")
     public ResponseEntity<ClientSignResponse> sign(@RequestBody @Validated ClientSignRequest clientSignRequest) {
-        if (!memberService.isLoginIdAvailable(clientSignRequest.getLoginId()))
+        if (!memberService.isLoginIdExist(clientSignRequest.getLoginId()))
             throw new SignFailException("아이디가 중복입니다");
         if (clientSignRequest.getPersonalInformationCollectionAgreement() && clientSignRequest.getAddress() == null)
             throw new SignFailException("정보제공에 동의했을경우, 주소를 필수로 입력해야 합니다");
