@@ -1,4 +1,4 @@
-package NaNSsoGong.MrDaeBakDining.error.response;
+package NaNSsoGong.MrDaeBakDining.exception.response;
 
 import lombok.Builder;
 import lombok.Data;

@@ -7,20 +7,24 @@ import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
 import NaNSsoGong.MrDaeBakDining.domain.guest.repository.GuestRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.request.*;
-import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.OrderUpdateResponse;
+import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.ClientOrderInfoResponse;
+import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.GuestOrderInfoResponse;
+import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.OrderSheetInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.*;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderSheetRepository;
+import NaNSsoGong.MrDaeBakDining.domain.order.service.OrderBuilder;
 import NaNSsoGong.MrDaeBakDining.domain.order.service.OrderService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
-import NaNSsoGong.MrDaeBakDining.error.exception.BusinessException;
-import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.error.exception.NoProperOrderStatusException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
+import NaNSsoGong.MrDaeBakDining.exception.exception.BusinessException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoProperOrderStatusException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.PriceNotSameException;
+import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,8 +37,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 
 import static NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus.ORDERED;
 import static NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus.RESERVED;
@@ -56,44 +58,48 @@ public class OrderRestController {
     private final RiderRepository riderRepository;
     private final DinnerRepository dinnerRepository;
     private final StyleRepository styleRepository;
+    private final OrderBuilder orderBuilder;
 
     @Operation(summary = "클라이언트 주문", description = "클라이언트 세션이 필요합니다")
+    @Transactional
     @PostMapping("/client")
-    public ResponseEntity clientOrder(@Parameter(name = "clientId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_CLIENT) Long clientId,
-                                      @RequestBody @Validated OrderRequest orderRequest) {
-        orderValid(orderRequest);
+    public ResponseEntity<ClientOrderInfoResponse> clientOrderCreate(
+            @Parameter(name = "clientId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_CLIENT) Long clientId,
+            @RequestBody @Validated OrderCreateRequest orderCreateRequest) {
+        orderValid(orderCreateRequest);
 
         Client client = clientRepository.findById(clientId).orElseThrow(() -> {
-                    throw new NoExistEntityException("존재하지 않는 클라이언트입니다");
-                }
-        );
+            throw new NoExistEntityException("존재하지 않는 클라이언트입니다");
+        });
 
-        OrderDto orderDto = orderRequest.toOrderDto();
+        OrderDto orderDto = orderCreateRequest.toOrderDto();
         ClientOrder clientOrder = orderService.makeClientOrder(client, orderDto);
 
-        HashMap<String, Object> ret = new HashMap<>();
-        ret.put("orderId", clientOrder.getId());
+        Integer actualPrice = orderService.orderPriceAfterSale(clientOrder);
+        if (!actualPrice.equals(orderDto.getTotalPriceAfterSale()))
+            throw new PriceNotSameException(orderDto.getTotalPriceAfterSale(), actualPrice);
 
-        return ResponseEntity.ok().body(ret);
+        client.getClientOrderList().add(clientOrder);
+        return ResponseEntity.ok().body(new ClientOrderInfoResponse(clientOrder));
     }
 
 
     @Operation(summary = "게스트 주문", description = "세션이 필요 없습니다")
-    @PostMapping("/guest")
     @Transactional
-    public ResponseEntity guestOrder(@RequestBody @Validated GuestOrderRequest guestOrderRequest) {
+    @PostMapping("/guest")
+    public ResponseEntity<GuestOrderInfoResponse> guestOrderCreate(@RequestBody @Validated GuestOrderCreateRequest guestOrderRequest) {
         orderValid(guestOrderRequest);
 
         OrderDto orderDto = guestOrderRequest.toOrderDto();
         Guest guest = new Guest(guestOrderRequest.getName(), guestOrderRequest.getCardNumber());
         guestRepository.save(guest);
         GuestOrder guestOrder = orderService.makeGuestOrder(guest, orderDto);
+        Integer actualPrice = orderService.orderPriceAfterSale(guestOrder);
+        if (!actualPrice.equals(orderDto.getTotalPriceAfterSale()))
+            throw new PriceNotSameException(orderDto.getTotalPriceAfterSale(), actualPrice);
 
-        HashMap<String, Object> ret = new HashMap<>();
-        ret.put("guestOrderId", guestOrder.getId());
-        ret.put("UUID", guest.getUuid());
-
-        return ResponseEntity.ok().body(ret);
+        guest.setGuestOrder(guestOrder);
+        return ResponseEntity.ok().body(new GuestOrderInfoResponse(guestOrder));
     }
 
     @Operation(summary = "주문상태 변경")
@@ -142,25 +148,35 @@ public class OrderRestController {
         return ResponseEntity.ok().body("라이더변경완료");
     }
 
-    @Operation(summary = "주문변경", description = "orderSheetId로 요청해야합니다. orderId아님")
+    @Operation(summary = "오더시트업데이트")
     @Transactional
     @PutMapping("/{orderSheetId}")
-    public ResponseEntity<OrderUpdateResponse> orderUpdate(@PathVariable(name = "orderSheetId") Long orderSheetId,
-                                                           @RequestBody OrderSheetRequest orderSheetRequest) {
-        OrderSheet orderSheet = orderSheetRepository.findById(orderSheetId)
-                .orElseThrow(() -> {
-                    throw new NoExistEntityException("존재하지 않는 오더시트 입니다");
-                });
-        OrderSheet updatedOrderSheet = orderService.updateOrderSheet(orderSheet, orderSheetRequest.toOrderSheetDto());
-        return ResponseEntity.ok().body(new OrderUpdateResponse(updatedOrderSheet.getId()));
+    public ResponseEntity<OrderSheetInfoResponse> orderUpdate(@PathVariable(name = "orderSheetId") Long orderSheetId,
+                                                              @RequestBody OrderSheetUpdateRequest orderSheetUpdateRequest) {
+        OrderSheet orderSheet = orderSheetRepository.findById(orderSheetId).orElseThrow(() -> {
+            throw new NoExistEntityException("존재하지 않는 오더시트 입니다");
+        });
+        Style style = styleRepository.findById(orderSheetUpdateRequest.getStyleId()).orElseGet(() -> {
+            throw new NoExistEntityException("존재하지 않는 스타일입니다");
+        });
+        Dinner dinner = dinnerRepository.findById(orderSheetUpdateRequest.getDinnerId()).orElseGet(() -> {
+            throw new NoExistEntityException("존재하지 않는 디너입니다");
+        });
+
+        orderSheet.setStyle(style);
+        orderSheet.setDinner(dinner);
+        orderSheet.getFoodDifferenceList().clear();
+        orderBuilder.addToFoodDifferenceList(orderSheet, orderSheetUpdateRequest.getFoodIdAndDifference());
+
+        return ResponseEntity.ok().body(new OrderSheetInfoResponse(orderSheet));
     }
 
-    private void orderValid(OrderRequest orderRequest) {
-        if (!(orderRequest.getOrderStatus() == ORDERED || orderRequest.getOrderStatus() == RESERVED))
+    private void orderValid(OrderCreateRequest orderCreateRequest) {
+        if (!(orderCreateRequest.getOrderStatus() == ORDERED || orderCreateRequest.getOrderStatus() == RESERVED))
             throw new NoProperOrderStatusException("OrderStatus가 주문이거나 예약이어야 합니다");
-        if (orderRequest.getOrderStatus() == RESERVED && orderRequest.getReservedTime() == null)
+        if (orderCreateRequest.getOrderStatus() == RESERVED && orderCreateRequest.getReservedTime() == null)
             throw new NoProperOrderStatusException("OrderStatus가 RESERVED이면, reservedTime이 null일 수 없습니다");
-        for (var orderSheet : orderRequest.getOrderSheetRequestList()) {
+        for (var orderSheet : orderCreateRequest.getOrderSheetCreateRequestList()) {
             Dinner dinner = dinnerRepository.findById(orderSheet.getDinnerId()).orElseThrow(() -> {
                 throw new NoExistEntityException("존재하지 않는 디너입니다");
             });

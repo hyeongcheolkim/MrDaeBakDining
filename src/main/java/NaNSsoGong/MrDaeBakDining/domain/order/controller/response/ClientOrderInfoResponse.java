@@ -21,10 +21,11 @@ public class ClientOrderInfoResponse {
     private String riderName;
     private Address address;
     private LocalDateTime orderTime;
+    private LocalDateTime reservedTime;
     private OrderStatus orderStatus;
-    List<OrderSheetResponse> orderSheetResponseList = new ArrayList<>();
+    List<OrderSheetInfoResponse> orderSheetResponseList = new ArrayList<>();
 
-    public ClientOrderInfoResponse(ClientOrder clientOrder, List<OrderSheet> orderSheetList) {
+    public ClientOrderInfoResponse(ClientOrder clientOrder) {
         this.orderId = clientOrder.getId();
         this.clientId = clientOrder.getClient().getId();
         this.clientName = clientOrder.getClient().getName();
@@ -33,42 +34,8 @@ public class ClientOrderInfoResponse {
         this.address = clientOrder.getAddress();
         this.orderTime = clientOrder.getOrderTime();
         this.orderStatus = clientOrder.getOrderStatus();
-        this.orderSheetResponseList = orderSheetList.stream()
-                .map(OrderSheetResponse::new)
+        this.orderSheetResponseList = clientOrder.getOrderSheetList().stream()
+                .map(OrderSheetInfoResponse::new)
                 .collect(Collectors.toList());
-    }
-
-    @Data
-    static public class OrderSheetResponse {
-        private Long orderSheetId;
-        private Long styleId;
-        private String styleName;
-        private Long dinnerId;
-        private String dinnerName;
-        private List<OrderSheetFoodResponse> FoodDifferenceList = new ArrayList<>();
-        public OrderSheetResponse(OrderSheet orderSheet){
-            this.orderSheetId = orderSheet.getId();
-            this.styleId = orderSheet.getStyle().getId();
-            this.dinnerId = orderSheet.getDinner().getId();
-            this.FoodDifferenceList = orderSheet.getFoodDifferenceList().stream()
-                    .map(OrderSheetFoodResponse::new)
-                    .collect(Collectors.toList());
-            this.styleName = orderSheet.getStyle().getName();
-            this.dinnerName = orderSheet.getDinner().getName();
-        }
-    }
-
-    @Data
-    static public class OrderSheetFoodResponse {
-        private Long orderSheetItemId;
-        Long foodId;
-        String foodName;
-        Integer foodQuantity;
-        public OrderSheetFoodResponse(FoodDifference foodDifference){
-            this.orderSheetItemId = foodDifference.getId();
-            this.foodId = foodDifference.getFood().getId();
-            this.foodName = foodDifference.getFood().getName();
-            this.foodQuantity = foodDifference.getFoodQuantity();
-        }
     }
 }

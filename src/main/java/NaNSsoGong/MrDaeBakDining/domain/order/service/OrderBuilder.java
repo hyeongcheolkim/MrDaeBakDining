@@ -51,21 +51,21 @@ public class OrderBuilder {
             orderSheet.setOrder(order);
             orderSheet.setDinner(dinnerRepository.findById(orderSheetDto.getDinnerId()).get());
             orderSheet.setStyle(styleRepository.findById(orderSheetDto.getStyleId()).get());
-            buildFoodDifferenceList(orderSheet, orderDto);
+            buildToFoodDifferenceList(orderSheet, orderDto);
             ret.add(orderSheet);
         }
         return ret;
     }
 
-    private void buildFoodDifferenceList(OrderSheet orderSheet, OrderDto orderDto) {
+    private void buildToFoodDifferenceList(OrderSheet orderSheet, OrderDto orderDto) {
         List<OrderSheetDto> orderSheetDtoList = orderDto.getOrderSheetDtoList();
         for (var orderSheetDto : orderSheetDtoList) {
             Map<Long, Integer> foodIdAndDifference = orderSheetDto.getFoodIdAndDifference();
-            buildFoodDifferenceList(orderSheet, foodIdAndDifference);
+            addToFoodDifferenceList(orderSheet, foodIdAndDifference);
         }
     }
 
-    public void buildFoodDifferenceList(OrderSheet orderSheet, Map<Long, Integer> foodIdAndDifference) {
+    public void addToFoodDifferenceList(OrderSheet orderSheet, Map<Long, Integer> foodIdAndDifference) {
         for(var foodId : foodIdAndDifference.keySet()){
             FoodDifference foodDifference = new FoodDifference();
             foodDifference.setOrderSheet(orderSheet);

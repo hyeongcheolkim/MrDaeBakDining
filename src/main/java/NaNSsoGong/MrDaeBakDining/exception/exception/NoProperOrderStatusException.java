@@ -1,4 +1,4 @@
-package NaNSsoGong.MrDaeBakDining.error.exception;
+package NaNSsoGong.MrDaeBakDining.exception.exception;
 
 public class NoProperOrderStatusException extends BusinessException{
     public NoProperOrderStatusException() {

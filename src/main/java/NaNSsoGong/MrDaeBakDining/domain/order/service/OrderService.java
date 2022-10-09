@@ -11,7 +11,6 @@ import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderSheetDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.ClientOrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.GuestOrderRepository;
-import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
@@ -40,12 +39,6 @@ public class OrderService {
         guestOrderRepository.save(guestOrder);
         orderBuilder.buildOrder(guestOrder, orderDto);
         return guestOrder;
-    }
-
-    public OrderSheet updateOrderSheet(OrderSheet orderSheet, OrderSheetDto orderSheetDto) {
-        orderSheet.getFoodDifferenceList().clear();
-        orderBuilder.buildFoodDifferenceList(orderSheet, orderSheetDto.getFoodIdAndDifference());
-        return orderSheet;
     }
 
     public Integer orderPriceAfterSale(Order order) {

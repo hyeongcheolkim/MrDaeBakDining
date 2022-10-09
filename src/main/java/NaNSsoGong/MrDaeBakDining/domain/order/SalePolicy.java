@@ -4,7 +4,7 @@ import NaNSsoGong.MrDaeBakDining.domain.client.domain.ClientGrade;
 
 import static NaNSsoGong.MrDaeBakDining.domain.client.domain.ClientGrade.*;
 
-public class SalePolicy {
+public abstract class SalePolicy {
     private static final Integer BRONZE_SALE_RATE = 0;
     private static final Integer GOLD_SALE_RATE = 3;
     private static final Integer DIAMOND_SALE_RATE = 5;
@@ -21,6 +21,4 @@ public class SalePolicy {
             return CHALLENGER_SALE_RATE;
         return BRONZE_SALE_RATE;
     }
-
-    private SalePolicy(){}
 }

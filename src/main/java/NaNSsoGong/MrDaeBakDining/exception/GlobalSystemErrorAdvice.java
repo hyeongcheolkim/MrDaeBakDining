@@ -1,6 +1,6 @@
-package NaNSsoGong.MrDaeBakDining.error;
+package NaNSsoGong.MrDaeBakDining.exception;
 
-import NaNSsoGong.MrDaeBakDining.error.response.*;
+import NaNSsoGong.MrDaeBakDining.exception.response.*;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;

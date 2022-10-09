@@ -3,7 +3,6 @@ package NaNSsoGong.MrDaeBakDining.domain.order.service;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.service.DinnerService;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
-import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.FoodDifference;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderSheet;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Transactional
 public class OrderSheetService {
     private final DinnerService dinnerService;
-    private final FoodRepository foodRepository;
 
     public Integer orderSheetPriceBeforeSale(OrderSheet orderSheet){
         Integer ret = 0;

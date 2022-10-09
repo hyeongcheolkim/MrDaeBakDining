@@ -14,28 +14,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-public class OrderRequest {
+public class OrderCreateRequest {
     @NotNull
     private Address address;
     @NotNull
     private OrderStatus orderStatus;
     @Nullable
     private LocalDateTime reservedTime;
-    private List<OrderSheetRequest> orderSheetRequestList = new ArrayList<>();
+    private List<OrderSheetCreateRequest> orderSheetCreateRequestList = new ArrayList<>();
+    private Integer totalPriceAfterSale;
 
-    public OrderDto toOrderDto(){
+    public OrderDto toOrderDto() {
         OrderDto ret = OrderDto.builder()
                 .address(this.address)
                 .orderStatus(this.orderStatus)
-                .orderSheetDtoList(this.orderSheetRequestList.stream()
-                        .map(OrderSheetRequest::toOrderSheetDto)
+                .orderSheetDtoList(this.orderSheetCreateRequestList.stream()
+                        .map(OrderSheetCreateRequest::toOrderSheetDto)
                         .collect(Collectors.toList()))
                 .orderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .totalPriceAfterSale(this.totalPriceAfterSale)
                 .build();
-        if(reservedTime != null){
-            ret.setReserveTime(this.reservedTime);
+        if (orderStatus.equals(OrderStatus.RESERVED))
             ret.setOrderStatus(OrderStatus.RESERVED);
-        }
         return ret;
     }
 }

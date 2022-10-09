@@ -8,11 +8,13 @@ import NaNSsoGong.MrDaeBakDining.domain.ingredient.controller.response.Ingredien
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
-import NaNSsoGong.MrDaeBakDining.error.exception.DisableEntityContainException;
-import NaNSsoGong.MrDaeBakDining.error.exception.EntityCreateFailException;
-import NaNSsoGong.MrDaeBakDining.error.exception.MinusQuantityException;
-import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
+import NaNSsoGong.MrDaeBakDining.exception.exception.DisabledEntityContainException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.EntityCreateFailException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.MinusQuantityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
+import NaNSsoGong.MrDaeBakDining.exception.response.DisabledEntityContainExceptionResponse;
+import NaNSsoGong.MrDaeBakDining.exception.response.DisabledEntityContainInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.DISABLE_COMPLETE;
@@ -60,7 +61,7 @@ public class IngredientRestController {
     @Transactional
     @PostMapping("")
     public ResponseEntity<IngredientCreateResponse> ingredientCreate(@RequestBody @Validated IngredientCreateRequest ingredientCreateRequest) {
-        if(ingredientService.isIngredientNameExist(ingredientCreateRequest.getName()))
+        if (ingredientService.isIngredientNameExist(ingredientCreateRequest.getName()))
             throw new EntityCreateFailException();
 
         Ingredient ingredient = new Ingredient();
@@ -86,19 +87,22 @@ public class IngredientRestController {
         return ResponseEntity.ok().body(new IngredientUpdateResponse(ingredient.getId(), ingredient.getStockQuantity()));
     }
 
-    @Operation(summary = "재료 비활성화", description = "enable = false")
+    @Operation(summary = "재료 비활성화", description = "이 재료를 필요로 하는 레시피가 존재하지 않을때 비활성화할 수 있습니다")
     @PatchMapping("/disable/{ingredientId}")
-    public ResponseEntity<String> ingredientDisable(@PathVariable(value = "ingredientId") Long ingredientId){
+    public ResponseEntity<String> ingredientDisable(@PathVariable(value = "ingredientId") Long ingredientId) {
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 재료입니다");
         });
         if (!ingredient.getRecipeList().isEmpty())
-            throw new DisableEntityContainException(
+            throw new DisabledEntityContainException(
                     ingredient.getRecipeList().stream()
-                            .collect(Collectors.toMap(
-                                    i1 -> Hibernate.getClass(i1.getFood()).getSimpleName(),
-                                    i2 -> i2.getFood().getId()
-                            ))
+                            .map(e -> e.getFood())
+                            .map(e -> DisabledEntityContainInfo.builder()
+                                    .classTypeName(Hibernate.getClass(e).getSimpleName())
+                                    .instanceName(e.getName())
+                                    .instanceId(e.getId())
+                                    .build())
+                            .collect(Collectors.toList())
             );
 
         ingredient.setEnable(false);

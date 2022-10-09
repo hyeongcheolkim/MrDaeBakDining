@@ -1,0 +1,13 @@
+package NaNSsoGong.MrDaeBakDining.domain.client.controller.response;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
+public class ClientGradeInfoResponse {
+    private String clientGradeName;
+    private Integer cut;
+    private Integer saleRate;
+}

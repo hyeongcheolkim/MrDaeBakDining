@@ -1,8 +1,10 @@
 package NaNSsoGong.MrDaeBakDining.domain.client.service;
 
+import NaNSsoGong.MrDaeBakDining.domain.client.ClientGradeConst;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.ClientGrade;
 import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
+import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.ClientOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,25 +24,23 @@ public class ClientService {
 
     @Transactional
     public void evaluateClientGrade() {
-        List<Long> clientIdList = clientRepository.clientIdList();
-        for (var clientId : clientIdList) {
-            ClientGrade clientGrade;
-            Long orderCount = clientOrderRepository.countByClientIdAndOrderStatus(clientId, DELIVERED);
-            clientGrade = getClientGrade(orderCount);
-            if (clientGrade.equals(BRONZE))
-                continue;
-            Client foundClient = clientRepository.findById(clientId).get();
-            foundClient.setClientGrade(clientGrade);
+        List<Client> enableClientListWithOrderList = clientRepository.enableClientListWithOrderList();
+        for (var client : enableClientListWithOrderList) {
+            Long count = client.getClientOrderList().stream()
+                    .filter(e -> e.getOrderStatus().equals(DELIVERED))
+                    .count();
+            client.setClientGrade(ClientGrade(count));
         }
     }
 
-    private ClientGrade getClientGrade(Long orderCount) {
-        if (orderCount > CHALLENGER_CUT)
+    private ClientGrade ClientGrade(Long orderCount) {
+        if (orderCount >= ClientGradeConst.getGradeCut(CHALLENGER))
             return CHALLENGER;
-        else if (orderCount > DIAMOND_CUT)
+        else if (orderCount >= ClientGradeConst.getGradeCut(DIAMOND))
             return DIAMOND;
-        else if (orderCount > GOLD_CUT)
+        else if (orderCount >= ClientGradeConst.getGradeCut(GOLD))
             return GOLD;
-        return BRONZE;
+        else
+            return BRONZE;
     }
 }

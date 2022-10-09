@@ -6,8 +6,8 @@ import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerInfoRes
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.service.DinnerService;
-import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -10,6 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ClientRepository extends JpaRepository<Client, Long> {
-    @Query("select c.id from Client c")
-    List<Long> clientIdList();
+    @Query("select c from Client c join fetch c.clientOrderList where c.Enable = true")
+    List<Client> enableClientListWithOrderList();
 }

@@ -1,4 +1,4 @@
-package NaNSsoGong.MrDaeBakDining.error.exception;
+package NaNSsoGong.MrDaeBakDining.exception.exception;
 
 public class NoLoginMemberException extends BusinessException{
     public NoLoginMemberException() {

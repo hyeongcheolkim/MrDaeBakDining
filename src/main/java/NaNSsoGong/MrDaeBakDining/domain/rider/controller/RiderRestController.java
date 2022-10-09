@@ -6,9 +6,9 @@ import NaNSsoGong.MrDaeBakDining.domain.rider.controller.response.RiderInfoRespo
 import NaNSsoGong.MrDaeBakDining.domain.rider.controller.response.RiderSignResponse;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
-import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.error.exception.SignFailException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.SignFailException;
+import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

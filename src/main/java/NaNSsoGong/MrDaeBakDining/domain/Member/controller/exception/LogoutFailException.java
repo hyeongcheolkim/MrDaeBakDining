@@ -1,6 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.member.controller.exception;
 
-import NaNSsoGong.MrDaeBakDining.error.exception.BusinessException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.BusinessException;
 
 public class LogoutFailException extends BusinessException {
     public LogoutFailException() {

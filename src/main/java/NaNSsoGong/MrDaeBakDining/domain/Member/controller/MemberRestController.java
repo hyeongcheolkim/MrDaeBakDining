@@ -10,8 +10,8 @@ import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
-import NaNSsoGong.MrDaeBakDining.error.exception.NoLoginMemberException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoLoginMemberException;
+import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -70,10 +70,7 @@ public class MemberRestController {
         }
         memberLoginResponse.setSessionId(session.getId());
 
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(memberLoginResponse);
+        return ResponseEntity.ok().body(memberLoginResponse);
     }
 
     @Operation(summary = "로그아웃", description = "로그인된 상태에서만 로그아웃할 수 있습니다, 즉 세션이 필수입니다")
@@ -90,17 +87,17 @@ public class MemberRestController {
     @Transactional
     @PatchMapping("/signout")
     public ResponseEntity<String> signout(@Parameter(name = "clientId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_CLIENT, required = false) Long clientId,
-                                  @Parameter(name = "chefId", hidden = true, allowEmptyValue = true)@SessionAttribute(name = LOGIN_CHEF, required = false) Long chefId,
-                                  @Parameter(name = "riderId", hidden = true, allowEmptyValue = true)@SessionAttribute(name = LOGIN_RIDER, required = false) Long riderId,
-                                  HttpServletRequest request) {
+                                          @Parameter(name = "chefId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_CHEF, required = false) Long chefId,
+                                          @Parameter(name = "riderId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_RIDER, required = false) Long riderId,
+                                          HttpServletRequest request) {
         if (clientId == null && chefId == null && riderId == null)
             throw new NoLoginMemberException("로그인하지 않는 멤버의 접근입니다");
         Long memberId = null;
-        if(clientId != null)
+        if (clientId != null)
             memberId = clientId;
-        else if(chefId != null)
+        else if (chefId != null)
             memberId = chefId;
-        else if(riderId != null)
+        else if (riderId != null)
             memberId = riderId;
         Member foundMember = memberRepository.findById(memberId).get();
         foundMember.setEnable(false);
@@ -110,7 +107,7 @@ public class MemberRestController {
 
     @Operation(summary = "아이디 중복체크")
     @GetMapping("/valid-id")
-    public ResponseEntity<Boolean> isLoginIdAvailable(@RequestParam String loginId){
+    public ResponseEntity<Boolean> isLoginIdAvailable(@RequestParam String loginId) {
         Boolean loginIdAvailable = memberService.isLoginIdExist(loginId);
         return ResponseEntity.ok().body(loginIdAvailable);
     }

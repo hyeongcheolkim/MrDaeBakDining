@@ -1,6 +1,5 @@
 package NaNSsoGong.MrDaeBakDining.domain.food.controller;
 
-import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerFood;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.request.FoodCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodCreateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodInfoResponse;
@@ -10,10 +9,11 @@ import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.service.FoodService;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
-import NaNSsoGong.MrDaeBakDining.error.exception.BusinessException;
-import NaNSsoGong.MrDaeBakDining.error.exception.DisableEntityContainException;
-import NaNSsoGong.MrDaeBakDining.error.exception.EntityCreateFailException;
-import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.BusinessException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.DisabledEntityContainException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.EntityCreateFailException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.response.DisabledEntityContainInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
@@ -57,8 +57,8 @@ public class FoodRestController {
     @Operation(summary = "푸드생성", description = "새로운 푸드메뉴를 만듭니다")
     @Transactional
     @PostMapping("")
-    public ResponseEntity<FoodCreateResponse> foodCreate(@RequestBody @Validated FoodCreateRequest foodCreateRequest){
-        if(foodService.isFoodNameExist(foodCreateRequest.getName()))
+    public ResponseEntity<FoodCreateResponse> foodCreate(@RequestBody @Validated FoodCreateRequest foodCreateRequest) {
+        if (foodService.isFoodNameExist(foodCreateRequest.getName()))
             throw new EntityCreateFailException();
 
         Food food = foodCreateRequest.toFood();
@@ -109,12 +109,15 @@ public class FoodRestController {
             throw new NoExistEntityException("존재하지 않는 푸드입니다");
         });
         if (!food.getDinnerFoodList().isEmpty())
-            throw new DisableEntityContainException(
+            throw new DisabledEntityContainException(
                     food.getDinnerFoodList().stream()
-                            .collect(Collectors.toMap(
-                                    i1 -> Hibernate.getClass(i1.getDinner()).getSimpleName(),
-                                    i2 -> i2.getDinner().getId()
-                            ))
+                            .map(e -> e.getDinner())
+                            .map(e -> DisabledEntityContainInfo.builder()
+                                    .classTypeName(Hibernate.getClass(e).getSimpleName())
+                                    .instanceName(e.getName())
+                                    .instanceId(e.getId())
+                                    .build())
+                            .collect(Collectors.toList())
             );
         food.setEnable(false);
         return ResponseEntity.ok().body(DISABLE_COMPLETE);

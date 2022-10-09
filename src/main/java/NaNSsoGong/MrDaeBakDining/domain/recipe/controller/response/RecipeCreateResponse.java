@@ -7,5 +7,4 @@ import lombok.Data;
 @AllArgsConstructor
 public class RecipeCreateResponse {
     private Long recipeId;
-    private Boolean updated;
 }

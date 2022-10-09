@@ -1,4 +1,4 @@
-package NaNSsoGong.MrDaeBakDining.error.exception;
+package NaNSsoGong.MrDaeBakDining.exception.exception;
 
 public class EntityCreateFailException extends BusinessException{
     private final static String defaultMessage = "이미 같은 이름의 Entity가 존재합니다";

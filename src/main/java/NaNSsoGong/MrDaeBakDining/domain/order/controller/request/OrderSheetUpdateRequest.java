@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
-public class OrderSheetRequest {
+public class OrderSheetUpdateRequest {
     @NotNull
     private Long styleId;
     @NotNull

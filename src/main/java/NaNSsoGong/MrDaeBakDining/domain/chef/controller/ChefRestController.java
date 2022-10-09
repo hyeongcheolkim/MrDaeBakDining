@@ -6,9 +6,9 @@ import NaNSsoGong.MrDaeBakDining.domain.chef.controller.response.ChefSignRespons
 import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;
 import NaNSsoGong.MrDaeBakDining.domain.chef.repository.ChefRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
-import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.error.exception.SignFailException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.SignFailException;
+import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

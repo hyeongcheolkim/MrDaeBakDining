@@ -51,7 +51,7 @@ public class StyleService {
                 .anyMatch(e -> e == true);
     }
 
-    private List<StyleTableware> makeStyleItemList(Style style, StyleDto styleDto) {
+    public List<StyleTableware> makeStyleItemList(Style style, StyleDto styleDto) {
         var ret = new ArrayList<StyleTableware>();
         List<Long> tablewareIdList = styleDto.getTablewareIdList();
         for (var tablewareId : tablewareIdList) {

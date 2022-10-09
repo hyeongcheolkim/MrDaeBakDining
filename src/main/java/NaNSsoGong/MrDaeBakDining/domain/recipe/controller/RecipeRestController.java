@@ -8,13 +8,12 @@ import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.request.RecipeCreateRe
 import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.request.RecipeUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.response.RecipeCreateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.response.RecipeInfoResponse;
-import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.response.RecipeUpdateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.service.RecipeService;
-import NaNSsoGong.MrDaeBakDining.error.exception.EntityCreateFailException;
-import NaNSsoGong.MrDaeBakDining.error.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.error.response.BusinessExceptionResponse;
+import NaNSsoGong.MrDaeBakDining.exception.exception.EntityCreateFailException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,8 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/recipe")
@@ -65,27 +62,28 @@ public class RecipeRestController {
             throw new NoExistEntityException("존재하지 않는 재료입니다");
         });
 
-        Optional<Recipe> foundRecipe = recipeRepository.findByFoodIdAndIngredientId(food.getId(), ingredient.getId());
-        if (foundRecipe.isPresent())
+        if (recipeRepository.findByFoodIdAndIngredientId(food.getId(), ingredient.getId()).isPresent())
             throw new EntityCreateFailException();
 
         Integer ingredientQuantity = recipeCreateRequest.getIngredientQuantity();
         Recipe recipe = recipeService.makeRecipe(food, ingredient, ingredientQuantity);
-        return ResponseEntity.ok().body(new RecipeCreateResponse(recipe.getId(), false));
+        return ResponseEntity.ok().body(new RecipeCreateResponse(recipe.getId()));
     }
 
     @Operation(summary = "레시피업데이트")
     @Transactional
     @PutMapping("")
-    public ResponseEntity<RecipeUpdateResponse> recipeUpdate(@RequestBody @Validated RecipeUpdateRequest recipeUpdateRequest) {
+    public ResponseEntity<RecipeInfoResponse> recipeUpdate(@RequestBody @Validated RecipeUpdateRequest recipeUpdateRequest) {
         Long foodId = recipeUpdateRequest.getFoodId();
         Long ingredientId = recipeUpdateRequest.getIngredientId();
         Integer ingredientQuantity = recipeUpdateRequest.getIngredientQuantity();
+
         Recipe recipe = recipeRepository.findByFoodIdAndIngredientId(foodId, ingredientId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 레시피입니다");
         });
+
         recipe.setIngredientQuantity(ingredientQuantity);
-        return ResponseEntity.ok().body(new RecipeUpdateResponse(recipe.getId()));
+        return ResponseEntity.ok().body(new RecipeInfoResponse(recipe));
     }
 
     @Operation(summary = "레시피삭제", description = "연관되어있는 푸드나 재료는 삭제되지 않습니다")

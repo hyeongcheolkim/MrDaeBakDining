@@ -16,5 +16,6 @@ public class OrderDto {
     private OrderStatus orderStatus;
     private LocalDateTime orderTime;
     private LocalDateTime reserveTime;
+    private Integer totalPriceAfterSale;
     private List<OrderSheetDto> orderSheetDtoList = new ArrayList<>();
 }
