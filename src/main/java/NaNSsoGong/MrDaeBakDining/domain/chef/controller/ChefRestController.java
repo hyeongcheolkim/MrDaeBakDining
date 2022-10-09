@@ -6,6 +6,7 @@ import NaNSsoGong.MrDaeBakDining.domain.chef.controller.response.ChefInfoRespons
 import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;
 import NaNSsoGong.MrDaeBakDining.domain.chef.repository.ChefRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
+import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.PersonalInformationException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
@@ -39,7 +40,7 @@ public class ChefRestController {
     @PostMapping("/sign")
     public ResponseEntity<ChefInfoResponse> sign(@RequestBody @Validated ChefSignRequest chefSignRequest) {
         if (!memberService.isLoginIdExist(chefSignRequest.getLoginId()))
-            throw new PersonalInformationException("아이디가 중복입니다");
+            throw new DuplicatedFieldValueException();
 
         Chef chef = chefSignRequest.toChef();
         Chef savedChef = chefRepository.save(chef);

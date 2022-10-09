@@ -6,6 +6,7 @@ import NaNSsoGong.MrDaeBakDining.domain.rider.controller.request.RiderUpdateRequ
 import NaNSsoGong.MrDaeBakDining.domain.rider.controller.response.RiderInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
+import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.PersonalInformationException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
@@ -37,7 +38,7 @@ public class RiderRestController {
     @PostMapping("/sign")
     public ResponseEntity<RiderInfoResponse> sign(@RequestBody @Validated RiderSignRequest riderSignRequest) {
         if (!memberService.isLoginIdExist(riderSignRequest.getLoginId()))
-            throw new PersonalInformationException("아이디가 중복입니다");
+            throw new DuplicatedFieldValueException();
 
         Rider rider = riderSignRequest.toRider();
         Rider savedRider = riderRepository.save(rider);

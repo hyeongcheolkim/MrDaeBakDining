@@ -11,6 +11,7 @@ import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.client.service.ClientService;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
 import NaNSsoGong.MrDaeBakDining.domain.order.SalePolicy;
+import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.PersonalInformationException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
@@ -47,7 +48,7 @@ public class ClientRestController {
     @PostMapping("/sign")
     public ResponseEntity<ClientInfoResponse> sign(@RequestBody @Validated ClientSignRequest clientSignRequest) {
         if (!memberService.isLoginIdExist(clientSignRequest.getLoginId()))
-            throw new PersonalInformationException("아이디가 중복입니다");
+            throw new DuplicatedFieldValueException();
         if (clientSignRequest.getPersonalInformationCollectionAgreement() && clientSignRequest.getAddress() == null)
             throw new PersonalInformationException("정보제공에 동의했을경우, 주소를 필수로 입력해야 합니다");
         if (clientSignRequest.getPersonalInformationCollectionAgreement() && clientSignRequest.getCardNumber().isEmpty())
