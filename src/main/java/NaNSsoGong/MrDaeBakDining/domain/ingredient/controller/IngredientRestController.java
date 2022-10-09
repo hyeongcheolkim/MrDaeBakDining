@@ -85,6 +85,7 @@ public class IngredientRestController {
     }
 
     @Operation(summary = "재료 비활성화", description = "이 재료를 필요로 하는 레시피가 존재하지 않을때 비활성화할 수 있습니다")
+    @Transactional
     @PatchMapping("/disable/{ingredientId}")
     public ResponseEntity<String> ingredientDisable(@PathVariable(value = "ingredientId") Long ingredientId) {
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {

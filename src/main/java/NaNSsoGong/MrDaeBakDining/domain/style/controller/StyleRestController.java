@@ -66,6 +66,7 @@ public class StyleRestController {
     }
 
     @Operation(summary = "스타일 비활성화", description = "enable = false")
+    @Transactional
     @PatchMapping("/disable/{styleId}")
     public ResponseEntity<String> styleDisable(@PathVariable(value = "styleId") Long styleId) {
         Style style = styleRepository.findById(styleId).orElseThrow(() -> {

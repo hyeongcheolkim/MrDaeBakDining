@@ -64,6 +64,7 @@ public class DinnerRestController {
     }
 
     @Operation(summary = "디너 비활성화", description = "enable = false")
+    @Transactional
     @PatchMapping("/disable/{dinnerId}")
     public ResponseEntity<String> dinnerDisable(@PathVariable(value = "dinnerId") Long dinnerId) {
         Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
