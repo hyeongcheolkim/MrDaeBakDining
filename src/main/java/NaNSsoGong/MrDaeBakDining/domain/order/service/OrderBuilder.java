@@ -29,7 +29,10 @@ public class OrderBuilder {
         order.setOrderTime(orderDto.getOrderTime());
         if (order.getOrderStatus().equals(OrderStatus.RESERVED))
             order.setReservedTime(orderDto.getReserveTime());
-        order.setOrderSheetList(buildOrderSheetList(order, orderDto));
+
+        List<OrderSheet> orderSheetList = buildOrderSheetList(order, orderDto);
+        for(var orderSheet : orderSheetList)
+            order.getOrderSheetList().add(orderSheet);
     }
 
     private List<OrderSheet> buildOrderSheetList(Order order, OrderDto orderDto) {

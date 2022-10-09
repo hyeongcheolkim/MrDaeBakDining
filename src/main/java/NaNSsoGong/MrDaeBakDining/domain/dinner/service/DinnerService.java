@@ -45,6 +45,7 @@ public class DinnerService {
         for(var excludedStyle : excludedStyleList)
             dinner.getExcludedStyleList().add(excludedStyle);
 
+
         return dinner;
     }
 
@@ -66,13 +67,12 @@ public class DinnerService {
         Map<Long, Integer> itemIdAndQuantity = dinnerDto.getFoodIdAndQuantity();
         for (var itemId : itemIdAndQuantity.keySet()) {
             Food foundFood = foodRepository.findById(itemId).get();
-            if(!foundFood.getEnable())
-                continue;
-
             DinnerFood dinnerFood = new DinnerFood();
             dinnerFood.setDinner(dinner);
             dinnerFood.setFood(foundFood);
             dinnerFood.setFoodQuantity(itemIdAndQuantity.get(itemId));
+
+            foundFood.getDinnerFoodList().add(dinnerFood);
             ret.add(dinnerFood);
         }
         return ret;
@@ -82,9 +82,11 @@ public class DinnerService {
         var ret = new ArrayList<ExcludedStyle>();
         List<Long> excludedStyleIdList = dinnerDto.getExcludedStyleIdList();
         for(var styleId : excludedStyleIdList){
+            Style foundStyle = styleRepository.findById(styleId).get();
             ExcludedStyle excludedStyle = new ExcludedStyle();
-            excludedStyle.setStyle(styleRepository.findById(styleId).get());
             excludedStyle.setDinner(dinner);
+            excludedStyle.setStyle(foundStyle);
+
             ret.add(excludedStyle);
         }
         return ret;

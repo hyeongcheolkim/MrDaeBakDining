@@ -30,6 +30,8 @@ public class OrderService {
         clientOrder.setClient(client);
         clientOrderRepository.save(clientOrder);
         orderBuilder.buildOrder(clientOrder, orderDto);
+
+        client.getClientOrderList().add(clientOrder);
         return clientOrder;
     }
 
@@ -38,6 +40,8 @@ public class OrderService {
         guestOrder.setGuest(guest);
         guestOrderRepository.save(guestOrder);
         orderBuilder.buildOrder(guestOrder, orderDto);
+
+        guest.setGuestOrder(guestOrder);
         return guestOrder;
     }
 

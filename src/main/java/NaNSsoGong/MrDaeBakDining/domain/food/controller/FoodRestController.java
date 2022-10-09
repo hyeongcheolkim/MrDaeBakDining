@@ -1,18 +1,18 @@
 package NaNSsoGong.MrDaeBakDining.domain.food.controller;
 
-import NaNSsoGong.MrDaeBakDining.domain.ResponseConst;
-import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.request.FoodCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.request.FoodUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodMakeResponse;
-import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodReferencedDinnerResponse;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.FoodCategory;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.service.FoodService;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
-import NaNSsoGong.MrDaeBakDining.exception.exception.*;
+import NaNSsoGong.MrDaeBakDining.exception.exception.BusinessException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.DisabledEntityContainException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.exception.response.DisabledEntityContainInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
+import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.DISABLE_COMPLETE;
 
 @Tag(name = "food")
 @RestController

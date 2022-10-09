@@ -92,7 +92,7 @@ public class StyleRestController {
         style.setName(styleUpdateRequest.getName());
         style.setSellPrice(styleUpdateRequest.getSellPrice());
 
-        List<StyleTableware> styleTablewareList = styleService.makeStyleItemList(style, styleUpdateRequest.toStyleDto());
+        List<StyleTableware> styleTablewareList = styleService.makeStyleTablewareList(style, styleUpdateRequest.toStyleDto());
         style.getStyleTablewareList().clear();
         for (var styleTableware : styleTablewareList)
             style.getStyleTablewareList().add(styleTableware);

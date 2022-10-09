@@ -15,6 +15,4 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class Rider extends Member {
-    @OneToOne(mappedBy = "rider", fetch = FetchType.LAZY)
-    Order order;
 }

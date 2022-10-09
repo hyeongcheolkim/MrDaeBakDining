@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +30,7 @@ public class StyleService {
         style.setEnable(true);
         style.setOrderable(true);
 
-        List<StyleTableware> styleTablewareList = makeStyleItemList(style, styleDto);
+        List<StyleTableware> styleTablewareList = makeStyleTablewareList(style, styleDto);
         for (var styleTableware : styleTablewareList)
             style.getStyleTablewareList().add(styleTableware);
         return style;
@@ -51,13 +50,16 @@ public class StyleService {
                 .anyMatch(e -> e == true);
     }
 
-    public List<StyleTableware> makeStyleItemList(Style style, StyleDto styleDto) {
+    public List<StyleTableware> makeStyleTablewareList(Style style, StyleDto styleDto) {
         var ret = new ArrayList<StyleTableware>();
         List<Long> tablewareIdList = styleDto.getTablewareIdList();
         for (var tablewareId : tablewareIdList) {
+            Tableware foundTableware = tablewareRepository.findById(tablewareId).get();
             StyleTableware styleTableware = new StyleTableware();
             styleTableware.setStyle(style);
-            styleTableware.setTableware(tablewareRepository.findById(tablewareId).get());
+            styleTableware.setTableware(foundTableware);
+
+            foundTableware.getStyleTablewareList().add(styleTableware);
             ret.add(styleTableware);
         }
         return ret;

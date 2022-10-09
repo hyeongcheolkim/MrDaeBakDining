@@ -79,7 +79,6 @@ public class OrderRestController {
         if (!actualPrice.equals(orderDto.getTotalPriceAfterSale()))
             throw new PriceNotSameException(orderDto.getTotalPriceAfterSale(), actualPrice);
 
-        client.getClientOrderList().add(clientOrder);
         return ResponseEntity.ok().body(new ClientOrderInfoResponse(clientOrder));
     }
 
@@ -98,7 +97,6 @@ public class OrderRestController {
         if (!actualPrice.equals(orderDto.getTotalPriceAfterSale()))
             throw new PriceNotSameException(orderDto.getTotalPriceAfterSale(), actualPrice);
 
-        guest.setGuestOrder(guestOrder);
         return ResponseEntity.ok().body(new GuestOrderInfoResponse(guestOrder));
     }
 
