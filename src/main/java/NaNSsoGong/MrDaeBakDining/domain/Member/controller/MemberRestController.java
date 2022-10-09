@@ -1,10 +1,9 @@
 package NaNSsoGong.MrDaeBakDining.domain.member.controller;
 
-import NaNSsoGong.MrDaeBakDining.domain.ResponseConst;
 import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
-import NaNSsoGong.MrDaeBakDining.domain.member.controller.exception.LoginFailException;
-import NaNSsoGong.MrDaeBakDining.domain.member.controller.exception.LogoutFailException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.LoginFailException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.LogoutFailException;
 import NaNSsoGong.MrDaeBakDining.domain.member.controller.request.MemberLoginRequest;
 import NaNSsoGong.MrDaeBakDining.domain.member.controller.request.MemberUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.member.controller.response.MemberInfoResponse;
@@ -13,10 +12,8 @@ import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
-import NaNSsoGong.MrDaeBakDining.exception.exception.BusinessException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoLoginMemberException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,7 +24,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -100,7 +96,7 @@ public class MemberRestController {
                                           @Parameter(name = "riderId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_RIDER, required = false) Long riderId,
                                           HttpServletRequest request) {
         if (clientId == null && chefId == null && riderId == null)
-            throw new NoLoginMemberException("로그인하지 않는 멤버의 접근입니다");
+            throw new NoExistEntityException();
         Long memberId = null;
         if (clientId != null)
             memberId = clientId;
