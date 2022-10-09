@@ -21,8 +21,9 @@ public class OrderCreateRequest {
     private OrderStatus orderStatus;
     @Nullable
     private LocalDateTime reservedTime;
-    private List<OrderSheetCreateRequest> orderSheetCreateRequestList = new ArrayList<>();
+    @NotNull
     private Integer totalPriceAfterSale;
+    private List<OrderSheetCreateRequest> orderSheetCreateRequestList = new ArrayList<>();
 
     public OrderDto toOrderDto() {
         OrderDto ret = OrderDto.builder()
@@ -31,8 +32,9 @@ public class OrderCreateRequest {
                 .orderSheetDtoList(this.orderSheetCreateRequestList.stream()
                         .map(OrderSheetCreateRequest::toOrderSheetDto)
                         .collect(Collectors.toList()))
-                .orderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .totalPriceAfterSale(this.totalPriceAfterSale)
+                .orderTime(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES
+                ))
                 .build();
         if (orderStatus.equals(OrderStatus.RESERVED))
             ret.setOrderStatus(OrderStatus.RESERVED);
