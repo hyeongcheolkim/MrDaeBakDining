@@ -6,7 +6,6 @@ import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.*;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderSheetDto;
-import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderReservedTimeRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderSheetRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,23 +22,14 @@ public class OrderBuilder {
     private final StyleRepository styleRepository;
     private final OrderSheetRepository orderSheetRepository;
     private final FoodRepository foodRepository;
-    private final OrderReservedTimeRepository orderReservedTimeRepository;
-    private final DinnerService dinnerService;
 
     public void buildOrder(Order order, OrderDto orderDto) {
         order.setAddress(orderDto.getAddress());
         order.setOrderStatus(orderDto.getOrderStatus());
         order.setOrderTime(orderDto.getOrderTime());
         if (order.getOrderStatus().equals(OrderStatus.RESERVED))
-            saveReservedTime(order, orderDto);
+            order.setReservedTime(orderDto.getReserveTime());
         order.setOrderSheetList(buildOrderSheetList(order, orderDto));
-    }
-
-    private void saveReservedTime(Order order, OrderDto orderDto) {
-        OrderReservedTime orderReservedTime = new OrderReservedTime();
-        orderReservedTime.setOrder(order);
-        orderReservedTime.setReservedTime(orderDto.getReserveTime());
-        orderReservedTimeRepository.save(orderReservedTime);
     }
 
     private List<OrderSheet> buildOrderSheetList(Order order, OrderDto orderDto) {

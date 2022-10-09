@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FoodService {
     private final FoodRepository foodRepository;
-    private final IngredientRepository ingredientRepository;
 
     public Boolean isMakeAble(Food food){
         List<Recipe> recipeList = food.getRecipeList();

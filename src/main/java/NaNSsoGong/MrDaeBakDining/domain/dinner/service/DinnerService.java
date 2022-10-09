@@ -23,8 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class DinnerService {
     private final DinnerRepository dinnerRepository;
-    private final FoodRepository foodRepository;
     private final StyleRepository styleRepository;
+    private final FoodRepository foodRepository;
 
     @Transactional
     public Dinner makeDinner(DinnerDto dinnerDto) {

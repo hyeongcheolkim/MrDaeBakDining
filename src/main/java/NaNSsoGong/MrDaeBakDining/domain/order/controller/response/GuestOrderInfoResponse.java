@@ -20,6 +20,7 @@ public class GuestOrderInfoResponse {
     private String riderName;
     private Address address;
     private LocalDateTime orderTime;
+    private LocalDateTime reservedTime;
     private OrderStatus orderStatus;
     List<OrderSheetInfoResponse> orderSheetResponseList = new ArrayList<>();
 
@@ -32,6 +33,7 @@ public class GuestOrderInfoResponse {
         this.riderName = guestOrder.getRider() == null ? "미정" : guestOrder.getRider().getName();
         this.address = guestOrder.getAddress();
         this.orderTime = guestOrder.getOrderTime();
+        this.reservedTime = guestOrder.getReservedTime();
         this.orderStatus = guestOrder.getOrderStatus();
         this.orderSheetResponseList = guestOrder.getOrderSheetList().stream()
                 .map(OrderSheetInfoResponse::new)

@@ -50,14 +50,14 @@ import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_RIDER;
 @Slf4j
 @ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class OrderRestController {
-    private final OrderService orderService;
     private final OrderSheetRepository orderSheetRepository;
+    private final ClientRepository clientRepository;
+    private final DinnerRepository dinnerRepository;
     private final OrderRepository orderRepository;
     private final GuestRepository guestRepository;
-    private final ClientRepository clientRepository;
     private final RiderRepository riderRepository;
-    private final DinnerRepository dinnerRepository;
     private final StyleRepository styleRepository;
+    private final OrderService orderService;
     private final OrderBuilder orderBuilder;
 
     @Operation(summary = "클라이언트 주문", description = "클라이언트 세션이 필요합니다")

@@ -37,8 +37,8 @@ import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.DISABLE_COMPLETE;
 @RequiredArgsConstructor
 @ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class IngredientRestController {
-    private final IngredientService ingredientService;
     private final IngredientRepository ingredientRepository;
+    private final IngredientService ingredientService;
 
     @Operation(summary = "재료조회")
     @GetMapping("/{ingredientId}")

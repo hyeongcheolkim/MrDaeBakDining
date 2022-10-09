@@ -31,10 +31,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class RecipeRestController {
-    private final RecipeRepository recipeRepository;
-    private final RecipeService recipeService;
-    private final FoodRepository foodRepository;
     private final IngredientRepository ingredientRepository;
+    private final RecipeRepository recipeRepository;
+    private final FoodRepository foodRepository;
+    private final RecipeService recipeService;
 
     @Operation(summary = "레시피단건조회 by recipeId")
     @GetMapping("/{recipeId}")

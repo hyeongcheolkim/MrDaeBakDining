@@ -29,10 +29,11 @@ public class ClientOrderInfoResponse {
         this.orderId = clientOrder.getId();
         this.clientId = clientOrder.getClient().getId();
         this.clientName = clientOrder.getClient().getName();
-        this.riderId = clientOrder.getRider() == null ? null : clientOrder.getRider().getId();
+        this.riderId = clientOrder.getRider().getId();
         this.riderName = clientOrder.getRider() == null ? "미정" : clientOrder.getRider().getName();
         this.address = clientOrder.getAddress();
         this.orderTime = clientOrder.getOrderTime();
+        this.reservedTime = clientOrder.getReservedTime();
         this.orderStatus = clientOrder.getOrderStatus();
         this.orderSheetResponseList = clientOrder.getOrderSheetList().stream()
                 .map(OrderSheetInfoResponse::new)

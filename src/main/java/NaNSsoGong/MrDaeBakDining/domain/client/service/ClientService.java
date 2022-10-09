@@ -4,8 +4,6 @@ import NaNSsoGong.MrDaeBakDining.domain.client.ClientGradeConst;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.ClientGrade;
 import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
-import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus;
-import NaNSsoGong.MrDaeBakDining.domain.order.repository.ClientOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,14 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static NaNSsoGong.MrDaeBakDining.domain.client.domain.ClientGrade.*;
-import static NaNSsoGong.MrDaeBakDining.domain.client.ClientGradeConst.*;
-import static NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus.*;
+import static NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus.DELIVERED;
 
 @Service
 @RequiredArgsConstructor
 public class ClientService {
     private final ClientRepository clientRepository;
-    private final ClientOrderRepository clientOrderRepository;
 
     @Transactional
     public void evaluateClientGrade() {

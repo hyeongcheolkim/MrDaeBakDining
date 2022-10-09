@@ -26,10 +26,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.UUID;
 
-import static NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus.values;
 import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_CLIENT;
 
 @Tag(name = "order", description = "order기능에 관한 api집합입니다")
@@ -39,10 +38,10 @@ import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_CLIENT
 @Slf4j
 @ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class OrderInfoRestController {
-    private final OrderRepository orderRepository;
-    private final OrderSheetRepository orderSheetRepository;
     private final ClientOrderRepository clientOrderRepository;
+    private final OrderSheetRepository orderSheetRepository;
     private final GuestOrderRepository guestOrderRepository;
+    private final OrderRepository orderRepository;
     private final GuestRepository guestRepository;
 
     @Operation(summary = "오더시트조회", description = "Order의 구성요소인 OrderSheet를 개별적으로 조회합니다")

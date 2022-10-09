@@ -16,8 +16,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RecipeService {
     private final RecipeRepository recipeRepository;
-    private final FoodRepository foodRepository;
-    private final IngredientRepository ingredientRepository;
 
     @Transactional
     public Recipe makeRecipe(Food food, Ingredient ingredient, Integer ingredientQuantity){

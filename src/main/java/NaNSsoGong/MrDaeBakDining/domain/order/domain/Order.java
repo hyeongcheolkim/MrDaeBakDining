@@ -28,6 +28,7 @@ public class Order {
     @Embedded
     private Address address;
     private LocalDateTime orderTime;
+    private LocalDateTime reservedTime;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
     @OneToOne(fetch = FetchType.LAZY)
