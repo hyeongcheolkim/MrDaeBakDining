@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_CLIENT;
 
-@Tag(name = "client")
+@Tag(name = "member")
 @RestController
 @RequestMapping("/api/client")
 @RequiredArgsConstructor

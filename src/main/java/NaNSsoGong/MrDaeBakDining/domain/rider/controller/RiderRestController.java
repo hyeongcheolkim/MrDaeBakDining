@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.*;
 
-@Tag(name = "rider")
+@Tag(name = "member")
 @RestController
 @RequestMapping("/api/rider")
 @RequiredArgsConstructor
