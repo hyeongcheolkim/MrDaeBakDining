@@ -2,7 +2,6 @@ package NaNSsoGong.MrDaeBakDining.domain.style.controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.style.controller.request.StyleCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.style.controller.request.StyleUpdateRequest;
-import NaNSsoGong.MrDaeBakDining.domain.style.controller.response.StyleCreateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.style.controller.response.StyleInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleTableware;
@@ -55,12 +54,12 @@ public class StyleRestController {
 
     @Operation(summary = "스타일 생성")
     @PostMapping("")
-    public ResponseEntity<StyleCreateResponse> styleCreate(@RequestBody @Validated StyleCreateRequest styleCreateRequest) {
+    public ResponseEntity<StyleInfoResponse> styleCreate(@RequestBody @Validated StyleCreateRequest styleCreateRequest) {
         if (styleService.isStyleNameExist(styleCreateRequest.getName()))
             throw new EntityCreateFailException();
 
         Style madeStyle = styleService.makeStyle(styleCreateRequest.toStyleDto());
-        return ResponseEntity.ok().body(new StyleCreateResponse(madeStyle.getId()));
+        return ResponseEntity.ok().body(new StyleInfoResponse(madeStyle));
     }
 
     @Operation(summary = "스타일 비활성화", description = "enable = false")

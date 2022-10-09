@@ -3,7 +3,6 @@ package NaNSsoGong.MrDaeBakDining.domain.rider.controller;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.controller.request.RiderSignRequest;
 import NaNSsoGong.MrDaeBakDining.domain.rider.controller.response.RiderInfoResponse;
-import NaNSsoGong.MrDaeBakDining.domain.rider.controller.response.RiderSignResponse;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
 import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
@@ -33,13 +32,13 @@ public class RiderRestController {
     @Operation(summary = "회원가입")
     @Transactional
     @PostMapping("/sign")
-    public ResponseEntity<RiderSignResponse> sign(@RequestBody @Validated RiderSignRequest riderSignRequest) {
+    public ResponseEntity<RiderInfoResponse> sign(@RequestBody @Validated RiderSignRequest riderSignRequest) {
         if (!memberService.isLoginIdExist(riderSignRequest.getLoginId()))
             throw new SignFailException("아이디가 중복입니다");
 
         Rider rider = riderSignRequest.toRider();
         Rider savedRider = riderRepository.save(rider);
-        return ResponseEntity.ok().body(new RiderSignResponse(savedRider.getId()));
+        return ResponseEntity.ok().body(new RiderInfoResponse(savedRider));
     }
 
     @Operation(summary = "회원정보조회 by riderId")

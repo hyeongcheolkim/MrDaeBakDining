@@ -3,7 +3,6 @@ package NaNSsoGong.MrDaeBakDining.domain.tableware.controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.tableware.controller.request.TablewareCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.controller.request.TablewareUpdateRequest;
-import NaNSsoGong.MrDaeBakDining.domain.tableware.controller.response.TablewareCreateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.controller.response.TablewareInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
@@ -60,7 +59,7 @@ public class TablewareRestController {
     @Operation(summary = "테이블웨어 생성", description = "기존 같은 이름의 테이블 웨어가 이미 존재한다면, enable = true로 바꿉니다")
     @Transactional
     @PostMapping("")
-    public ResponseEntity<TablewareCreateResponse> tablewareCreate(@RequestBody @Validated TablewareCreateRequest tablewareCreateRequest) {
+    public ResponseEntity<TablewareInfoResponse> tablewareCreate(@RequestBody @Validated TablewareCreateRequest tablewareCreateRequest) {
         String name = tablewareCreateRequest.getName();
         if (tablewareService.isTablewareNameExist(name))
             throw new EntityCreateFailException();
@@ -70,7 +69,7 @@ public class TablewareRestController {
         tableware.setEnable(true);
         tableware.setName(name);
 
-        return ResponseEntity.ok().body(new TablewareCreateResponse(savedTableware.getId()));
+        return ResponseEntity.ok().body(new TablewareInfoResponse(savedTableware));
     }
 
     @Operation(summary = "테이블웨어 비활성화", description = "이 테이블웨어를 포함하는 스타일이 존재하지 않을때 비활성화할 수 있습니다")

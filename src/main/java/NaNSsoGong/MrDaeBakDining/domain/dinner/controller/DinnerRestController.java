@@ -1,7 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.dinner.controller;
 
+import NaNSsoGong.MrDaeBakDining.domain.ResponseConst;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.request.DinnerCreateRequest;
-import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerCreateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.DISABLE_COMPLETE;
+import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
 
 @RestController
 @RequestMapping("/api/dinner")
@@ -33,9 +33,9 @@ public class DinnerRestController {
 
     @Operation(summary = "디너 생성")
     @PostMapping("")
-    public ResponseEntity<DinnerCreateResponse> dinnerCreate(@RequestBody @Validated DinnerCreateRequest dinnerCreateRequest) {
+    public ResponseEntity<DinnerInfoResponse> dinnerCreate(@RequestBody @Validated DinnerCreateRequest dinnerCreateRequest) {
         Dinner madeDinner = dinnerService.makeDinner(dinnerCreateRequest.toDinnerDto());
-        return ResponseEntity.ok().body(new DinnerCreateResponse(madeDinner.getId()));
+        return ResponseEntity.ok().body(new DinnerInfoResponse(madeDinner));
     }
 
     @Operation(summary = "디너조회 By dinnerId")

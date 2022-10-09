@@ -4,7 +4,6 @@ import NaNSsoGong.MrDaeBakDining.domain.client.ClientGradeConst;
 import NaNSsoGong.MrDaeBakDining.domain.client.controller.request.ClientSignRequest;
 import NaNSsoGong.MrDaeBakDining.domain.client.controller.response.ClientGradeInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.client.controller.response.ClientInfoResponse;
-import NaNSsoGong.MrDaeBakDining.domain.client.controller.response.ClientSignResponse;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.ClientGrade;
 import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
@@ -20,7 +19,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -44,7 +42,7 @@ public class ClientRestController {
     @Operation(summary = "회원가입")
     @Transactional
     @PostMapping("/sign")
-    public ResponseEntity<ClientSignResponse> sign(@RequestBody @Validated ClientSignRequest clientSignRequest) {
+    public ResponseEntity<ClientInfoResponse> sign(@RequestBody @Validated ClientSignRequest clientSignRequest) {
         if (!memberService.isLoginIdExist(clientSignRequest.getLoginId()))
             throw new SignFailException("아이디가 중복입니다");
         if (clientSignRequest.getPersonalInformationCollectionAgreement() && clientSignRequest.getAddress() == null)
@@ -54,7 +52,7 @@ public class ClientRestController {
 
         Client client = clientSignRequest.toClient();
         Client savedClient = clientRepository.save(client);
-        return ResponseEntity.ok().body(new ClientSignResponse(savedClient.getId()));
+        return ResponseEntity.ok().body(new ClientInfoResponse(savedClient));
     }
 
     @Operation(summary = "회원정보조회 by clientId")

@@ -1,7 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.food.controller;
 
+import NaNSsoGong.MrDaeBakDining.domain.ResponseConst;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.request.FoodCreateRequest;
-import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodCreateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodMakeResponse;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodReferencedDinnerResponse;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.DISABLE_COMPLETE;
+import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
 
 @RestController
 @RequestMapping("/api/food")
@@ -57,13 +57,13 @@ public class FoodRestController {
     @Operation(summary = "푸드생성", description = "새로운 푸드메뉴를 만듭니다")
     @Transactional
     @PostMapping("")
-    public ResponseEntity<FoodCreateResponse> foodCreate(@RequestBody @Validated FoodCreateRequest foodCreateRequest) {
+    public ResponseEntity<FoodInfoResponse> foodCreate(@RequestBody @Validated FoodCreateRequest foodCreateRequest) {
         if (foodService.isFoodNameExist(foodCreateRequest.getName()))
             throw new EntityCreateFailException();
 
         Food food = foodCreateRequest.toFood();
         Food savedFood = foodRepository.save(food);
-        return ResponseEntity.ok().body(new FoodCreateResponse(savedFood.getId()));
+        return ResponseEntity.ok().body(new FoodInfoResponse(savedFood));
     }
 
     @Operation(summary = "만들 수 있는 푸드인지 확인", description = "푸드에 들어가는 재료의 재고량에 의존합니다")

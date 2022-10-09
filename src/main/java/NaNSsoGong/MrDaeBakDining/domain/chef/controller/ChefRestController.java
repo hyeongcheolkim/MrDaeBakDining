@@ -2,7 +2,6 @@ package NaNSsoGong.MrDaeBakDining.domain.chef.controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.chef.controller.request.ChefSignRequest;
 import NaNSsoGong.MrDaeBakDining.domain.chef.controller.response.ChefInfoResponse;
-import NaNSsoGong.MrDaeBakDining.domain.chef.controller.response.ChefSignResponse;
 import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;
 import NaNSsoGong.MrDaeBakDining.domain.chef.repository.ChefRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
@@ -35,13 +34,13 @@ public class ChefRestController {
     @Operation(summary = "회원가입")
     @Transactional
     @PostMapping("/sign")
-    public ResponseEntity<ChefSignResponse> sign(@RequestBody @Validated ChefSignRequest chefSignRequest) {
+    public ResponseEntity<ChefInfoResponse> sign(@RequestBody @Validated ChefSignRequest chefSignRequest) {
         if (!memberService.isLoginIdExist(chefSignRequest.getLoginId()))
             throw new SignFailException("아이디가 중복입니다");
 
         Chef chef = chefSignRequest.toChef();
         Chef savedChef = chefRepository.save(chef);
-        return ResponseEntity.ok().body(new ChefSignResponse(savedChef.getId()));
+        return ResponseEntity.ok().body(new ChefInfoResponse(savedChef));
     }
 
     @Operation(summary = "회원정보조회 by chefId")

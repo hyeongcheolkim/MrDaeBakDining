@@ -6,7 +6,6 @@ import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.request.RecipeCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.request.RecipeUpdateRequest;
-import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.response.RecipeCreateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.response.RecipeInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
@@ -54,7 +53,7 @@ public class RecipeRestController {
     @Operation(summary = "레시피 생성")
     @Transactional
     @PostMapping("")
-    public ResponseEntity<RecipeCreateResponse> recipeCreate(@RequestBody @Validated RecipeCreateRequest recipeCreateRequest) {
+    public ResponseEntity<RecipeInfoResponse> recipeCreate(@RequestBody @Validated RecipeCreateRequest recipeCreateRequest) {
         Food food = foodRepository.findById(recipeCreateRequest.getFoodId()).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 푸드입니다");
         });
@@ -67,7 +66,7 @@ public class RecipeRestController {
 
         Integer ingredientQuantity = recipeCreateRequest.getIngredientQuantity();
         Recipe recipe = recipeService.makeRecipe(food, ingredient, ingredientQuantity);
-        return ResponseEntity.ok().body(new RecipeCreateResponse(recipe.getId()));
+        return ResponseEntity.ok().body(new RecipeInfoResponse(recipe));
     }
 
     @Operation(summary = "레시피업데이트")
@@ -90,6 +89,6 @@ public class RecipeRestController {
     @DeleteMapping("/{recipeId}")
     public ResponseEntity recipeDelete(@PathVariable(name = "recipeId") Long recipeId) {
         recipeRepository.deleteById(recipeId);
-        return ResponseEntity.ok().body("삭제완료");
+        return ResponseEntity.ok().body("deleteComplete");
     }
 }
