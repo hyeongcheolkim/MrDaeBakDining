@@ -8,7 +8,7 @@ import NaNSsoGong.MrDaeBakDining.domain.tableware.domain.Tableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.service.TablewareService;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DisabledEntityContainException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.EntityCreateFailException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import NaNSsoGong.MrDaeBakDining.exception.response.DisabledEntityContainInfo;
@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
 
+@Tag(name = "tableware")
 @RestController
 @RequestMapping("/api/tableware")
 @RequiredArgsConstructor
@@ -62,7 +64,7 @@ public class TablewareRestController {
     public ResponseEntity<TablewareInfoResponse> tablewareCreate(@RequestBody @Validated TablewareCreateRequest tablewareCreateRequest) {
         String name = tablewareCreateRequest.getName();
         if (tablewareService.isTablewareNameExist(name))
-            throw new EntityCreateFailException();
+            throw new DuplicatedFieldValueException();
 
         Tableware tableware = new Tableware();
         Tableware savedTableware = tablewareRepository.save(tableware);
@@ -79,10 +81,11 @@ public class TablewareRestController {
         Tableware tableware = tablewareRepository.findById(tablewareId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 테이블웨어입니다");
         });
-        if (!tableware.getStyleTablewareList().isEmpty())
+        if (tableware.getStyleTablewareList().stream().filter(e -> e.getStyle().getEnable()).count() != 0)
             throw new DisabledEntityContainException(
                     tableware.getStyleTablewareList().stream()
                             .map(e -> e.getStyle())
+                            .filter(e -> e.getEnable())
                             .map(e -> DisabledEntityContainInfo.builder()
                                     .classTypeName(Hibernate.getClass(e).getSimpleName())
                                     .instanceName(e.getName())

@@ -1,20 +1,21 @@
 package NaNSsoGong.MrDaeBakDining.domain.food.controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.ResponseConst;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.request.FoodCreateRequest;
+import NaNSsoGong.MrDaeBakDining.domain.food.controller.request.FoodUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodMakeResponse;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodReferencedDinnerResponse;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
+import NaNSsoGong.MrDaeBakDining.domain.food.domain.FoodCategory;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.food.service.FoodService;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
-import NaNSsoGong.MrDaeBakDining.exception.exception.BusinessException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.DisabledEntityContainException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.EntityCreateFailException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.*;
 import NaNSsoGong.MrDaeBakDining.exception.response.DisabledEntityContainInfo;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
 
+@Tag(name = "food")
 @RestController
 @RequestMapping("/api/food")
 @RequiredArgsConstructor
@@ -54,12 +56,25 @@ public class FoodRestController {
                 .map(FoodInfoResponse::new);
     }
 
+    @Operation(summary = "푸드카테고리 후보값리스트조회")
+    @GetMapping("/category/value/list")
+    public ResponseEntity<List<FoodCategory>> foodCategoryList(){
+        return ResponseEntity.ok().body(List.of(FoodCategory.values()));
+    }
+
+    @Operation(summary = "푸드리스트조회 By FoodCategory")
+    @GetMapping("/category/list")
+    public Page<FoodInfoResponse> foodInfoListByFoodCategory(@RequestParam FoodCategory foodCategory, Pageable pageable){
+        return foodRepository.findAllByFoodCategory(foodCategory, pageable).map(FoodInfoResponse::new);
+    }
+
+
     @Operation(summary = "푸드생성", description = "새로운 푸드메뉴를 만듭니다")
     @Transactional
     @PostMapping("")
     public ResponseEntity<FoodInfoResponse> foodCreate(@RequestBody @Validated FoodCreateRequest foodCreateRequest) {
         if (foodService.isFoodNameExist(foodCreateRequest.getName()))
-            throw new EntityCreateFailException();
+            throw new DuplicatedFieldValueException();
 
         Food food = foodCreateRequest.toFood();
         Food savedFood = foodRepository.save(food);
@@ -89,18 +104,6 @@ public class FoodRestController {
                 .body(new FoodMakeResponse(foodId, food.getName(), ingredientAndConsumedQuantity));
     }
 
-    @GetMapping("/ref-dinner-list/{foodId}")
-    public ResponseEntity<List<FoodReferencedDinnerResponse>> referencedDinnerList(@PathVariable(value = "foodId") Long foodId) {
-        Food food = foodRepository.findById(foodId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 푸드입니다");
-        });
-        return ResponseEntity
-                .ok()
-                .body(food.getDinnerFoodList().stream()
-                        .map(FoodReferencedDinnerResponse::new)
-                        .collect(Collectors.toList()));
-    }
-
     @Operation(summary = "푸드 비활성화", description = "이 푸드가 포함되는 디너가 존재하지 않을때만 비활성화 할 수 있습니다")
     @Transactional
     @PatchMapping("/disable/{foodId}")
@@ -108,10 +111,11 @@ public class FoodRestController {
         Food food = foodRepository.findById(foodId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 푸드입니다");
         });
-        if (!food.getDinnerFoodList().isEmpty())
+        if (food.getDinnerFoodList().stream().filter(e -> e.getDinner().getEnable()).count() != 0)
             throw new DisabledEntityContainException(
                     food.getDinnerFoodList().stream()
                             .map(e -> e.getDinner())
+                            .filter(e -> e.getEnable())
                             .map(e -> DisabledEntityContainInfo.builder()
                                     .classTypeName(Hibernate.getClass(e).getSimpleName())
                                     .instanceName(e.getName())
@@ -121,5 +125,26 @@ public class FoodRestController {
             );
         food.setEnable(false);
         return ResponseEntity.ok().body(DISABLE_COMPLETE);
+    }
+
+    @Operation(summary = "푸드업데이트")
+    @Transactional
+    @PutMapping("/{foodId}")
+    public ResponseEntity<FoodInfoResponse> foodUpdate(
+            @PathVariable(value = "foodId") Long foodId,
+            @RequestBody @Validated FoodUpdateRequest foodUpdateRequest) {
+        Food food = foodRepository.findById(foodId).orElseThrow(() -> {
+            throw new NoExistEntityException();
+        });
+        if (!food.getName().equals(foodUpdateRequest.getName())
+                && foodService.isFoodNameExist(foodUpdateRequest.getName()))
+            throw new DuplicatedFieldValueException();
+
+        food.setName(foodUpdateRequest.getName());
+        food.setFoodCategory(foodUpdateRequest.getFoodCategory());
+        food.setSellPrice(foodUpdateRequest.getSellPrice());
+        food.setOrderable(foodUpdateRequest.getOrderable());
+
+        return ResponseEntity.ok().body(new FoodInfoResponse(food));
     }
 }

@@ -7,18 +7,20 @@ import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleTableware;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.service.StyleService;
-import NaNSsoGong.MrDaeBakDining.exception.exception.EntityCreateFailException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,7 @@ import java.util.List;
 
 import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
 
+@Tag(name = "style")
 @RestController
 @RequestMapping("/api/style")
 @RequiredArgsConstructor
@@ -56,7 +59,7 @@ public class StyleRestController {
     @PostMapping("")
     public ResponseEntity<StyleInfoResponse> styleCreate(@RequestBody @Validated StyleCreateRequest styleCreateRequest) {
         if (styleService.isStyleNameExist(styleCreateRequest.getName()))
-            throw new EntityCreateFailException();
+            throw new DuplicatedFieldValueException();
 
         Style madeStyle = styleService.makeStyle(styleCreateRequest.toStyleDto());
         return ResponseEntity.ok().body(new StyleInfoResponse(madeStyle));
@@ -73,6 +76,7 @@ public class StyleRestController {
     }
 
     @Operation(summary = "스타일업데이트")
+    @Transactional
     @PutMapping("/{styleId}")
     public ResponseEntity<StyleInfoResponse> styleUpdate(
             @PathVariable(value = "styleId") Long styleId,
@@ -80,6 +84,10 @@ public class StyleRestController {
         Style style = styleRepository.findById(styleId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 스타일입니다");
         });
+
+        if(!style.getName().equals(styleUpdateRequest.getName())
+        && styleService.isStyleNameExist(styleUpdateRequest.getName()))
+            throw new DuplicatedFieldValueException();
 
         style.setName(styleUpdateRequest.getName());
         style.setSellPrice(styleUpdateRequest.getSellPrice());

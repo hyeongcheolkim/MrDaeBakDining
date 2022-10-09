@@ -31,7 +31,7 @@ import java.util.UUID;
 
 import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_CLIENT;
 
-@Tag(name = "order", description = "order기능에 관한 api집합입니다")
+@Tag(name = "order")
 @RestController
 @RequestMapping("/api/order")
 @RequiredArgsConstructor

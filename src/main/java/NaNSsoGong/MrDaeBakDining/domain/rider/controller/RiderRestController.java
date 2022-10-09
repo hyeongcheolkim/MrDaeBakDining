@@ -2,17 +2,19 @@ package NaNSsoGong.MrDaeBakDining.domain.rider.controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.controller.request.RiderSignRequest;
+import NaNSsoGong.MrDaeBakDining.domain.rider.controller.request.RiderUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.rider.controller.response.RiderInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
 import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.SignFailException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.PersonalInformationException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.*;
 
+@Tag(name = "rider")
 @RestController
 @RequestMapping("/api/rider")
 @RequiredArgsConstructor
@@ -34,7 +37,7 @@ public class RiderRestController {
     @PostMapping("/sign")
     public ResponseEntity<RiderInfoResponse> sign(@RequestBody @Validated RiderSignRequest riderSignRequest) {
         if (!memberService.isLoginIdExist(riderSignRequest.getLoginId()))
-            throw new SignFailException("아이디가 중복입니다");
+            throw new PersonalInformationException("아이디가 중복입니다");
 
         Rider rider = riderSignRequest.toRider();
         Rider savedRider = riderRepository.save(rider);
@@ -58,6 +61,19 @@ public class RiderRestController {
         Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 rider입니다");
         });
+        return ResponseEntity.ok().body(new RiderInfoResponse(rider));
+    }
+
+    @Operation(summary="라이더업데이트")
+    @Transactional
+    @PutMapping("/{riderId}")
+    public ResponseEntity<RiderInfoResponse> riderUpdate(
+            @PathVariable(value = "riderId") Long riderId,
+            @RequestBody @Validated RiderUpdateRequest riderUpdateRequest) {
+        Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
+            throw new NoExistEntityException();
+        });
+        rider.setName(riderUpdateRequest.getName());
         return ResponseEntity.ok().body(new RiderInfoResponse(rider));
     }
 }

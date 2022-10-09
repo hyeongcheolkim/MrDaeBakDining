@@ -1,21 +1,20 @@
 package NaNSsoGong.MrDaeBakDining.domain.ingredient.controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.controller.request.IngredientCreateRequest;
+import NaNSsoGong.MrDaeBakDining.domain.ingredient.controller.request.IngredientQuantityUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.controller.request.IngredientUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.controller.response.IngredientInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
-import NaNSsoGong.MrDaeBakDining.exception.exception.DisabledEntityContainException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.EntityCreateFailException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.MinusQuantityException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.*;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import NaNSsoGong.MrDaeBakDining.exception.response.DisabledEntityContainInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 
 import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.DISABLE_COMPLETE;
 
-
+@Tag(name = "ingredient")
 @RestController
 @RequestMapping("/api/ingredient")
 @RequiredArgsConstructor
@@ -60,7 +59,7 @@ public class IngredientRestController {
     @PostMapping("")
     public ResponseEntity<IngredientInfoResponse> ingredientCreate(@RequestBody @Validated IngredientCreateRequest ingredientCreateRequest) {
         if (ingredientService.isIngredientNameExist(ingredientCreateRequest.getName()))
-            throw new EntityCreateFailException();
+            throw new DuplicatedFieldValueException();
 
         Ingredient ingredient = new Ingredient();
         ingredient.setEnable(true);
@@ -73,12 +72,12 @@ public class IngredientRestController {
     @Operation(summary = "수량 증감", description = "재고량을 0미만으로 만들 수 없다면 요청은 무시되고, Exception이 발생합니다")
     @Transactional
     @PatchMapping("/{ingredientId}")
-    public ResponseEntity<IngredientInfoResponse> ingredientUpdate(@PathVariable(name = "ingredientId") Long ingredientId,
-                                                                     @RequestBody @Validated IngredientUpdateRequest ingredientUpdateRequest) {
+    public ResponseEntity<IngredientInfoResponse> ingredientQuantityUpdate(@PathVariable(name = "ingredientId") Long ingredientId,
+                                                                           @RequestBody @Validated IngredientQuantityUpdateRequest ingredientQuantityUpdateRequest) {
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 재료입니다");
         });
-        Integer newQuantity = ingredient.getStockQuantity() + ingredientUpdateRequest.getQuantityDiff();
+        Integer newQuantity = ingredient.getStockQuantity() + ingredientQuantityUpdateRequest.getQuantityDiff();
         if (newQuantity < 0)
             throw new MinusQuantityException("재료 수량은 0보다 작을 수 없습니다");
         ingredient.setStockQuantity(newQuantity);
@@ -91,10 +90,11 @@ public class IngredientRestController {
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 재료입니다");
         });
-        if (!ingredient.getRecipeList().isEmpty())
+        if (ingredient.getRecipeList().stream().filter(e -> e.getFood().getEnable()).count() != 0)
             throw new DisabledEntityContainException(
                     ingredient.getRecipeList().stream()
                             .map(e -> e.getFood())
+                            .filter(e -> e.getEnable())
                             .map(e -> DisabledEntityContainInfo.builder()
                                     .classTypeName(Hibernate.getClass(e).getSimpleName())
                                     .instanceName(e.getName())
@@ -105,5 +105,23 @@ public class IngredientRestController {
 
         ingredient.setEnable(false);
         return ResponseEntity.ok().body(DISABLE_COMPLETE);
+    }
+
+    @Operation(summary = "재료업데이트")
+    @Transactional
+    @PutMapping("/{ingredientId}")
+    public ResponseEntity<IngredientInfoResponse> ingredientUpdate(
+            @PathVariable(value = "ingredientId") Long ingredientId,
+            @RequestBody @Validated IngredientUpdateRequest ingredientUpdateRequest) {
+        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
+            throw new NoExistEntityException();
+        });
+        if (!ingredient.getName().equals(ingredientUpdateRequest.getName())
+                && ingredientService.isIngredientNameExist(ingredientUpdateRequest.getName()))
+            throw new DuplicatedFieldValueException();
+        ingredient.setName(ingredientUpdateRequest.getName());
+        ingredient.setStockQuantity(ingredient.getStockQuantity());
+
+        return ResponseEntity.ok().body(new IngredientInfoResponse(ingredient));
     }
 }

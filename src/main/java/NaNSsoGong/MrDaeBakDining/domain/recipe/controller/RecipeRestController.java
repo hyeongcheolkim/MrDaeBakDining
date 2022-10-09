@@ -10,13 +10,14 @@ import NaNSsoGong.MrDaeBakDining.domain.recipe.controller.response.RecipeInfoRes
 import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.service.RecipeService;
-import NaNSsoGong.MrDaeBakDining.exception.exception.EntityCreateFailException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "recipe")
 @RestController
 @RequestMapping("/api/recipe")
 @RequiredArgsConstructor
@@ -62,7 +64,7 @@ public class RecipeRestController {
         });
 
         if (recipeRepository.findByFoodIdAndIngredientId(food.getId(), ingredient.getId()).isPresent())
-            throw new EntityCreateFailException();
+            throw new DuplicatedFieldValueException();
 
         Integer ingredientQuantity = recipeCreateRequest.getIngredientQuantity();
         Recipe recipe = recipeService.makeRecipe(food, ingredient, ingredientQuantity);

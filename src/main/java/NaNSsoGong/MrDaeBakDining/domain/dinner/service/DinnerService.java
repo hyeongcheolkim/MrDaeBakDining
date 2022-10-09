@@ -28,7 +28,7 @@ public class DinnerService {
 
     @Transactional
     public Dinner makeDinner(DinnerDto dinnerDto) {
-        Dinner dinner = dinnerRepository.findByName(dinnerDto.getName()).orElseGet(Dinner::new);
+        Dinner dinner = new Dinner();
 
         dinnerRepository.save(dinner);
         dinner.setName(dinnerDto.getName());
@@ -88,5 +88,11 @@ public class DinnerService {
             ret.add(excludedStyle);
         }
         return ret;
+    }
+
+    public Boolean isDinnerNameExist(String name) {
+        return dinnerRepository.findAllByName(name).stream()
+                .map(Dinner::getEnable)
+                .anyMatch(e -> e == true);
     }
 }

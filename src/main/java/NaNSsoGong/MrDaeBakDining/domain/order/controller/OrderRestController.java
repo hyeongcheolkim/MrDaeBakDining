@@ -43,7 +43,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus.RESERVED
 import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_CLIENT;
 import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_RIDER;
 
-@Tag(name = "order", description = "order기능에 관한 api집합입니다")
+@Tag(name = "order")
 @RestController
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
