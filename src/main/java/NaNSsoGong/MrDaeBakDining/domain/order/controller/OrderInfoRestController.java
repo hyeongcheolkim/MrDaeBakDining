@@ -48,7 +48,7 @@ public class OrderInfoRestController {
     @GetMapping("/sheet/{orderSheetId}")
     public ResponseEntity<OrderSheetInfoResponse> orderSheetInfoByOrderSheetId(@PathVariable(value = "orderSheetId") Long orderSheetId) {
         OrderSheet orderSheet = orderSheetRepository.findById(orderSheetId).orElseThrow(() -> {
-            throw new NoExistEntityException();
+            throw new NoExistEntityException("존재하지 않는 오더시트입니다");
         });
         return ResponseEntity.ok().body(new OrderSheetInfoResponse(orderSheet));
     }

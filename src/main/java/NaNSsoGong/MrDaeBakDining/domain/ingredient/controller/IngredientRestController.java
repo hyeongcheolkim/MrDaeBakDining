@@ -115,7 +115,7 @@ public class IngredientRestController {
             @PathVariable(value = "ingredientId") Long ingredientId,
             @RequestBody @Validated IngredientUpdateRequest ingredientUpdateRequest) {
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
-            throw new NoExistEntityException();
+            throw new NoExistEntityException("존재하지 않는 재료입니다");
         });
         if (!ingredient.getName().equals(ingredientUpdateRequest.getName())
                 && ingredientService.isIngredientNameExist(ingredientUpdateRequest.getName()))

@@ -107,7 +107,7 @@ public class ClientRestController {
             @PathVariable(value = "clientId") Long clientId,
             @RequestBody @Validated ClientUpdateRequest clientUpdateRequest) {
         Client client = clientRepository.findById(clientId).orElseThrow(() -> {
-            throw new NoExistEntityException();
+            throw new NoExistEntityException("존재하지 않는 클라이언트입니다");
         });
 
         if (clientUpdateRequest.getPersonalInformationCollectionAgreement() && clientUpdateRequest.getAddress() == null)

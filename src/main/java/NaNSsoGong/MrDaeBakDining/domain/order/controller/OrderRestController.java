@@ -10,6 +10,7 @@ import NaNSsoGong.MrDaeBakDining.domain.order.controller.request.*;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.ClientOrderInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.GuestOrderInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.OrderSheetInfoResponse;
+import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.OrderUpdateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.*;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
@@ -37,6 +38,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus.ORDERED;
 import static NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus.RESERVED;
@@ -146,27 +149,41 @@ public class OrderRestController {
         return ResponseEntity.ok().body("라이더변경완료");
     }
 
-    @Operation(summary = "오더시트업데이트")
+    @Operation(summary = "주문수정", description = "오더에 포함된 각 오더시트를 수정합니다")
     @Transactional
-    @PutMapping("/{orderSheetId}")
-    public ResponseEntity<OrderSheetInfoResponse> orderUpdate(@PathVariable(name = "orderSheetId") Long orderSheetId,
-                                                              @RequestBody OrderSheetUpdateRequest orderSheetUpdateRequest) {
-        OrderSheet orderSheet = orderSheetRepository.findById(orderSheetId).orElseThrow(() -> {
+    @PutMapping("/{orderId}")
+    public ResponseEntity<OrderUpdateResponse> orderUpdate(
+            @PathVariable(name = "orderId") Long orderId,
+            @RequestBody OrderUpdateRequest orderUpdateRequest) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> {
             throw new NoExistEntityException("존재하지 않는 오더시트 입니다");
         });
-        Style style = styleRepository.findById(orderSheetUpdateRequest.getStyleId()).orElseGet(() -> {
-            throw new NoExistEntityException("존재하지 않는 스타일입니다");
-        });
-        Dinner dinner = dinnerRepository.findById(orderSheetUpdateRequest.getDinnerId()).orElseGet(() -> {
-            throw new NoExistEntityException("존재하지 않는 디너입니다");
-        });
+        Integer previousTotalPriceAfterSale = order.getTotalPriceAfterSale();
 
-        orderSheet.setStyle(style);
-        orderSheet.setDinner(dinner);
-        orderSheet.getFoodDifferenceList().clear();
-        orderBuilder.addToFoodDifferenceList(orderSheet, orderSheetUpdateRequest.getFoodIdAndDifference());
+        List<OrderSheetUpdateRequest> orderSheetUpdateRequestList = orderUpdateRequest.getOrderSheetUpdateRequestList();
+        for (var orderSheetUpdateRequest : orderSheetUpdateRequestList) {
+            OrderSheet orderSheet = orderSheetRepository.findById(orderSheetUpdateRequest.getOrderSheetId()).orElseThrow(() -> {
+                throw new NoExistEntityException("존재하지 않는 오더시트입니다");
+            });
+            Style style = styleRepository.findById(orderSheetUpdateRequest.getStyleId()).orElseGet(() -> {
+                throw new NoExistEntityException("존재하지 않는 스타일입니다");
+            });
+            Dinner dinner = dinnerRepository.findById(orderSheetUpdateRequest.getDinnerId()).orElseGet(() -> {
+                throw new NoExistEntityException("존재하지 않는 디너입니다");
+            });
 
-        return ResponseEntity.ok().body(new OrderSheetInfoResponse(orderSheet));
+            if(!order.getOrderSheetList().contains(orderSheet))
+                throw new BusinessException("오더와 오더시트가 가르키는 오더가 서로 다릅니다");
+
+            orderSheet.setStyle(style);
+            orderSheet.setDinner(dinner);
+            orderSheet.getFoodDifferenceList().clear();
+            orderBuilder.addToFoodDifferenceList(orderSheet, orderSheetUpdateRequest.getFoodIdAndDifference());
+        }
+
+        Integer nextTotalPriceAfterSale = orderService.orderPriceAfterSale(order);
+        order.setTotalPriceAfterSale(nextTotalPriceAfterSale);
+        return ResponseEntity.ok().body(new OrderUpdateResponse(order, previousTotalPriceAfterSale, nextTotalPriceAfterSale));
     }
 
     private void orderValid(OrderCreateRequest orderCreateRequest) {

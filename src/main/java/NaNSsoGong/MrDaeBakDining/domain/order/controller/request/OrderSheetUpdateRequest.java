@@ -10,16 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 public class OrderSheetUpdateRequest {
     @NotNull
+    private Long orderSheetId;
+    @NotNull
     private Long styleId;
     @NotNull
     private Long dinnerId;
     private Map<Long, Integer> foodIdAndDifference = new ConcurrentHashMap<>();
-
-    public OrderSheetDto toOrderSheetDto(){
-        return OrderSheetDto.builder()
-                .styleId(this.styleId)
-                .dinnerId(this.dinnerId)
-                .foodIdAndDifference(this.foodIdAndDifference)
-                .build();
-    }
 }

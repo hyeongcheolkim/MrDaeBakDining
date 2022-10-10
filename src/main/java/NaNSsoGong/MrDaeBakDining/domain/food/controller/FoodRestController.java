@@ -134,7 +134,7 @@ public class FoodRestController {
             @PathVariable(value = "foodId") Long foodId,
             @RequestBody @Validated FoodUpdateRequest foodUpdateRequest) {
         Food food = foodRepository.findById(foodId).orElseThrow(() -> {
-            throw new NoExistEntityException();
+            throw new NoExistEntityException("존재하지 않는 푸드입니다");
         });
         if (!food.getName().equals(foodUpdateRequest.getName())
                 && foodService.isFoodNameExist(foodUpdateRequest.getName()))

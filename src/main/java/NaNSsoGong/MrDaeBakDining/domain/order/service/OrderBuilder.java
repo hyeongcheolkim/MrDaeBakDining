@@ -27,6 +27,7 @@ public class OrderBuilder {
         order.setAddress(orderDto.getAddress());
         order.setOrderStatus(orderDto.getOrderStatus());
         order.setOrderTime(orderDto.getOrderTime());
+        order.setTotalPriceAfterSale(orderDto.getTotalPriceAfterSale());
         if (order.getOrderStatus().equals(OrderStatus.RESERVED))
             order.setReservedTime(orderDto.getReserveTime());
 

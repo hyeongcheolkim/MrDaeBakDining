@@ -27,8 +27,8 @@ public class OrderService {
 
     public ClientOrder makeClientOrder(Client client, OrderDto orderDto) {
         ClientOrder clientOrder = new ClientOrder();
-        clientOrder.setClient(client);
         clientOrderRepository.save(clientOrder);
+        clientOrder.setClient(client);
         orderBuilder.buildOrder(clientOrder, orderDto);
 
         client.getClientOrderList().add(clientOrder);
@@ -37,8 +37,8 @@ public class OrderService {
 
     public GuestOrder makeGuestOrder(Guest guest, OrderDto orderDto) {
         GuestOrder guestOrder = new GuestOrder();
-        guestOrder.setGuest(guest);
         guestOrderRepository.save(guestOrder);
+        guestOrder.setGuest(guest);
         orderBuilder.buildOrder(guestOrder, orderDto);
 
         guest.setGuestOrder(guestOrder);

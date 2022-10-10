@@ -34,6 +34,7 @@ public class Order {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Rider rider;
+    private Integer totalPriceAfterSale;
     @OneToMany(mappedBy = "order")
     List<OrderSheet> orderSheetList = new ArrayList<>();
 }

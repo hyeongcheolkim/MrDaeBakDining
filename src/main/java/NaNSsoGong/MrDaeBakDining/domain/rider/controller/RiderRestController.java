@@ -72,7 +72,7 @@ public class RiderRestController {
             @PathVariable(value = "riderId") Long riderId,
             @RequestBody @Validated RiderUpdateRequest riderUpdateRequest) {
         Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
-            throw new NoExistEntityException();
+            throw new NoExistEntityException("존재하지 않는 라이더입니다");
         });
         rider.setName(riderUpdateRequest.getName());
         return ResponseEntity.ok().body(new RiderInfoResponse(rider));

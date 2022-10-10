@@ -75,7 +75,7 @@ public class ChefRestController {
             @PathVariable(value = "chefId") Long chefId,
             @RequestBody @Validated ChefUpdateRequest chefUpdateRequest) {
         Chef chef = chefRepository.findById(chefId).orElseThrow(() -> {
-            throw new NoExistEntityException();
+            throw new NoExistEntityException("존재하지 않는 쉐프입니다");
         });
         chef.setName(chefUpdateRequest.getName());
         return ResponseEntity.ok().body(new ChefInfoResponse(chef));

@@ -81,7 +81,7 @@ public class DinnerRestController {
             @PathVariable(value = "dinnerId") Long dinnerId,
             @RequestBody @Validated DinnerUpdateRequest dinnerUpdateRequest) {
         Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
-            throw new NoExistEntityException();
+            throw new NoExistEntityException("존재하지 않는 디너입니다");
         });
 
         if(!dinner.getName().equals(dinnerUpdateRequest.getName())
