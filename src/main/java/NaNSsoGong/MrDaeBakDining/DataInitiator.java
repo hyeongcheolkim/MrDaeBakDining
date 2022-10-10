@@ -391,7 +391,9 @@ public class DataInitiator {
 
 
         clientOrder = (ClientOrder) orderService.makeClientOrder(client1, orderDto);
+        clientOrder.setTotalPriceAfterSale(orderService.orderPriceAfterSale(clientOrder));
         guestOrder = (GuestOrder) orderService.makeGuestOrder(guest, orderDto);
+        guestOrder.setTotalPriceAfterSale(orderService.orderPriceAfterSale(guestOrder));
     }
 
 

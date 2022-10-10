@@ -25,6 +25,7 @@ public class OrderInfoResponse {
     List<OrderSheetInfoResponse> orderSheetResponseList = new ArrayList<>();
 
     public OrderInfoResponse(Order order) {
+        this.orderId = order.getId();
         this.riderId = order.getRider() == null ? null : order.getRider().getId();
         this.riderName = order.getRider() == null ? "미정" : order.getRider().getName();
         this.address = order.getAddress();
