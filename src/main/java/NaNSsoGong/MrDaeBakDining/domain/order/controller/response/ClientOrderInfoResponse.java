@@ -13,30 +13,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-public class ClientOrderInfoResponse {
-    private Long orderId;
+public class ClientOrderInfoResponse extends OrderInfoResponse{
     private Long clientId;
     private String clientName;
-    private Long riderId;
-    private String riderName;
-    private Address address;
-    private LocalDateTime orderTime;
-    private LocalDateTime reservedTime;
-    private OrderStatus orderStatus;
-    List<OrderSheetInfoResponse> orderSheetResponseList = new ArrayList<>();
 
     public ClientOrderInfoResponse(ClientOrder clientOrder) {
-        this.orderId = clientOrder.getId();
+        super(clientOrder);
         this.clientId = clientOrder.getClient().getId();
         this.clientName = clientOrder.getClient().getName();
-        this.riderId = clientOrder.getRider().getId();
-        this.riderName = clientOrder.getRider() == null ? "미정" : clientOrder.getRider().getName();
-        this.address = clientOrder.getAddress();
-        this.orderTime = clientOrder.getOrderTime();
-        this.reservedTime = clientOrder.getReservedTime();
-        this.orderStatus = clientOrder.getOrderStatus();
-        this.orderSheetResponseList = clientOrder.getOrderSheetList().stream()
-                .map(OrderSheetInfoResponse::new)
-                .collect(Collectors.toList());
     }
 }

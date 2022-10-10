@@ -96,7 +96,7 @@ public class MemberRestController {
                                           @Parameter(name = "riderId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_RIDER, required = false) Long riderId,
                                           HttpServletRequest request) {
         if (clientId == null && chefId == null && riderId == null)
-            throw new NoExistEntityException();
+            throw new NoExistEntityException("존재하지 않는 세션입니다");
         Long memberId = null;
         if (clientId != null)
             memberId = clientId;
@@ -124,7 +124,7 @@ public class MemberRestController {
             @PathVariable(value = "memberId") Long memberId,
             @RequestBody @Validated MemberUpdateRequest memberUpdateRequest) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> {
-            throw new NoExistEntityException();
+            throw new NoExistEntityException("존재하지 않는 멤버입니다");
         });
         if (!member.getLoginId().equals(memberUpdateRequest.getLoginId())
                 && memberService.isLoginIdExist(memberUpdateRequest.getLoginId()))

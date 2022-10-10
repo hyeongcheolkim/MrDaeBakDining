@@ -11,32 +11,15 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Data
-public class GuestOrderInfoResponse {
-    private Long orderId;
+public class GuestOrderInfoResponse extends OrderInfoResponse {
     private Long guestId;
     private String guestName;
     private UUID uuid;
-    private Long riderId;
-    private String riderName;
-    private Address address;
-    private LocalDateTime orderTime;
-    private LocalDateTime reservedTime;
-    private OrderStatus orderStatus;
-    List<OrderSheetInfoResponse> orderSheetResponseList = new ArrayList<>();
 
     public GuestOrderInfoResponse(GuestOrder guestOrder) {
-        this.orderId = guestOrder.getId();
+        super(guestOrder);
         this.guestId = guestOrder.getGuest().getId();
         this.guestName = guestOrder.getGuest().getName();
         this.uuid = guestOrder.getGuest().getUuid();
-        this.riderId = guestOrder.getRider() == null ? null : guestOrder.getRider().getId();
-        this.riderName = guestOrder.getRider() == null ? "미정" : guestOrder.getRider().getName();
-        this.address = guestOrder.getAddress();
-        this.orderTime = guestOrder.getOrderTime();
-        this.reservedTime = guestOrder.getReservedTime();
-        this.orderStatus = guestOrder.getOrderStatus();
-        this.orderSheetResponseList = guestOrder.getOrderSheetList().stream()
-                .map(OrderSheetInfoResponse::new)
-                .collect(Collectors.toList());
     }
 }
