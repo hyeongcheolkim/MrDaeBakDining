@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class OrderSheetService {
     private final DinnerService dinnerService;
 

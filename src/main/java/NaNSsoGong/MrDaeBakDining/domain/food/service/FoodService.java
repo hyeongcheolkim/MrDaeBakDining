@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class FoodService {
     private final FoodRepository foodRepository;
@@ -31,7 +32,6 @@ public class FoodService {
         return true;
     }
 
-    @Transactional
     public Map<Ingredient, Integer> makeFood(Food food){
         var ret = new ConcurrentHashMap<Ingredient, Integer>();
         List<Recipe> recipeList = food.getRecipeList();

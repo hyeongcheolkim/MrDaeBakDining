@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Transactional
 @RequiredArgsConstructor
 public class DataInitiator {
     private final FoodService foodService;
@@ -105,7 +106,6 @@ public class DataInitiator {
     public ClientOrder clientOrder;
     public GuestOrder guestOrder;
 
-    @Transactional
     public void factoryInit() {
         for (int i = 0; i < 100; ++i) {
             var client = new Client();
@@ -230,7 +230,6 @@ public class DataInitiator {
         }
     }
 
-    @Transactional
     public void dataInit() {
         client1 = new Client();
         client1.setName("ClientA");

@@ -14,11 +14,11 @@ import static NaNSsoGong.MrDaeBakDining.domain.client.domain.ClientGrade.*;
 import static NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus.DELIVERED;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ClientService {
     private final ClientRepository clientRepository;
 
-    @Transactional
     public void evaluateClientGrade() {
         List<Client> enableClientListWithOrderList = clientRepository.enableClientListWithOrderList();
         for (var client : enableClientListWithOrderList) {

@@ -12,7 +12,7 @@ import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.exception.exception.BusinessException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DisabledEntityContainException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.response.DisabledEntityContainInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +33,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.DISABLE_COMPLETE;
 
 @Tag(name = "food")
 @RestController
+@Transactional
 @RequestMapping("/api/food")
 @RequiredArgsConstructor
 public class FoodRestController {
@@ -43,7 +44,7 @@ public class FoodRestController {
     @GetMapping("/{foodId}")
     public ResponseEntity<FoodInfoResponse> foodInfoByFoodId(@PathVariable(value = "foodId") Long foodId) {
         Food food = foodRepository.findById(foodId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 푸드입니다");
+            throw new NoExistInstanceException(Food.class);
         });
         return ResponseEntity.ok().body(new FoodInfoResponse(food));
     }
@@ -70,7 +71,6 @@ public class FoodRestController {
 
 
     @Operation(summary = "푸드생성", description = "새로운 푸드메뉴를 만듭니다")
-    @Transactional
     @PostMapping("")
     public ResponseEntity<FoodInfoResponse> foodCreate(@RequestBody @Validated FoodCreateRequest foodCreateRequest) {
         if (foodService.isFoodNameExist(foodCreateRequest.getName()))
@@ -85,7 +85,7 @@ public class FoodRestController {
     @GetMapping("/make/{foodId}")
     public ResponseEntity<Boolean> isMakeAble(@PathVariable(value = "foodId") Long foodId) {
         Food food = foodRepository.findById(foodId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 푸드입니다");
+            throw new NoExistInstanceException(Food.class);
         });
         return ResponseEntity.ok().body(foodService.isMakeAble(food));
     }
@@ -94,7 +94,7 @@ public class FoodRestController {
     @PostMapping("/make/{foodId}")
     public ResponseEntity<FoodMakeResponse> foodMake(@PathVariable(value = "foodId") Long foodId) {
         Food food = foodRepository.findById(foodId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 푸드입니다");
+            throw new NoExistInstanceException(Food.class);
         });
         if (!foodService.isMakeAble(food))
             throw new BusinessException("재료가 부족해 만들 수 없는 음식입니다");
@@ -105,11 +105,10 @@ public class FoodRestController {
     }
 
     @Operation(summary = "푸드 비활성화", description = "이 푸드가 포함되는 디너가 존재하지 않을때만 비활성화 할 수 있습니다")
-    @Transactional
     @PatchMapping("/disable/{foodId}")
     public ResponseEntity<String> talbewareDisable(@PathVariable(value = "foodId") Long foodId) {
         Food food = foodRepository.findById(foodId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 푸드입니다");
+            throw new NoExistInstanceException(Food.class);
         });
         if (food.getDinnerFoodList().stream().filter(e -> e.getDinner().getEnable()).count() != 0)
             throw new DisabledEntityContainException(
@@ -128,13 +127,12 @@ public class FoodRestController {
     }
 
     @Operation(summary = "푸드업데이트")
-    @Transactional
     @PutMapping("/{foodId}")
     public ResponseEntity<FoodInfoResponse> foodUpdate(
             @PathVariable(value = "foodId") Long foodId,
             @RequestBody @Validated FoodUpdateRequest foodUpdateRequest) {
         Food food = foodRepository.findById(foodId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 푸드입니다");
+            throw new NoExistInstanceException(Food.class);
         });
         if (!food.getName().equals(foodUpdateRequest.getName())
                 && foodService.isFoodNameExist(foodUpdateRequest.getName()))

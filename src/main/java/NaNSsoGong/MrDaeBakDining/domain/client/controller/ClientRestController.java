@@ -12,7 +12,7 @@ import NaNSsoGong.MrDaeBakDining.domain.client.service.ClientService;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
 import NaNSsoGong.MrDaeBakDining.domain.order.SalePolicy;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.PersonalInformationException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +35,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_CLIENT
 
 @Tag(name = "member")
 @RestController
+@Transactional
 @RequestMapping("/api/client")
 @RequiredArgsConstructor
 @ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
@@ -44,7 +45,6 @@ public class ClientRestController {
     private final MemberService memberService;
 
     @Operation(summary = "회원가입")
-    @Transactional
     @PostMapping("/sign")
     public ResponseEntity<ClientInfoResponse> sign(@RequestBody @Validated ClientSignRequest clientSignRequest) {
         if (!memberService.isLoginIdExist(clientSignRequest.getLoginId()))
@@ -55,7 +55,10 @@ public class ClientRestController {
             throw new PersonalInformationException("정보제공에 동의했을경우, 카드번호를 필수로 입력해야 합니다");
 
         Client client = clientSignRequest.toClient();
+        client.setClientGrade(ClientGrade.BRONZE);
+        client.setEnable(true);
         Client savedClient = clientRepository.save(client);
+
         return ResponseEntity.ok().body(new ClientInfoResponse(savedClient));
     }
 
@@ -63,7 +66,7 @@ public class ClientRestController {
     @GetMapping("/{clientId}")
     public ResponseEntity<ClientInfoResponse> clientInfoByClientId(@PathVariable(name = "clientId") Long clientId) {
         Client client = clientRepository.findById(clientId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 클라이언트입니다");
+            throw new NoExistInstanceException(Client.class);
         });
         return ResponseEntity.ok().body(new ClientInfoResponse(client));
     }
@@ -74,7 +77,7 @@ public class ClientRestController {
             @Parameter(name = "clientId", hidden = true, allowEmptyValue = true)
             @SessionAttribute(value = LOGIN_CLIENT) Long clientId) {
         Client client = clientRepository.findById(clientId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 클라이언트입니다");
+            throw new NoExistInstanceException(Client.class);
         });
         return ResponseEntity.ok().body(new ClientInfoResponse(client));
     }
@@ -101,15 +104,13 @@ public class ClientRestController {
     }
 
     @Operation(summary = "클라이언트업데이트", description = "개인정보 동의상태에서 비동의로 변경할경우. 개인정보가 모두 삭제됩니다")
-    @Transactional
     @PutMapping("/{clientId}")
     public ResponseEntity<ClientInfoResponse> clientUpdate(
             @PathVariable(value = "clientId") Long clientId,
             @RequestBody @Validated ClientUpdateRequest clientUpdateRequest) {
         Client client = clientRepository.findById(clientId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 클라이언트입니다");
+            throw new NoExistInstanceException(Client.class);
         });
-
         if (clientUpdateRequest.getPersonalInformationCollectionAgreement() && clientUpdateRequest.getAddress() == null)
             throw new PersonalInformationException("정보제공에 동의했을경우, 주소를 필수로 입력해야 합니다");
         if (clientUpdateRequest.getPersonalInformationCollectionAgreement() && clientUpdateRequest.getCardNumber().isEmpty())
@@ -124,6 +125,7 @@ public class ClientRestController {
             client.setAddress(null);
             client.setCardNumber(null);
         }
+
         return ResponseEntity.ok().body(new ClientInfoResponse(client));
     }
 }

@@ -11,7 +11,7 @@ import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.service.RecipeService;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "recipe")
 @RestController
+@Transactional
 @RequestMapping("/api/recipe")
 @RequiredArgsConstructor
 @ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
@@ -41,7 +42,7 @@ public class RecipeRestController {
     @GetMapping("/{recipeId}")
     public ResponseEntity<RecipeInfoResponse> recipeInfo(@PathVariable(name = "recipeId") Long recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 레시피입니다");
+            throw new NoExistInstanceException(Recipe.class);
         });
         return ResponseEntity.ok().body(new RecipeInfoResponse(recipe));
     }
@@ -53,14 +54,13 @@ public class RecipeRestController {
     }
 
     @Operation(summary = "레시피 생성")
-    @Transactional
     @PostMapping("")
     public ResponseEntity<RecipeInfoResponse> recipeCreate(@RequestBody @Validated RecipeCreateRequest recipeCreateRequest) {
         Food food = foodRepository.findById(recipeCreateRequest.getFoodId()).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 푸드입니다");
+            throw new NoExistInstanceException(Food.class);
         });
         Ingredient ingredient = ingredientRepository.findById(recipeCreateRequest.getIngredientId()).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 재료입니다");
+            throw new NoExistInstanceException(Ingredient.class);
         });
 
         if (recipeRepository.findByFoodIdAndIngredientId(food.getId(), ingredient.getId()).isPresent())
@@ -72,7 +72,6 @@ public class RecipeRestController {
     }
 
     @Operation(summary = "레시피업데이트")
-    @Transactional
     @PutMapping("")
     public ResponseEntity<RecipeInfoResponse> recipeUpdate(@RequestBody @Validated RecipeUpdateRequest recipeUpdateRequest) {
         Long foodId = recipeUpdateRequest.getFoodId();
@@ -80,7 +79,7 @@ public class RecipeRestController {
         Integer ingredientQuantity = recipeUpdateRequest.getIngredientQuantity();
 
         Recipe recipe = recipeRepository.findByFoodIdAndIngredientId(foodId, ingredientId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 레시피입니다");
+            throw new NoExistInstanceException(Recipe.class);
         });
 
         recipe.setIngredientQuantity(ingredientQuantity);

@@ -1,5 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.controller;
 
+import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
 import NaNSsoGong.MrDaeBakDining.domain.guest.repository.GuestRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.ClientOrderInfoResponse;
@@ -10,7 +11,7 @@ import NaNSsoGong.MrDaeBakDining.domain.order.repository.ClientOrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.GuestOrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderSheetRepository;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +25,7 @@ import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +35,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_CLIENT
 
 @Tag(name = "order")
 @RestController
+@Transactional
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
 @Slf4j
@@ -48,7 +51,7 @@ public class OrderInfoRestController {
     @GetMapping("/sheet/{orderSheetId}")
     public ResponseEntity<OrderSheetInfoResponse> orderSheetInfoByOrderSheetId(@PathVariable(value = "orderSheetId") Long orderSheetId) {
         OrderSheet orderSheet = orderSheetRepository.findById(orderSheetId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 오더시트입니다");
+            throw new NoExistInstanceException(OrderSheet.class);
         });
         return ResponseEntity.ok().body(new OrderSheetInfoResponse(orderSheet));
     }
@@ -57,27 +60,25 @@ public class OrderInfoRestController {
     @GetMapping("/{orderId}")
     public ResponseEntity<Object> orderInfoByOrderId(@PathVariable("orderId") Long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 orderId 입니다");
+            throw new NoExistInstanceException(Order.class);
         });
 
         if (ClientOrder.class.isAssignableFrom(Hibernate.getClass(order)))
-            return ResponseEntity.ok()
-                    .body(new ClientOrderInfoResponse((ClientOrder) order));
+            return ResponseEntity.ok().body(new ClientOrderInfoResponse((ClientOrder) order));
         else if (GuestOrder.class.isAssignableFrom(Hibernate.getClass(order)))
-            return ResponseEntity.ok()
-                    .body(new GuestOrderInfoResponse((GuestOrder) order));
+            return ResponseEntity.ok().body(new GuestOrderInfoResponse((GuestOrder) order));
         else
-            throw new NoExistEntityException("존재하는 주문이나 주문자가 식별되지 않습니다");
+            throw new NoExistInstanceException(Order.class);
     }
 
     @Operation(summary = "주문단건조회 by UUID", description = "게스트가 자신의 uuid를 이용하여 호출합니다")
     @GetMapping("/guest/{uuid}")
     public ResponseEntity<GuestOrderInfoResponse> guestOrderInfoByUuid(@PathVariable("uuid") UUID uuid) {
         Guest guest = guestRepository.findByUuid(uuid).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 게스트 입니다");
+            throw new NoExistInstanceException(Guest.class);
         });
         GuestOrder guestOrder = guestOrderRepository.findByGuestId(guest.getId()).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 게스트오더 입니다");
+            throw new NoExistInstanceException(GuestOrder.class);
         });
         return ResponseEntity.ok().body(new GuestOrderInfoResponse(guestOrder));
     }
@@ -92,7 +93,7 @@ public class OrderInfoRestController {
             else if (GuestOrder.class.isAssignableFrom(Hibernate.getClass(e)))
                 return new GuestOrderInfoResponse((GuestOrder) e);
             else
-                throw new NoExistEntityException("존재하는 주문이나 주문자가 식별되지 않습니다");
+                throw new NoExistInstanceException(Order.class);
         });
     }
 
@@ -108,7 +109,7 @@ public class OrderInfoRestController {
     @GetMapping("client/list/{clientId}")
     public Page<ClientOrderInfoResponse> orderInfoListByClientId(@PathVariable("clientId") Long clientId, Pageable pageable) {
         if (!orderRepository.existsById(clientId))
-            throw new NoExistEntityException("존재하지 않는 clientId 입니다");
+            throw new NoExistInstanceException(Client.class);
         Page<ClientOrder> clientOrderList = clientOrderRepository.findAllByClientId(clientId, pageable);
         return clientOrderList.map(ClientOrderInfoResponse::new);
     }
@@ -131,7 +132,7 @@ public class OrderInfoRestController {
             else if (GuestOrder.class.isAssignableFrom(Hibernate.getClass(e)))
                 return new GuestOrderInfoResponse((GuestOrder) e);
             else
-                throw new NoExistEntityException("존재하는 주문이나 주문자가 식별되지 않습니다");
+                throw new NoExistInstanceException(Order.class);
         });
     }
 }

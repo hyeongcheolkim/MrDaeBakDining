@@ -7,8 +7,7 @@ import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;
 import NaNSsoGong.MrDaeBakDining.domain.chef.repository.ChefRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.PersonalInformationException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,10 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.*;
+import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_CHEF;
 
 @Tag(name = "member")
 @RestController
+@Transactional
 @RequestMapping("/api/chef")
 @RequiredArgsConstructor
 @Slf4j
@@ -36,7 +36,6 @@ public class ChefRestController {
     private final MemberService memberService;
 
     @Operation(summary = "회원가입")
-    @Transactional
     @PostMapping("/sign")
     public ResponseEntity<ChefInfoResponse> sign(@RequestBody @Validated ChefSignRequest chefSignRequest) {
         if (!memberService.isLoginIdExist(chefSignRequest.getLoginId()))
@@ -51,9 +50,8 @@ public class ChefRestController {
     @GetMapping("/{chefId}")
     public ResponseEntity<ChefInfoResponse> chefInfoByChefId(@PathVariable(name = "chefId") Long chefId) {
         Chef chef = chefRepository.findById(chefId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 chef입니다");
+            throw new NoExistInstanceException(Chef.class);
         });
-
         return ResponseEntity.ok().body(new ChefInfoResponse(chef));
     }
 
@@ -63,19 +61,18 @@ public class ChefRestController {
             @Parameter(name = "chefId", hidden = true, allowEmptyValue = true)
             @SessionAttribute(value = LOGIN_CHEF) Long chefId) {
         Chef chef = chefRepository.findById(chefId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 chef입니다");
+            throw new NoExistInstanceException(Chef.class);
         });
         return ResponseEntity.ok().body(new ChefInfoResponse(chef));
     }
 
     @Operation(summary="쉐프업데이트")
-    @Transactional
     @PutMapping("/{chefId}")
     public ResponseEntity<ChefInfoResponse> chefUpdate(
             @PathVariable(value = "chefId") Long chefId,
             @RequestBody @Validated ChefUpdateRequest chefUpdateRequest) {
         Chef chef = chefRepository.findById(chefId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 쉐프입니다");
+            throw new NoExistInstanceException(Chef.class);
         });
         chef.setName(chefUpdateRequest.getName());
         return ResponseEntity.ok().body(new ChefInfoResponse(chef));

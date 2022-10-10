@@ -1,6 +1,5 @@
 package NaNSsoGong.MrDaeBakDining.domain.dinner.controller;
 
-import NaNSsoGong.MrDaeBakDining.domain.ResponseConst;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.request.DinnerCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.request.DinnerUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerInfoResponse;
@@ -8,7 +7,7 @@ import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.service.DinnerService;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,6 +27,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
 
 @Tag(name = "dinner")
 @RestController
+@Transactional
 @RequestMapping("/api/dinner")
 @RequiredArgsConstructor
 @Slf4j
@@ -50,7 +50,7 @@ public class DinnerRestController {
     @GetMapping("/{dinnerId}")
     public ResponseEntity<DinnerInfoResponse> dinnerInfoByDinnerId(@PathVariable(value = "dinnerId") Long dinnerId) {
         Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 디너입니다");
+            throw new NoExistInstanceException(Dinner.class);
         });
         return ResponseEntity.ok().body(new DinnerInfoResponse(dinner));
     }
@@ -64,24 +64,22 @@ public class DinnerRestController {
     }
 
     @Operation(summary = "디너 비활성화", description = "enable = false")
-    @Transactional
     @PatchMapping("/disable/{dinnerId}")
     public ResponseEntity<String> dinnerDisable(@PathVariable(value = "dinnerId") Long dinnerId) {
         Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 디너입니다");
+            throw new NoExistInstanceException(Dinner.class);
         });
         dinner.setEnable(false);
         return ResponseEntity.ok().body(DISABLE_COMPLETE);
     }
 
     @Operation(summary = "디너업데이트")
-    @Transactional
     @PutMapping("/{dinnerId}")
     public ResponseEntity<DinnerInfoResponse> dinnerUpdate(
             @PathVariable(value = "dinnerId") Long dinnerId,
             @RequestBody @Validated DinnerUpdateRequest dinnerUpdateRequest) {
         Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 디너입니다");
+            throw new NoExistInstanceException(Dinner.class);
         });
 
         if(!dinner.getName().equals(dinnerUpdateRequest.getName())

@@ -20,13 +20,13 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class DinnerService {
     private final DinnerRepository dinnerRepository;
     private final StyleRepository styleRepository;
     private final FoodRepository foodRepository;
 
-    @Transactional
     public Dinner makeDinner(DinnerDto dinnerDto) {
         Dinner dinner = new Dinner();
 

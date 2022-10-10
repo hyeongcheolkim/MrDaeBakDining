@@ -5,10 +5,12 @@ import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientReposito
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class IngredientService {
     private final IngredientRepository ingredientRepository;

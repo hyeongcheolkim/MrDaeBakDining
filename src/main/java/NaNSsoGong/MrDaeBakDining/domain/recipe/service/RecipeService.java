@@ -13,11 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RecipeService {
     private final RecipeRepository recipeRepository;
 
-    @Transactional
     public Recipe makeRecipe(Food food, Ingredient ingredient, Integer ingredientQuantity){
         Recipe recipe = new Recipe();
         recipe.setFood(food);

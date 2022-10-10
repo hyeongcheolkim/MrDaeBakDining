@@ -8,7 +8,7 @@ import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleTableware;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.service.StyleService;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,6 +30,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
 
 @Tag(name = "style")
 @RestController
+@Transactional
 @RequestMapping("/api/style")
 @RequiredArgsConstructor
 @Slf4j
@@ -42,7 +43,7 @@ public class StyleRestController {
     @GetMapping("/{styleId}")
     public ResponseEntity<StyleInfoResponse> styleInfoByStyleId(@PathVariable(value = "styleId") Long styleId) {
         Style style = styleRepository.findById(styleId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 스타일입니다");
+            throw new NoExistInstanceException(Style.class);
         });
         return ResponseEntity.ok().body(new StyleInfoResponse(style));
     }
@@ -66,24 +67,22 @@ public class StyleRestController {
     }
 
     @Operation(summary = "스타일 비활성화", description = "enable = false")
-    @Transactional
     @PatchMapping("/disable/{styleId}")
     public ResponseEntity<String> styleDisable(@PathVariable(value = "styleId") Long styleId) {
         Style style = styleRepository.findById(styleId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 스타일입니다");
+            throw new NoExistInstanceException(Style.class);
         });
         style.setEnable(false);
         return ResponseEntity.ok().body(DISABLE_COMPLETE);
     }
 
     @Operation(summary = "스타일업데이트")
-    @Transactional
     @PutMapping("/{styleId}")
     public ResponseEntity<StyleInfoResponse> styleUpdate(
             @PathVariable(value = "styleId") Long styleId,
             @RequestBody @Validated StyleUpdateRequest styleUpdateRequest) {
         Style style = styleRepository.findById(styleId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 스타일입니다");
+            throw new NoExistInstanceException(Style.class);
         });
 
         if(!style.getName().equals(styleUpdateRequest.getName())

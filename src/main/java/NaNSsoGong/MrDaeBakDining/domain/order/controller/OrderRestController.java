@@ -9,7 +9,6 @@ import NaNSsoGong.MrDaeBakDining.domain.guest.repository.GuestRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.request.*;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.ClientOrderInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.GuestOrderInfoResponse;
-import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.OrderSheetInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.OrderUpdateResponse;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.*;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
@@ -22,7 +21,7 @@ import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
 import NaNSsoGong.MrDaeBakDining.exception.exception.BusinessException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.NoProperOrderStatusException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.PriceNotSameException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
@@ -48,6 +47,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_RIDER;
 
 @Tag(name = "order")
 @RestController
+@Transactional
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
 @Slf4j
@@ -64,7 +64,6 @@ public class OrderRestController {
     private final OrderBuilder orderBuilder;
 
     @Operation(summary = "클라이언트 주문", description = "클라이언트 세션이 필요합니다")
-    @Transactional
     @PostMapping("/client")
     public ResponseEntity<ClientOrderInfoResponse> clientOrderCreate(
             @Parameter(name = "clientId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_CLIENT) Long clientId,
@@ -72,7 +71,7 @@ public class OrderRestController {
         orderValid(orderCreateRequest);
 
         Client client = clientRepository.findById(clientId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 클라이언트입니다");
+            throw new NoExistInstanceException(Client.class);
         });
 
         OrderDto orderDto = orderCreateRequest.toOrderDto();
@@ -87,7 +86,6 @@ public class OrderRestController {
 
 
     @Operation(summary = "게스트 주문", description = "세션이 필요 없습니다")
-    @Transactional
     @PostMapping("/guest")
     public ResponseEntity<GuestOrderInfoResponse> guestOrderCreate(@RequestBody @Validated GuestOrderCreateRequest guestOrderRequest) {
         orderValid(guestOrderRequest);
@@ -104,13 +102,12 @@ public class OrderRestController {
     }
 
     @Operation(summary = "주문상태 변경")
-    @Transactional
     @PatchMapping("/status")
     public ResponseEntity changeOrderStatus(@RequestBody @Validated ChangeOrderStatusRequest changeOrderStatusRequest) {
         Long orderId = changeOrderStatusRequest.getOrderId();
         OrderStatus orderStatus = changeOrderStatusRequest.getOrderStatus();
         Order order = orderRepository.findById(orderId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 주문입니다");
+            throw new NoExistInstanceException(Order.class);
         });
 
         order.setOrderStatus(orderStatus);
@@ -118,15 +115,14 @@ public class OrderRestController {
     }
 
     @Operation(summary = "라이더 변경 by riderId", description = "변경기능이지만, 배정 기능처럼 사용할 수 있습니다")
-    @Transactional
     @PatchMapping("/rider/{riderId}")
     public ResponseEntity changeRiderByRiderId(@PathVariable(value = "riderId") Long riderId,
                                                @RequestBody @Validated ChangeRiderRequest changeRiderRequest) {
         Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 라이더입니다");
+            throw new NoExistInstanceException(Rider.class);
         });
         Order order = orderRepository.findById(changeRiderRequest.getOrderId()).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 주문입니다");
+            throw new NoExistInstanceException(Order.class);
         });
 
         order.setRider(rider);
@@ -134,15 +130,14 @@ public class OrderRestController {
     }
 
     @Operation(summary = "라이더 변경 by Session", description = "변경기능이지만, 배정 기능처럼 사용할 수 있습니다")
-    @Transactional
     @PatchMapping("/rider")
     public ResponseEntity changeRiderBySession(@Parameter(name = "riderId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_RIDER) Long riderId,
                                                @RequestBody @Validated ChangeRiderRequest changeRiderRequest) {
         Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 라이더입니다");
+            throw new NoExistInstanceException(Rider.class);
         });
         Order order = orderRepository.findById(changeRiderRequest.getOrderId()).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 주문입니다");
+            throw new NoExistInstanceException(Order.class);
         });
 
         order.setRider(rider);
@@ -150,26 +145,25 @@ public class OrderRestController {
     }
 
     @Operation(summary = "주문수정", description = "오더에 포함된 각 오더시트를 수정합니다")
-    @Transactional
     @PutMapping("/{orderId}")
     public ResponseEntity<OrderUpdateResponse> orderUpdate(
             @PathVariable(name = "orderId") Long orderId,
             @RequestBody OrderUpdateRequest orderUpdateRequest) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 오더시트 입니다");
+            throw new NoExistInstanceException(OrderSheet.class);
         });
         Integer previousTotalPriceAfterSale = order.getTotalPriceAfterSale();
 
         List<OrderSheetUpdateRequest> orderSheetUpdateRequestList = orderUpdateRequest.getOrderSheetUpdateRequestList();
         for (var orderSheetUpdateRequest : orderSheetUpdateRequestList) {
             OrderSheet orderSheet = orderSheetRepository.findById(orderSheetUpdateRequest.getOrderSheetId()).orElseThrow(() -> {
-                throw new NoExistEntityException("존재하지 않는 오더시트입니다");
+                throw new NoExistInstanceException(OrderSheet.class);
             });
             Style style = styleRepository.findById(orderSheetUpdateRequest.getStyleId()).orElseGet(() -> {
-                throw new NoExistEntityException("존재하지 않는 스타일입니다");
+                throw new NoExistInstanceException(Style.class);
             });
             Dinner dinner = dinnerRepository.findById(orderSheetUpdateRequest.getDinnerId()).orElseGet(() -> {
-                throw new NoExistEntityException("존재하지 않는 디너입니다");
+                throw new NoExistInstanceException(Dinner.class);
             });
 
             if(!order.getOrderSheetList().contains(orderSheet))
@@ -193,10 +187,10 @@ public class OrderRestController {
             throw new NoProperOrderStatusException("OrderStatus가 RESERVED이면, reservedTime이 null일 수 없습니다");
         for (var orderSheet : orderCreateRequest.getOrderSheetCreateRequestList()) {
             Dinner dinner = dinnerRepository.findById(orderSheet.getDinnerId()).orElseThrow(() -> {
-                throw new NoExistEntityException("존재하지 않는 디너입니다");
+                throw new NoExistInstanceException(Dinner.class);
             });
             Style style = styleRepository.findById(orderSheet.getStyleId()).orElseThrow(() -> {
-                throw new NoExistEntityException("존재하지 않는 스타일입니다");
+                throw new NoExistInstanceException(Style.class);
             });
             if (dinner.getExcludedStyleList().contains(style))
                 throw new BusinessException(String.format(

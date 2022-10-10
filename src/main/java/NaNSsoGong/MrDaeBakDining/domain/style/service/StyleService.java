@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class StyleService {
     private final StyleRepository styleRepository;
     private final TablewareRepository tablewareRepository;

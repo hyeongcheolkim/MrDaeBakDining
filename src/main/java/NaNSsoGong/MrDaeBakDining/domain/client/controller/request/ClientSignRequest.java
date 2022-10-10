@@ -27,9 +27,6 @@ public class ClientSignRequest {
     public Client toClient(){
         Client client = new Client();
 
-        client.setClientGrade(ClientGrade.BRONZE);
-        client.setEnable(true);
-
         client.setName(this.name);
         client.setLoginId(this.loginId);
         client.setPassword(this.password);

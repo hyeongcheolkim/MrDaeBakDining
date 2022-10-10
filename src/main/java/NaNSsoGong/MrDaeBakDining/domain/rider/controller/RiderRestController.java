@@ -7,8 +7,7 @@ import NaNSsoGong.MrDaeBakDining.domain.rider.controller.response.RiderInfoRespo
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.PersonalInformationException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,6 +25,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.*;
 
 @Tag(name = "member")
 @RestController
+@Transactional
 @RequestMapping("/api/rider")
 @RequiredArgsConstructor
 @ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
@@ -34,7 +34,6 @@ public class RiderRestController {
     private final MemberService memberService;
 
     @Operation(summary = "회원가입")
-    @Transactional
     @PostMapping("/sign")
     public ResponseEntity<RiderInfoResponse> sign(@RequestBody @Validated RiderSignRequest riderSignRequest) {
         if (!memberService.isLoginIdExist(riderSignRequest.getLoginId()))
@@ -49,7 +48,7 @@ public class RiderRestController {
     @GetMapping("/{riderId}")
     public ResponseEntity<RiderInfoResponse> riderInfoByRiderId(@PathVariable(name = "riderId") Long riderId) {
         Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 rider입니다");
+            throw new NoExistInstanceException(Rider.class);
         });
         return ResponseEntity.ok().body(new RiderInfoResponse(rider));
     }
@@ -60,19 +59,18 @@ public class RiderRestController {
             @Parameter(name = "riderId", hidden = true, allowEmptyValue = true)
             @SessionAttribute(value = LOGIN_RIDER) Long riderId) {
         Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 rider입니다");
+            throw new NoExistInstanceException(Rider.class);
         });
         return ResponseEntity.ok().body(new RiderInfoResponse(rider));
     }
 
     @Operation(summary="라이더업데이트")
-    @Transactional
     @PutMapping("/{riderId}")
     public ResponseEntity<RiderInfoResponse> riderUpdate(
             @PathVariable(value = "riderId") Long riderId,
             @RequestBody @Validated RiderUpdateRequest riderUpdateRequest) {
         Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 라이더입니다");
+            throw new NoExistInstanceException(Rider.class);
         });
         rider.setName(riderUpdateRequest.getName());
         return ResponseEntity.ok().body(new RiderInfoResponse(rider));

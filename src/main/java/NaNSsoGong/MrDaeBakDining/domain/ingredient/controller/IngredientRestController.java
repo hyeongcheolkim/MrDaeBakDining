@@ -30,6 +30,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.DISABLE_COMPLETE;
 
 @Tag(name = "ingredient")
 @RestController
+@Transactional
 @RequestMapping("/api/ingredient")
 @RequiredArgsConstructor
 @ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
@@ -41,7 +42,7 @@ public class IngredientRestController {
     @GetMapping("/{ingredientId}")
     public ResponseEntity<IngredientInfoResponse> ingredientInfo(@PathVariable(name = "ingredientId") Long ingredientId) {
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 재료입니다");
+            throw new NoExistInstanceException(Ingredient.class);
         });
         return ResponseEntity.ok().body(new IngredientInfoResponse(ingredient));
     }
@@ -55,7 +56,6 @@ public class IngredientRestController {
     }
 
     @Operation(summary = "새로운 재료생성")
-    @Transactional
     @PostMapping("")
     public ResponseEntity<IngredientInfoResponse> ingredientCreate(@RequestBody @Validated IngredientCreateRequest ingredientCreateRequest) {
         if (ingredientService.isIngredientNameExist(ingredientCreateRequest.getName()))
@@ -70,12 +70,11 @@ public class IngredientRestController {
     }
 
     @Operation(summary = "수량 증감", description = "재고량을 0미만으로 만들 수 없다면 요청은 무시되고, Exception이 발생합니다")
-    @Transactional
     @PatchMapping("/{ingredientId}")
     public ResponseEntity<IngredientInfoResponse> ingredientQuantityUpdate(@PathVariable(name = "ingredientId") Long ingredientId,
                                                                            @RequestBody @Validated IngredientQuantityUpdateRequest ingredientQuantityUpdateRequest) {
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 재료입니다");
+            throw new NoExistInstanceException(Ingredient.class);
         });
         Integer newQuantity = ingredient.getStockQuantity() + ingredientQuantityUpdateRequest.getQuantityDiff();
         if (newQuantity < 0)
@@ -85,11 +84,10 @@ public class IngredientRestController {
     }
 
     @Operation(summary = "재료 비활성화", description = "이 재료를 필요로 하는 레시피가 존재하지 않을때 비활성화할 수 있습니다")
-    @Transactional
     @PatchMapping("/disable/{ingredientId}")
     public ResponseEntity<String> ingredientDisable(@PathVariable(value = "ingredientId") Long ingredientId) {
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 재료입니다");
+            throw new NoExistInstanceException(Ingredient.class);
         });
         if (ingredient.getRecipeList().stream().filter(e -> e.getFood().getEnable()).count() != 0)
             throw new DisabledEntityContainException(
@@ -109,13 +107,12 @@ public class IngredientRestController {
     }
 
     @Operation(summary = "재료업데이트")
-    @Transactional
     @PutMapping("/{ingredientId}")
     public ResponseEntity<IngredientInfoResponse> ingredientUpdate(
             @PathVariable(value = "ingredientId") Long ingredientId,
             @RequestBody @Validated IngredientUpdateRequest ingredientUpdateRequest) {
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 재료입니다");
+            throw new NoExistInstanceException(Ingredient.class);
         });
         if (!ingredient.getName().equals(ingredientUpdateRequest.getName())
                 && ingredientService.isIngredientNameExist(ingredientUpdateRequest.getName()))

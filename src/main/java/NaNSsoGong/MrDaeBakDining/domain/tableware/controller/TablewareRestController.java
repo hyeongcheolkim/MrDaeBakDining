@@ -9,7 +9,7 @@ import NaNSsoGong.MrDaeBakDining.domain.tableware.repository.TablewareRepository
 import NaNSsoGong.MrDaeBakDining.domain.tableware.service.TablewareService;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DisabledEntityContainException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import NaNSsoGong.MrDaeBakDining.exception.response.DisabledEntityContainInfo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +33,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
 
 @Tag(name = "tableware")
 @RestController
+@Transactional
 @RequestMapping("/api/tableware")
 @RequiredArgsConstructor
 @Slf4j
@@ -45,7 +46,7 @@ public class TablewareRestController {
     @GetMapping("/{tablewareId}")
     public ResponseEntity<TablewareInfoResponse> tablewareInfoByTablewareId(@PathVariable(value = "tablewareId") Long tablewareId) {
         Tableware tableware = tablewareRepository.findById(tablewareId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 tableware입니다");
+            throw new NoExistInstanceException(Tableware.class);
         });
         return ResponseEntity.ok().body(new TablewareInfoResponse(tableware));
     }
@@ -59,7 +60,6 @@ public class TablewareRestController {
     }
 
     @Operation(summary = "테이블웨어 생성", description = "기존 같은 이름의 테이블 웨어가 이미 존재한다면, enable = true로 바꿉니다")
-    @Transactional
     @PostMapping("")
     public ResponseEntity<TablewareInfoResponse> tablewareCreate(@RequestBody @Validated TablewareCreateRequest tablewareCreateRequest) {
         String name = tablewareCreateRequest.getName();
@@ -75,11 +75,10 @@ public class TablewareRestController {
     }
 
     @Operation(summary = "테이블웨어 비활성화", description = "이 테이블웨어를 포함하는 스타일이 존재하지 않을때 비활성화할 수 있습니다")
-    @Transactional
     @PatchMapping("//disable/{tablewareId}")
     public ResponseEntity<String> talbewareDisable(@PathVariable(value = "tablewareId") Long tablewareId) {
         Tableware tableware = tablewareRepository.findById(tablewareId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 테이블웨어입니다");
+            throw new NoExistInstanceException(Tableware.class);
         });
         if (tableware.getStyleTablewareList().stream().filter(e -> e.getStyle().getEnable()).count() != 0)
             throw new DisabledEntityContainException(
@@ -98,13 +97,12 @@ public class TablewareRestController {
     }
 
     @Operation(summary = "테이블웨어업데이트")
-    @Transactional
     @PutMapping("/{tablewareId}")
     public ResponseEntity<TablewareInfoResponse> tablewareUpdateByTablewareId
             (@PathVariable(value = "tablewareId") Long tablewareId,
              @RequestBody @Validated TablewareUpdateRequest tablewareCreateRequest) {
         Tableware tableware = tablewareRepository.findById(tablewareId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 테이블웨어입니다");
+            throw new NoExistInstanceException(Tableware.class);
         });
 
         tableware.setName(tablewareCreateRequest.getName());
