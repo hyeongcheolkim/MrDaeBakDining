@@ -3,10 +3,12 @@ package NaNSsoGong.MrDaeBakDining.domain.order.controller.request;
 import NaNSsoGong.MrDaeBakDining.domain.Address;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ public class OrderCreateRequest {
     private OrderStatus orderStatus;
     @Nullable
     private LocalDateTime reservedTime;
+    @JsonIgnore
+    private LocalDateTime orderTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
     @NotNull
     private Integer totalPriceAfterSale;
     private List<OrderSheetCreateRequest> orderSheetCreateRequestList = new ArrayList<>();
@@ -33,11 +37,10 @@ public class OrderCreateRequest {
                         .map(OrderSheetCreateRequest::toOrderSheetDto)
                         .collect(Collectors.toList()))
                 .totalPriceAfterSale(this.totalPriceAfterSale)
-                .orderTime(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES
-                ))
+                .orderTime(this.orderTime)
                 .build();
         if (orderStatus.equals(OrderStatus.RESERVED))
-            ret.setOrderStatus(OrderStatus.RESERVED);
+            ret.setReserveTime(this.reservedTime.truncatedTo(ChronoUnit.MINUTES));
         return ret;
     }
 }

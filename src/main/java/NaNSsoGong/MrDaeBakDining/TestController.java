@@ -1,5 +1,6 @@
 package NaNSsoGong.MrDaeBakDining;
 
+import NaNSsoGong.MrDaeBakDining.DataInitiator;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,8 +26,8 @@ public class TestController {
     @PostMapping("/data-init")
     public String dataInit() {
         if (flag) {
-            flag = false;
             dataInitiator.dataInit();
+            flag = false;
             return "data init complete";
         }
         return "already initiated";
@@ -35,8 +37,8 @@ public class TestController {
     @PostMapping("/factory-init")
     public String dataFactoryInit() {
         if (flag) {
-            flag = false;
             dataInitiator.factoryInit();
+            flag = false;
             return "data init complete";
         }
         return "already initiated";

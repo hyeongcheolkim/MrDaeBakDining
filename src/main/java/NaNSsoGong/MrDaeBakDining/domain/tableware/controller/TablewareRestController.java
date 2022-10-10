@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
 
-import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
+import static NaNSsoGong.MrDaeBakDining.exception.response.ResponseConst.*;
 
 @Tag(name = "tableware")
 @RestController

@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
+import static NaNSsoGong.MrDaeBakDining.exception.response.ResponseConst.*;
 
 @Tag(name = "dinner")
 @RestController

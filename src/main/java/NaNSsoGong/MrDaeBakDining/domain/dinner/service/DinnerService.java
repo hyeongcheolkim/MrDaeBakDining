@@ -9,6 +9,8 @@ import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.food.repository.FoodRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoOderableInstanceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,23 +37,42 @@ public class DinnerService {
         dinner.setDescription(dinnerDto.getDescription());
 
         List<DinnerFood> dinnerFoodList = makeDinnerFoodList(dinner, dinnerDto);
-        for(var dinnerFood : dinnerFoodList)
+        for (var dinnerFood : dinnerFoodList)
             dinner.getDinnerFoodList().add(dinnerFood);
 
         List<ExcludedStyle> excludedStyleList = makeExcludedStyleList(dinner, dinnerDto);
-        for(var excludedStyle : excludedStyleList)
+        for (var excludedStyle : excludedStyleList)
             dinner.getExcludedStyleList().add(excludedStyle);
-
 
         return dinner;
     }
 
+    private List<DinnerFood> makeDinnerFoodList(Dinner dinner, DinnerDto dinnerDto) {
+        var ret = new ArrayList<DinnerFood>();
+        Map<Long, Integer> itemIdAndQuantity = dinnerDto.getFoodIdAndQuantity();
+        for (var itemId : itemIdAndQuantity.keySet()) {
+            Food food = foodRepository.findById(itemId).orElseThrow(() -> {
+                throw new NoExistInstanceException(Food.class);
+            });
+
+            DinnerFood dinnerFood = new DinnerFood();
+            dinnerFood.setDinner(dinner);
+            dinnerFood.setFood(food);
+            dinnerFood.setFoodQuantity(itemIdAndQuantity.get(itemId));
+
+            food.getDinnerFoodList().add(dinnerFood);
+            ret.add(dinnerFood);
+        }
+        return ret;
+    }
+
     public Map<Food, Integer> toFoodAndQuantity(Long dinnerId) {
         var ret = new ConcurrentHashMap<Food, Integer>();
-        Optional<Dinner> foundDinner = dinnerRepository.findById(dinnerId);
-        if (foundDinner.isEmpty())
-            return ret;
-        List<DinnerFood> dinnerFoodList = foundDinner.get().getDinnerFoodList();
+        Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
+            throw new NoExistInstanceException(Dinner.class);
+        });
+
+        List<DinnerFood> dinnerFoodList = dinner.getDinnerFoodList();
         for (var dinnerFood : dinnerFoodList) {
             Food food = dinnerFood.getFood();
             ret.put(food, dinnerFood.getFoodQuantity());
@@ -59,26 +80,10 @@ public class DinnerService {
         return ret;
     }
 
-    private List<DinnerFood> makeDinnerFoodList(Dinner dinner, DinnerDto dinnerDto) {
-        var ret = new ArrayList<DinnerFood>();
-        Map<Long, Integer> itemIdAndQuantity = dinnerDto.getFoodIdAndQuantity();
-        for (var itemId : itemIdAndQuantity.keySet()) {
-            Food foundFood = foodRepository.findById(itemId).get();
-            DinnerFood dinnerFood = new DinnerFood();
-            dinnerFood.setDinner(dinner);
-            dinnerFood.setFood(foundFood);
-            dinnerFood.setFoodQuantity(itemIdAndQuantity.get(itemId));
-
-            foundFood.getDinnerFoodList().add(dinnerFood);
-            ret.add(dinnerFood);
-        }
-        return ret;
-    }
-
-    private List<ExcludedStyle> makeExcludedStyleList(Dinner dinner, DinnerDto dinnerDto){
+    private List<ExcludedStyle> makeExcludedStyleList(Dinner dinner, DinnerDto dinnerDto) {
         var ret = new ArrayList<ExcludedStyle>();
         List<Long> excludedStyleIdList = dinnerDto.getExcludedStyleIdList();
-        for(var styleId : excludedStyleIdList){
+        for (var styleId : excludedStyleIdList) {
             Style foundStyle = styleRepository.findById(styleId).get();
             ExcludedStyle excludedStyle = new ExcludedStyle();
             excludedStyle.setDinner(dinner);

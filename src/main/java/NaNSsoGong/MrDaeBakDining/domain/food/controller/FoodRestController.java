@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.DISABLE_COMPLETE;
+import static NaNSsoGong.MrDaeBakDining.exception.response.ResponseConst.DISABLE_COMPLETE;
 
 @Tag(name = "food")
 @RestController

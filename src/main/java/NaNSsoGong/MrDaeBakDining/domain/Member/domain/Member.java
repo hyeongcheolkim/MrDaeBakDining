@@ -19,5 +19,5 @@ public class Member {
     private String name;
     private String loginId;
     private String password;
-    private Boolean Enable;
+    private Boolean Enable = true;
 }

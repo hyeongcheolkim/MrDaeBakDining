@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
+import static NaNSsoGong.MrDaeBakDining.exception.response.ResponseConst.*;
 
 @Tag(name = "style")
 @RestController

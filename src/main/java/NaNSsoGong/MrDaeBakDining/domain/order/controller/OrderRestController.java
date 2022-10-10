@@ -20,10 +20,7 @@ import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import NaNSsoGong.MrDaeBakDining.domain.style.repository.StyleRepository;
-import NaNSsoGong.MrDaeBakDining.exception.exception.BusinessException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoProperOrderStatusException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.PriceNotSameException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.*;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -166,8 +163,12 @@ public class OrderRestController {
                 throw new NoExistInstanceException(Dinner.class);
             });
 
-            if(!order.getOrderSheetList().contains(orderSheet))
+            if (!order.getOrderSheetList().contains(orderSheet))
                 throw new BusinessException("오더와 오더시트가 가르키는 오더가 서로 다릅니다");
+            if (!dinner.getOrderable())
+                throw new NoOderableInstanceException(Dinner.class, dinner.getId());
+            if (!style.getOrderable())
+                throw new NoOderableInstanceException(Style.class, style.getId());
 
             orderSheet.setStyle(style);
             orderSheet.setDinner(dinner);
@@ -181,10 +182,15 @@ public class OrderRestController {
     }
 
     private void orderValid(OrderCreateRequest orderCreateRequest) {
-        if (!(orderCreateRequest.getOrderStatus() == ORDERED || orderCreateRequest.getOrderStatus() == RESERVED))
+        if (!(orderCreateRequest.getOrderStatus().equals(ORDERED) || orderCreateRequest.getOrderStatus().equals(RESERVED)))
             throw new NoProperOrderStatusException("OrderStatus가 주문이거나 예약이어야 합니다");
-        if (orderCreateRequest.getOrderStatus() == RESERVED && orderCreateRequest.getReservedTime() == null)
+        if (orderCreateRequest.getOrderStatus().equals(RESERVED) && orderCreateRequest.getReservedTime() == null)
             throw new NoProperOrderStatusException("OrderStatus가 RESERVED이면, reservedTime이 null일 수 없습니다");
+        if (orderCreateRequest.getOrderStatus().equals(ORDERED) && !orderService.isOpenTime(orderCreateRequest.getOrderTime()))
+            throw new NoOpenTimeException(
+                    orderCreateRequest.getOrderTime().getHour(),
+                    orderCreateRequest.getOrderTime().getMinute());
+
         for (var orderSheet : orderCreateRequest.getOrderSheetCreateRequestList()) {
             Dinner dinner = dinnerRepository.findById(orderSheet.getDinnerId()).orElseThrow(() -> {
                 throw new NoExistInstanceException(Dinner.class);
@@ -193,9 +199,7 @@ public class OrderRestController {
                 throw new NoExistInstanceException(Style.class);
             });
             if (dinner.getExcludedStyleList().contains(style))
-                throw new BusinessException(String.format(
-                        "dinnerId:%d에서 styleId:%d를 고를 수 없습니다", dinner.getId(), style.getId()
-                ));
+                throw new BusinessException(String.format("dinnerId:%d에서 styleId:%d를 고를 수 없습니다", dinner.getId(), style.getId()));
         }
     }
 }

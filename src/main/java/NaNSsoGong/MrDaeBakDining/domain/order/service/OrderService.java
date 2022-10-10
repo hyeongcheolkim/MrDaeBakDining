@@ -1,20 +1,21 @@
 package NaNSsoGong.MrDaeBakDining.domain.order.service;
 
+import NaNSsoGong.MrDaeBakDining.domain.time.TimeConst;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
 import NaNSsoGong.MrDaeBakDining.domain.order.SalePolicy;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.ClientOrder;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.GuestOrder;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.Order;
-import NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderSheet;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
-import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderSheetDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.ClientOrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.GuestOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -58,4 +59,22 @@ public class OrderService {
                 .reduce(0, Integer::sum);
     }
 
+    public Boolean isOpenTime(LocalDateTime orderTime){
+        LocalDateTime nowTime = LocalDateTime.now();
+        LocalDateTime openTime = LocalDateTime.of(
+                nowTime.getYear(),
+                nowTime.getMonth(),
+                nowTime.getDayOfMonth(),
+                TimeConst.getOpenHour(),
+                TimeConst.getOpenMinute()
+        );
+        LocalDateTime closeTime = LocalDateTime.of(
+                nowTime.getYear(),
+                nowTime.getMonth(),
+                nowTime.getDayOfMonth(),
+                TimeConst.getCloseHour(),
+                TimeConst.getCloseMinute()
+        );
+        return orderTime.isAfter(openTime) && orderTime.isBefore(closeTime);
+    }
 }

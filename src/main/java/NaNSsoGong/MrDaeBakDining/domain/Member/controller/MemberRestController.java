@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
-import static NaNSsoGong.MrDaeBakDining.domain.ResponseConst.*;
+import static NaNSsoGong.MrDaeBakDining.exception.response.ResponseConst.*;
 import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.*;
 
 @Tag(name = "member")
