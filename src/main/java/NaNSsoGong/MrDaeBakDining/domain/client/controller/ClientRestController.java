@@ -56,7 +56,6 @@ public class ClientRestController {
 
         Client client = clientSignRequest.toClient();
         client.setClientGrade(ClientGrade.BRONZE);
-        client.setEnable(true);
         Client savedClient = clientRepository.save(client);
 
         return ResponseEntity.ok().body(new ClientInfoResponse(savedClient));

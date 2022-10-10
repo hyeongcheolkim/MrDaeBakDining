@@ -24,7 +24,7 @@ public class Food{
     private String name;
     private Integer sellPrice;
     private Boolean enable = true;
-    private Boolean orderable;
+    private Boolean orderable = true;
     @Enumerated(EnumType.STRING)
     private FoodCategory foodCategory;
     @OneToMany(mappedBy = "food")

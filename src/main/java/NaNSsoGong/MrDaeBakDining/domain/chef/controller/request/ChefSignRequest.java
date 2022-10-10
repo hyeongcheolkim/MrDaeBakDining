@@ -19,7 +19,6 @@ public class ChefSignRequest {
         chef.setName(this.name);
         chef.setLoginId(this.loginId);
         chef.setPassword(this.password);
-        chef.setEnable(true);
         return chef;
     }
 }

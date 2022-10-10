@@ -1,7 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.client.controller.request;
 
 import NaNSsoGong.MrDaeBakDining.domain.Address;
-import NaNSsoGong.MrDaeBakDining.domain.client.domain.ClientGrade;
 import lombok.Data;
 import org.springframework.lang.Nullable;
 

@@ -21,7 +21,7 @@ public class Tableware {
     @Column(name = "tableware_id")
     private Long id;
     private String name;
-    private Boolean enable;
+    private Boolean enable = true;
     @OneToMany(mappedBy = "tableware")
     private List<StyleTableware> styleTablewareList = new ArrayList<>();
 }

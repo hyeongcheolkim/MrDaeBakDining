@@ -27,9 +27,6 @@ public class StyleService {
         style.setName(styleDto.getName());
         style.setSellPrice(styleDto.getSellPrice());
 
-        style.setEnable(true);
-        style.setOrderable(true);
-
         List<StyleTableware> styleTablewareList = makeStyleTablewareList(style, styleDto);
         for (var styleTableware : styleTablewareList)
             style.getStyleTablewareList().add(styleTableware);

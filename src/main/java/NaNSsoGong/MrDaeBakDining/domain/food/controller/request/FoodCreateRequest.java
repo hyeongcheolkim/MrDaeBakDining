@@ -21,8 +21,6 @@ public class FoodCreateRequest {
         food.setName(this.name);
         food.setSellPrice(this.sellPrice);
         food.setFoodCategory(this.foodCategory);
-        food.setEnable(true);
-        food.setOrderable(true);
         return food;
     }
 }

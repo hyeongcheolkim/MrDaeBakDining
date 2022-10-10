@@ -13,7 +13,7 @@ import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
-import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistEntityException;
+import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,6 +38,7 @@ import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.*;
 
 @Tag(name = "member")
 @RestController
+@Transactional
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
 @Slf4j
@@ -89,14 +90,13 @@ public class MemberRestController {
     }
 
     @Operation(summary = "회원탈퇴", description = "member.enable를 false로 바꿉니다, 정보가 삭제되는 것은 아닙니다")
-    @Transactional
     @PatchMapping("/signout")
     public ResponseEntity<String> signout(@Parameter(name = "clientId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_CLIENT, required = false) Long clientId,
                                           @Parameter(name = "chefId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_CHEF, required = false) Long chefId,
                                           @Parameter(name = "riderId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_RIDER, required = false) Long riderId,
                                           HttpServletRequest request) {
         if (clientId == null && chefId == null && riderId == null)
-            throw new NoExistEntityException("존재하지 않는 세션입니다");
+            throw new NoExistInstanceException(HttpSession.class);
         Long memberId = null;
         if (clientId != null)
             memberId = clientId;
@@ -118,13 +118,12 @@ public class MemberRestController {
     }
 
     @Operation(summary = "멤버업데이트")
-    @Transactional
     @PutMapping("/{memberId}")
     public ResponseEntity<MemberInfoResponse> memberUpdate(
             @PathVariable(value = "memberId") Long memberId,
             @RequestBody @Validated MemberUpdateRequest memberUpdateRequest) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> {
-            throw new NoExistEntityException("존재하지 않는 멤버입니다");
+            throw new NoExistInstanceException(Member.class);
         });
         if (!member.getLoginId().equals(memberUpdateRequest.getLoginId())
                 && memberService.isLoginIdExist(memberUpdateRequest.getLoginId()))

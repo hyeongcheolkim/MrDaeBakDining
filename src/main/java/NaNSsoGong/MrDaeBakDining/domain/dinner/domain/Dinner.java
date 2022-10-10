@@ -19,12 +19,11 @@ public class Dinner {
     @GeneratedValue
     @Column(name="dinner_id")
     private Long id;
-    @Column(unique = true)
     private String name;
     @Lob
     private String description;
     private Boolean enable = true;
-    private Boolean orderable;
+    private Boolean orderable = true;
     @OneToMany(mappedBy = "dinner", cascade = CascadeType.ALL, orphanRemoval = true)
     List<DinnerFood> dinnerFoodList = new ArrayList<>();
     @OneToMany(mappedBy = "dinner", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -62,7 +62,6 @@ public class IngredientRestController {
             throw new DuplicatedFieldValueException();
 
         Ingredient ingredient = new Ingredient();
-        ingredient.setEnable(true);
         ingredient.setName(ingredientCreateRequest.getName());
         ingredient.setStockQuantity(ingredientCreateRequest.getStockQuantity());
         Ingredient savedIngredient = ingredientRepository.save(ingredient);

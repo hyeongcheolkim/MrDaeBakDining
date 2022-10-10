@@ -68,7 +68,6 @@ public class TablewareRestController {
 
         Tableware tableware = new Tableware();
         Tableware savedTableware = tablewareRepository.save(tableware);
-        tableware.setEnable(true);
         tableware.setName(name);
 
         return ResponseEntity.ok().body(new TablewareInfoResponse(savedTableware));

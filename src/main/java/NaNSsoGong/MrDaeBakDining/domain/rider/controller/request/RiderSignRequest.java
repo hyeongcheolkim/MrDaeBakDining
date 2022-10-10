@@ -20,7 +20,6 @@ public class RiderSignRequest {
         rider.setName(this.name);
         rider.setLoginId(this.loginId);
         rider.setPassword(this.password);
-        rider.setEnable(true);
         return rider;
     }
 }

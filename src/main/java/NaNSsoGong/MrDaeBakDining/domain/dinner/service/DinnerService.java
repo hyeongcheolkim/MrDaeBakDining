@@ -34,9 +34,6 @@ public class DinnerService {
         dinner.setName(dinnerDto.getName());
         dinner.setDescription(dinnerDto.getDescription());
 
-        dinner.setOrderable(true);
-        dinner.setEnable(true);
-
         List<DinnerFood> dinnerFoodList = makeDinnerFoodList(dinner, dinnerDto);
         for(var dinnerFood : dinnerFoodList)
             dinner.getDinnerFoodList().add(dinnerFood);
