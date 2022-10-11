@@ -1,5 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.food.controller;
 
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerFood;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.request.FoodCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.request.FoodUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodInfoResponse;
@@ -113,8 +115,8 @@ public class FoodRestController {
         if (food.getDinnerFoodList().stream().filter(e -> e.getDinner().getEnable()).count() != 0)
             throw new DisabledEntityContainException(
                     food.getDinnerFoodList().stream()
-                            .map(e -> e.getDinner())
-                            .filter(e -> e.getEnable())
+                            .map(DinnerFood::getDinner)
+                            .filter(Dinner::getEnable)
                             .map(e -> DisabledEntityContainInfo.builder()
                                     .classTypeName(Hibernate.getClass(e).getSimpleName())
                                     .instanceName(e.getName())

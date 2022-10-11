@@ -1,5 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.ingredient.controller;
 
+import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.controller.request.IngredientCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.controller.request.IngredientQuantityUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.controller.request.IngredientUpdateRequest;
@@ -7,6 +8,7 @@ import NaNSsoGong.MrDaeBakDining.domain.ingredient.controller.response.Ingredien
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
+import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
 import NaNSsoGong.MrDaeBakDining.exception.exception.*;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import NaNSsoGong.MrDaeBakDining.exception.response.DisabledEntityContainInfo;
@@ -91,8 +93,8 @@ public class IngredientRestController {
         if (ingredient.getRecipeList().stream().filter(e -> e.getFood().getEnable()).count() != 0)
             throw new DisabledEntityContainException(
                     ingredient.getRecipeList().stream()
-                            .map(e -> e.getFood())
-                            .filter(e -> e.getEnable())
+                            .map(Recipe::getFood)
+                            .filter(Food::getEnable)
                             .map(e -> DisabledEntityContainInfo.builder()
                                     .classTypeName(Hibernate.getClass(e).getSimpleName())
                                     .instanceName(e.getName())

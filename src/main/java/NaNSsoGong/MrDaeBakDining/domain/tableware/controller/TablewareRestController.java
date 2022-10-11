@@ -1,6 +1,8 @@
 package NaNSsoGong.MrDaeBakDining.domain.tableware.controller;
 
 
+import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
+import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleTableware;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.controller.request.TablewareCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.controller.request.TablewareUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.tableware.controller.response.TablewareInfoResponse;
@@ -82,8 +84,8 @@ public class TablewareRestController {
         if (tableware.getStyleTablewareList().stream().filter(e -> e.getStyle().getEnable()).count() != 0)
             throw new DisabledEntityContainException(
                     tableware.getStyleTablewareList().stream()
-                            .map(e -> e.getStyle())
-                            .filter(e -> e.getEnable())
+                            .map(StyleTableware::getStyle)
+                            .filter(Style::getEnable)
                             .map(e -> DisabledEntityContainInfo.builder()
                                     .classTypeName(Hibernate.getClass(e).getSimpleName())
                                     .instanceName(e.getName())
