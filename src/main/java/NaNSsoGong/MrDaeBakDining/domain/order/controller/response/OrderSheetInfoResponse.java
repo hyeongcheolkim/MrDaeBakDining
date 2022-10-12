@@ -14,14 +14,14 @@ public class OrderSheetInfoResponse {
     private String styleName;
     private Long dinnerId;
     private String dinnerName;
-    private List<OrderSheetFoodInfoResponse> orderSheetFoodResponseList = new ArrayList<>();
+    private List<FoodDifferenceInfoResponse> foodDifferenceInfoResponseList = new ArrayList<>();
 
     public OrderSheetInfoResponse(OrderSheet orderSheet) {
         this.orderSheetId = orderSheet.getId();
         this.styleId = orderSheet.getStyle().getId();
         this.dinnerId = orderSheet.getDinner().getId();
-        this.orderSheetFoodResponseList = orderSheet.getFoodDifferenceList().stream()
-                .map(OrderSheetFoodInfoResponse::new)
+        this.foodDifferenceInfoResponseList = orderSheet.getFoodDifferenceList().stream()
+                .map(FoodDifferenceInfoResponse::new)
                 .collect(Collectors.toList());
         this.styleName = orderSheet.getStyle().getName();
         this.dinnerName = orderSheet.getDinner().getName();

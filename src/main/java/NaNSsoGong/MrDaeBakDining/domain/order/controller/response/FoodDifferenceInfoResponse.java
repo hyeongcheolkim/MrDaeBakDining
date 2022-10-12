@@ -4,13 +4,13 @@ import NaNSsoGong.MrDaeBakDining.domain.order.domain.FoodDifference;
 import lombok.Data;
 
 @Data
-public class OrderSheetFoodInfoResponse {
+public class FoodDifferenceInfoResponse {
     private Long orderSheetItemId;
     Long foodId;
     String foodName;
     Integer foodQuantity;
 
-    public OrderSheetFoodInfoResponse(FoodDifference foodDifference) {
+    public FoodDifferenceInfoResponse(FoodDifference foodDifference) {
         this.orderSheetItemId = foodDifference.getId();
         this.foodId = foodDifference.getFood().getId();
         this.foodName = foodDifference.getFood().getName();
