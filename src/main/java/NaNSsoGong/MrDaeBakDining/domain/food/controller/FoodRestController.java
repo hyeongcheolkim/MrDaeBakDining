@@ -3,7 +3,7 @@ package NaNSsoGong.MrDaeBakDining.domain.food.controller;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.DinnerFood;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.request.FoodCreateRequest;
-import NaNSsoGong.MrDaeBakDining.domain.food.controller.request.FoodUpdateRequest;
+import NaNSsoGong.MrDaeBakDining.domain.food.controller.request.FoodUpdateOderableRequest;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.food.controller.response.FoodMakeResponse;
 import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
@@ -108,7 +108,7 @@ public class FoodRestController {
 
     @Operation(summary = "푸드 비활성화", description = "이 푸드가 포함되는 디너가 존재하지 않을때만 비활성화 할 수 있습니다")
     @PatchMapping("/disable/{foodId}")
-    public ResponseEntity<String> talbewareDisable(@PathVariable(value = "foodId") Long foodId) {
+    public ResponseEntity<String> foodDisable(@PathVariable(value = "foodId") Long foodId) {
         Food food = foodRepository.findById(foodId).orElseThrow(() -> {
             throw new NoExistInstanceException(Food.class);
         });
@@ -128,23 +128,28 @@ public class FoodRestController {
         return ResponseEntity.ok().body(DISABLE_COMPLETE);
     }
 
-    @Operation(summary = "푸드업데이트")
-    @PutMapping("/{foodId}")
-    public ResponseEntity<FoodInfoResponse> foodUpdate(
-            @PathVariable(value = "foodId") Long foodId,
-            @RequestBody @Validated FoodUpdateRequest foodUpdateRequest) {
+    @Operation(summary = "푸드 연쇄 비활성화", description = "이 푸드가 포함되는 디너를 모두 비활성화 시킨뒤 이 푸드를 비활성화 합니다")
+    @PatchMapping("/disable-cascade/{foodId}")
+    public ResponseEntity<String> foodDisableCascade(@PathVariable(value = "foodId") Long foodId) {
         Food food = foodRepository.findById(foodId).orElseThrow(() -> {
             throw new NoExistInstanceException(Food.class);
         });
-        if (!food.getName().equals(foodUpdateRequest.getName())
-                && foodService.isFoodNameExist(foodUpdateRequest.getName()))
-            throw new DuplicatedFieldValueException();
+        for(var dinnerFood : food.getDinnerFoodList())
+            dinnerFood.getDinner().setEnable(false);
+        food.setEnable(false);
+        return ResponseEntity.ok().body(DISABLE_COMPLETE);
+    }
 
-        food.setName(foodUpdateRequest.getName());
-        food.setFoodCategory(foodUpdateRequest.getFoodCategory());
-        food.setSellPrice(foodUpdateRequest.getSellPrice());
-        food.setOrderable(foodUpdateRequest.getOrderable());
+    @Operation(summary = "푸드판매여부 설정")
+    @PutMapping("/{foodId}")
+    public ResponseEntity<FoodInfoResponse> foodUpdateOderable(
+            @PathVariable(value = "foodId") Long foodId,
+            @RequestBody @Validated FoodUpdateOderableRequest foodUpdateOderableRequest) {
+        Food food = foodRepository.findById(foodId).orElseThrow(() -> {
+            throw new NoExistInstanceException(Food.class);
+        });
 
+        food.setOrderable(foodUpdateOderableRequest.getOrderable());
         return ResponseEntity.ok().body(new FoodInfoResponse(food));
     }
 }

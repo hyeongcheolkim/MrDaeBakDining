@@ -97,16 +97,29 @@ public class TablewareRestController {
         return ResponseEntity.ok().body(DISABLE_COMPLETE);
     }
 
-    @Operation(summary = "테이블웨어업데이트")
-    @PutMapping("/{tablewareId}")
-    public ResponseEntity<TablewareInfoResponse> tablewareUpdateByTablewareId
-            (@PathVariable(value = "tablewareId") Long tablewareId,
-             @RequestBody @Validated TablewareUpdateRequest tablewareCreateRequest) {
+    @Operation(summary = "테이블웨어 연쇄 비활성화", description = "이 테이블웨어가 포함되는 스타일을 모두 비활성화 시킨뒤 이 테이블웨어를 비활성화 합니다")
+    @PatchMapping("/disable-cascade/{tablewareId}")
+    public ResponseEntity<String> talbewareDisableCaecade(@PathVariable(value = "tablewareId") Long tablewareId) {
         Tableware tableware = tablewareRepository.findById(tablewareId).orElseThrow(() -> {
             throw new NoExistInstanceException(Tableware.class);
         });
-
-        tableware.setName(tablewareCreateRequest.getName());
-        return ResponseEntity.ok().body(new TablewareInfoResponse(tableware));
+        for(var styleTableware : tableware.getStyleTablewareList())
+            styleTableware.getStyle().setEnable(false);
+        tableware.setEnable(false);
+        return ResponseEntity.ok().body(DISABLE_COMPLETE);
     }
+
+
+//    @Operation(summary = "테이블웨어업데이트")
+//    @PutMapping("/{tablewareId}")
+//    public ResponseEntity<TablewareInfoResponse> tablewareUpdateByTablewareId
+//            (@PathVariable(value = "tablewareId") Long tablewareId,
+//             @RequestBody @Validated TablewareUpdateRequest tablewareCreateRequest) {
+//        Tableware tableware = tablewareRepository.findById(tablewareId).orElseThrow(() -> {
+//            throw new NoExistInstanceException(Tableware.class);
+//        });
+//
+//        tableware.setName(tablewareCreateRequest.getName());
+//        return ResponseEntity.ok().body(new TablewareInfoResponse(tableware));
+//    }
 }

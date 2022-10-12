@@ -9,6 +9,7 @@ import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.repository.IngredientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
 import NaNSsoGong.MrDaeBakDining.domain.recipe.domain.Recipe;
+import NaNSsoGong.MrDaeBakDining.domain.recipe.repository.RecipeRepository;
 import NaNSsoGong.MrDaeBakDining.exception.exception.*;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import NaNSsoGong.MrDaeBakDining.exception.response.DisabledEntityContainInfo;
@@ -39,6 +40,7 @@ import static NaNSsoGong.MrDaeBakDining.exception.response.ResponseConst.DISABLE
 public class IngredientRestController {
     private final IngredientRepository ingredientRepository;
     private final IngredientService ingredientService;
+    private final RecipeRepository recipeRepository;
 
     @Operation(summary = "재료조회")
     @GetMapping("/{ingredientId}")
@@ -107,20 +109,33 @@ public class IngredientRestController {
         return ResponseEntity.ok().body(DISABLE_COMPLETE);
     }
 
-    @Operation(summary = "재료업데이트")
-    @PutMapping("/{ingredientId}")
-    public ResponseEntity<IngredientInfoResponse> ingredientUpdate(
-            @PathVariable(value = "ingredientId") Long ingredientId,
-            @RequestBody @Validated IngredientUpdateRequest ingredientUpdateRequest) {
+    @Operation(summary = "재료 연쇄 비활성화", description = "이 재료가 포함되는 레시피를 모두 삭제 시킨뒤 이 재료를 비활성화 합니다")
+    @PatchMapping("/disable-cascade/{ingredientId}")
+    public ResponseEntity<String> ingredientDisableCascade(@PathVariable(value = "ingredientId") Long ingredientId) {
         Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
             throw new NoExistInstanceException(Ingredient.class);
         });
-        if (!ingredient.getName().equals(ingredientUpdateRequest.getName())
-                && ingredientService.isIngredientNameExist(ingredientUpdateRequest.getName()))
-            throw new DuplicatedFieldValueException();
-        ingredient.setName(ingredientUpdateRequest.getName());
-        ingredient.setStockQuantity(ingredient.getStockQuantity());
-
-        return ResponseEntity.ok().body(new IngredientInfoResponse(ingredient));
+        recipeRepository.deleteAllById(ingredient.getRecipeList().stream()
+                .map(Recipe::getId)
+                .collect(Collectors.toList()));
+        ingredient.setEnable(false);
+        return ResponseEntity.ok().body(DISABLE_COMPLETE);
     }
+
+//    @Operation(summary = "재료업데이트")
+//    @PutMapping("/{ingredientId}")
+//    public ResponseEntity<IngredientInfoResponse> ingredientUpdate(
+//            @PathVariable(value = "ingredientId") Long ingredientId,
+//            @RequestBody @Validated IngredientUpdateRequest ingredientUpdateRequest) {
+//        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
+//            throw new NoExistInstanceException(Ingredient.class);
+//        });
+//        if (!ingredient.getName().equals(ingredientUpdateRequest.getName())
+//                && ingredientService.isIngredientNameExist(ingredientUpdateRequest.getName()))
+//            throw new DuplicatedFieldValueException();
+//        ingredient.setName(ingredientUpdateRequest.getName());
+//        ingredient.setStockQuantity(ingredient.getStockQuantity());
+//
+//        return ResponseEntity.ok().body(new IngredientInfoResponse(ingredient));
+//    }
 }

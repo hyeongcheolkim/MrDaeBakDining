@@ -1,7 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.style.controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.style.controller.request.StyleCreateRequest;
-import NaNSsoGong.MrDaeBakDining.domain.style.controller.request.StyleUpdateRequest;
+import NaNSsoGong.MrDaeBakDining.domain.style.controller.request.StyleUpdateOderableRequest;
 import NaNSsoGong.MrDaeBakDining.domain.style.controller.response.StyleInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.StyleTableware;
@@ -76,26 +76,15 @@ public class StyleRestController {
         return ResponseEntity.ok().body(DISABLE_COMPLETE);
     }
 
-    @Operation(summary = "스타일업데이트")
+    @Operation(summary = "스타일판매여부 업데이트")
     @PutMapping("/{styleId}")
-    public ResponseEntity<StyleInfoResponse> styleUpdate(
+    public ResponseEntity<StyleInfoResponse> styleOderablweUpdate(
             @PathVariable(value = "styleId") Long styleId,
-            @RequestBody @Validated StyleUpdateRequest styleUpdateRequest) {
+            @RequestBody @Validated StyleUpdateOderableRequest styleUpdateOderableRequest) {
         Style style = styleRepository.findById(styleId).orElseThrow(() -> {
             throw new NoExistInstanceException(Style.class);
         });
-
-        if(!style.getName().equals(styleUpdateRequest.getName())
-        && styleService.isStyleNameExist(styleUpdateRequest.getName()))
-            throw new DuplicatedFieldValueException();
-
-        style.setName(styleUpdateRequest.getName());
-        style.setSellPrice(styleUpdateRequest.getSellPrice());
-
-        List<StyleTableware> styleTablewareList = styleService.makeStyleTablewareList(style, styleUpdateRequest.toStyleDto());
-        style.getStyleTablewareList().clear();
-        for (var styleTableware : styleTablewareList)
-            style.getStyleTablewareList().add(styleTableware);
+        style.setOrderable(styleUpdateOderableRequest.getOderable());
         return ResponseEntity.ok().body(new StyleInfoResponse(style));
     }
 }

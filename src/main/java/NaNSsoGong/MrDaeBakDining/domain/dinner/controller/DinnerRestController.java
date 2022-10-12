@@ -1,7 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.dinner.controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.request.DinnerCreateRequest;
-import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.request.DinnerUpdateRequest;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.request.DinnerOderableUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
@@ -73,23 +73,16 @@ public class DinnerRestController {
         return ResponseEntity.ok().body(DISABLE_COMPLETE);
     }
 
-    @Operation(summary = "디너업데이트")
+    @Operation(summary = "디너판매여부 설정")
     @PutMapping("/{dinnerId}")
-    public ResponseEntity<DinnerInfoResponse> dinnerUpdate(
+    public ResponseEntity<DinnerInfoResponse> dinnerOrderableUpdate(
             @PathVariable(value = "dinnerId") Long dinnerId,
-            @RequestBody @Validated DinnerUpdateRequest dinnerUpdateRequest) {
+            @RequestBody @Validated DinnerOderableUpdateRequest dinnerOderableUpdateRequest) {
         Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
             throw new NoExistInstanceException(Dinner.class);
         });
 
-        if(!dinner.getName().equals(dinnerUpdateRequest.getName())
-                && dinnerService.isDinnerNameExist(dinnerUpdateRequest.getName()))
-            throw new DuplicatedFieldValueException();
-
-        dinner.setDescription(dinnerUpdateRequest.getDescription());
-        dinner.setOrderable(dinnerUpdateRequest.getOrderable());
-        dinner.setName(dinnerUpdateRequest.getName());
-
+        dinner.setOrderable(dinnerOderableUpdateRequest.getOrderable());
         return ResponseEntity.ok().body(new DinnerInfoResponse(dinner));
     }
 }

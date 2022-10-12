@@ -22,11 +22,13 @@ public class FoodService {
     private final FoodRepository foodRepository;
 
     public Boolean isMakeAble(Food food){
+        if(!food.getEnable())
+            return false;
         List<Recipe> recipeList = food.getRecipeList();
         for(var recipe : recipeList){
             Ingredient ingredient = recipe.getIngredient();
             Integer ingredientQuantity = recipe.getIngredientQuantity();
-            if(ingredient.getStockQuantity() < ingredientQuantity)
+            if(!ingredient.getEnable() || ingredient.getStockQuantity() < ingredientQuantity)
                 return false;
         }
         return true;
