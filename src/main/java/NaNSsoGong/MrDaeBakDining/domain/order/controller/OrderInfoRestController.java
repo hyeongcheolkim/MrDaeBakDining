@@ -122,7 +122,7 @@ public class OrderInfoRestController {
 
     @Operation(summary = "주문리스트조회 by OrderStatus", description = "주문상태로 필터링하여 조회합니다")
     @GetMapping("/status/list")
-    public Page<Object> orderInfoListByOrderStatus(@Parameter(name = "orderStatus", description = "ORDERED, RESERVED둘중 하나만 됩니다. 다른거 고르면 exception터집니다. 밑에는 무시")
+    public Page<Object> orderInfoListByOrderStatus(@Parameter(name = "orderStatus")
                                                    @RequestParam(value = "orderStatus") OrderStatus orderStatus,
                                                    Pageable pageable) {
         Page<Order> orderList = orderRepository.findAllByOrderStatus(orderStatus, pageable);
