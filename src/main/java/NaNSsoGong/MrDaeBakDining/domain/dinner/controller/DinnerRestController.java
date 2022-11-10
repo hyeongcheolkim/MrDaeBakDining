@@ -25,10 +25,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.util.UUID;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import static NaNSsoGong.MrDaeBakDining.exception.response.ResponseConst.*;
+import static NaNSsoGong.MrDaeBakDining.exception.response.ResponseConst.DISABLE_COMPLETE;
 
 @Tag(name = "dinner")
 @RestController
@@ -97,12 +99,12 @@ public class DinnerRestController {
         Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
             throw new NoExistInstanceException(Dinner.class);
         });
-        if(file == null)
+        if (file == null)
             throw new NoExistInstanceException(MultipartFile.class);
 
         String absolutePath = new File("").getAbsolutePath() + "\\" + "images/";
         File destinationFolder = new File(absolutePath);
-        if(!destinationFolder.exists())
+        if (!destinationFolder.exists())
             destinationFolder.mkdirs();
 
         String originalFilename = file.getOriginalFilename();
@@ -113,19 +115,23 @@ public class DinnerRestController {
     }
 
     @Operation(summary = "디너이미지 다운로드")
-    @GetMapping(value = "image/{dinnerId}", produces = MediaType.IMAGE_PNG_VALUE)
+    @GetMapping(value = "image/{dinnerId}")
     public ResponseEntity<byte[]> dinnerImageDownload(@PathVariable(value = "dinnerId") Long dinnerId) throws IOException {
         Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
             throw new NoExistInstanceException(Dinner.class);
         });
-        if(dinner.getImageName() == null || dinner.getImageName().isEmpty())
+        if (dinner.getImageName() == null || dinner.getImageName().isEmpty())
             throw new NoExistInstanceException(MultipartFile.class);
 
         String absolutePath = new File("").getAbsolutePath() + "\\" + "images/";
         String imageName = dinner.getImageName();
-        InputStream imageStream = new FileInputStream(absolutePath + imageName);
-        if(imageStream == null)
+        File file = new File(absolutePath + imageName);
+        if (!file.exists())
             throw new NoExistInstanceException(MultipartFile.class);
-        return ResponseEntity.ok().body(imageStream.readAllBytes());
+        InputStream imageStream = new FileInputStream(file);
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .body(imageStream.readAllBytes());
     }
 }
