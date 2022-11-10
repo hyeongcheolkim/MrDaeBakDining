@@ -36,7 +36,7 @@ public class RiderRestController {
     @Operation(summary = "회원가입")
     @PostMapping("/sign")
     public ResponseEntity<RiderInfoResponse> sign(@RequestBody @Validated RiderSignRequest riderSignRequest) {
-        if (!memberService.isLoginIdExist(riderSignRequest.getLoginId()))
+        if (memberService.isLoginIdExist(riderSignRequest.getLoginId()))
             throw new DuplicatedFieldValueException();
 
         Rider rider = riderSignRequest.toRider();

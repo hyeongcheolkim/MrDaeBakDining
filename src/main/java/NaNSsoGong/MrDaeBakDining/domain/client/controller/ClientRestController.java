@@ -47,7 +47,7 @@ public class ClientRestController {
     @Operation(summary = "회원가입")
     @PostMapping("/sign")
     public ResponseEntity<ClientInfoResponse> sign(@RequestBody @Validated ClientSignRequest clientSignRequest) {
-        if (!memberService.isLoginIdExist(clientSignRequest.getLoginId()))
+        if (memberService.isLoginIdExist(clientSignRequest.getLoginId()))
             throw new DuplicatedFieldValueException();
         if (clientSignRequest.getPersonalInformationCollectionAgreement() && clientSignRequest.getAddress() == null)
             throw new PersonalInformationException("정보제공에 동의했을경우, 주소를 필수로 입력해야 합니다");

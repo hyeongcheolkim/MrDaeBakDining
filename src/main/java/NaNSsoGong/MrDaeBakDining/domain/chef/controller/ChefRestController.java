@@ -38,7 +38,7 @@ public class ChefRestController {
     @Operation(summary = "회원가입")
     @PostMapping("/sign")
     public ResponseEntity<ChefInfoResponse> sign(@RequestBody @Validated ChefSignRequest chefSignRequest) {
-        if (!memberService.isLoginIdExist(chefSignRequest.getLoginId()))
+        if (memberService.isLoginIdExist(chefSignRequest.getLoginId()))
             throw new DuplicatedFieldValueException();
 
         Chef chef = chefSignRequest.toChef();
