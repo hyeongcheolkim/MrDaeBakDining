@@ -18,10 +18,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.UUID;
 
 import static NaNSsoGong.MrDaeBakDining.exception.response.ResponseConst.*;
 
@@ -39,7 +47,7 @@ public class DinnerRestController {
     @Operation(summary = "디너 생성")
     @PostMapping("")
     public ResponseEntity<DinnerInfoResponse> dinnerCreate(@RequestBody @Validated DinnerCreateRequest dinnerCreateRequest) {
-        if(dinnerService.isDinnerNameExist(dinnerCreateRequest.getName()))
+        if (dinnerService.isDinnerNameExist(dinnerCreateRequest.getName()))
             throw new DuplicatedFieldValueException();
 
         Dinner madeDinner = dinnerService.makeDinner(dinnerCreateRequest.toDinnerDto());
@@ -84,5 +92,35 @@ public class DinnerRestController {
 
         dinner.setOrderable(dinnerOderableUpdateRequest.getOrderable());
         return ResponseEntity.ok().body(new DinnerInfoResponse(dinner));
+    }
+
+    @Operation(summary = "디너이미지 업로드")
+    @PostMapping(value = "image/{dinnerId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String dinnerImageUpload(@PathVariable(value = "dinnerId") Long dinnerId, @RequestPart MultipartFile file) throws IOException {
+        Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
+            throw new NoExistInstanceException(Dinner.class);
+        });
+        String absolutePath = new File("").getAbsolutePath() + "\\" + "images/";
+        String originalFilename = file.getOriginalFilename();
+        File destination = new File(absolutePath + originalFilename);
+        file.transferTo(destination);
+        dinner.setImageName(originalFilename);
+        return "ok";
+    }
+
+    @Operation(summary = "디너이미지 다운로드")
+    @GetMapping(value = "image/{dinnerId}", produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<byte[]> dinnerImageDownload(@PathVariable(value = "dinnerId") Long dinnerId) throws IOException {
+        Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
+            throw new NoExistInstanceException(Dinner.class);
+        });
+        if(dinner.getImageName() == null || dinner.getImageName().isEmpty())
+            throw new NoExistInstanceException(MultipartFile.class);
+        String absolutePath = new File("").getAbsolutePath() + "\\" + "images/";
+        String imageName = dinner.getImageName();
+        InputStream imageStream = new FileInputStream(absolutePath + imageName);
+        if(imageStream == null)
+            throw new NoExistInstanceException(MultipartFile.class);
+        return ResponseEntity.ok().body(imageStream.readAllBytes());
     }
 }
