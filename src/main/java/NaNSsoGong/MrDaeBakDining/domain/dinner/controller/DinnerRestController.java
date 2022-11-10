@@ -133,10 +133,12 @@ public class DinnerRestController {
         if (!file.exists())
             throw new NoExistInstanceException(MultipartFile.class);
         InputStream imageStream = new FileInputStream(file);
+        byte[] image = imageStream.readAllBytes();
+        imageStream.close();
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.IMAGE_PNG)
-                .body(imageStream.readAllBytes());
+                .body(image);
     }
 
     @Operation(summary = "디너이미지 삭제")
@@ -152,10 +154,13 @@ public class DinnerRestController {
         String absolutePath = new File("").getAbsolutePath() + "\\" + "images/";
         String imageName = dinner.getImageName();
         File file = new File(absolutePath + imageName);
-        if (file.delete()) {
+
+        if (file.exists() && file.delete()) {
             dinner.setImageName(null);
             return ret;
-        }else
+        } else if (file.exists())
             throw new BusinessException("기존 디너 이미지가 사용중이므로 삭제할 수 없습니다");
+
+        return ret;
     }
 }
