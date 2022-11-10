@@ -25,10 +25,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.UUID;
 
 import static NaNSsoGong.MrDaeBakDining.exception.response.ResponseConst.*;
@@ -100,6 +97,9 @@ public class DinnerRestController {
         Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
             throw new NoExistInstanceException(Dinner.class);
         });
+        if(file == null)
+            throw new NoExistInstanceException(MultipartFile.class);
+
         String absolutePath = new File("").getAbsolutePath() + "\\" + "images/";
         String originalFilename = file.getOriginalFilename();
         File destination = new File(absolutePath + originalFilename);
@@ -116,6 +116,7 @@ public class DinnerRestController {
         });
         if(dinner.getImageName() == null || dinner.getImageName().isEmpty())
             throw new NoExistInstanceException(MultipartFile.class);
+
         String absolutePath = new File("").getAbsolutePath() + "\\" + "images/";
         String imageName = dinner.getImageName();
         InputStream imageStream = new FileInputStream(absolutePath + imageName);
