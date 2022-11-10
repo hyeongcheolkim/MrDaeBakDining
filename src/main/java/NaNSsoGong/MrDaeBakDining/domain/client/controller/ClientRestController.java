@@ -51,7 +51,7 @@ public class ClientRestController {
             throw new DuplicatedFieldValueException();
         if (clientSignRequest.getPersonalInformationCollectionAgreement() && clientSignRequest.getAddress() == null)
             throw new PersonalInformationException("정보제공에 동의했을경우, 주소를 필수로 입력해야 합니다");
-        if (clientSignRequest.getPersonalInformationCollectionAgreement() && clientSignRequest.getCardNumber().isEmpty())
+        if (clientSignRequest.getPersonalInformationCollectionAgreement() && clientSignRequest.getCardNumber() == null)
             throw new PersonalInformationException("정보제공에 동의했을경우, 카드번호를 필수로 입력해야 합니다");
 
         Client client = clientSignRequest.toClient();
@@ -112,7 +112,7 @@ public class ClientRestController {
         });
         if (clientUpdateRequest.getPersonalInformationCollectionAgreement() && clientUpdateRequest.getAddress() == null)
             throw new PersonalInformationException("정보제공에 동의했을경우, 주소를 필수로 입력해야 합니다");
-        if (clientUpdateRequest.getPersonalInformationCollectionAgreement() && clientUpdateRequest.getCardNumber().isEmpty())
+        if (clientUpdateRequest.getPersonalInformationCollectionAgreement() && clientUpdateRequest.getCardNumber() == null)
             throw new PersonalInformationException("정보제공에 동의했을경우, 카드번호를 필수로 입력해야 합니다");
 
         client.setPersonalInformationCollectionAgreement(clientUpdateRequest.getPersonalInformationCollectionAgreement());
