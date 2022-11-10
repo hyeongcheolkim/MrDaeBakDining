@@ -6,6 +6,7 @@ import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerInfoRes
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.service.DinnerService;
+import NaNSsoGong.MrDaeBakDining.exception.exception.BusinessException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,7 +97,7 @@ public class DinnerRestController {
 
     @Operation(summary = "디너이미지 업로드")
     @PostMapping(value = "image/{dinnerId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String dinnerImageUpload(@PathVariable(value = "dinnerId") Long dinnerId, @RequestPart MultipartFile file) throws IOException {
+    public ResponseEntity<String> dinnerImageUpload(@PathVariable(value = "dinnerId") Long dinnerId, @RequestPart MultipartFile file) throws IOException {
         Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
             throw new NoExistInstanceException(Dinner.class);
         });
@@ -107,11 +109,13 @@ public class DinnerRestController {
         if (!destinationFolder.exists())
             destinationFolder.mkdirs();
 
+        dinnerImageDelete(dinnerId);
+
         String originalFilename = file.getOriginalFilename();
         File destination = new File(absolutePath + originalFilename);
         file.transferTo(destination);
         dinner.setImageName(originalFilename);
-        return "ok";
+        return ResponseEntity.ok().body("ok");
     }
 
     @Operation(summary = "디너이미지 다운로드")
@@ -133,5 +137,25 @@ public class DinnerRestController {
                 .ok()
                 .contentType(MediaType.IMAGE_PNG)
                 .body(imageStream.readAllBytes());
+    }
+
+    @Operation(summary = "디너이미지 삭제")
+    @DeleteMapping("image/{dinnerId}")
+    public ResponseEntity<String> dinnerImageDelete(@PathVariable(value = "dinnerId") Long dinnerId) {
+        Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
+            throw new NoExistInstanceException(Dinner.class);
+        });
+        var ret = ResponseEntity.ok().body("deleteComplete");
+        if (dinner.getImageName() == null)
+            return ret;
+
+        String absolutePath = new File("").getAbsolutePath() + "\\" + "images/";
+        String imageName = dinner.getImageName();
+        File file = new File(absolutePath + imageName);
+        if (file.delete()) {
+            dinner.setImageName(null);
+            return ret;
+        }else
+            throw new BusinessException("기존 디너 이미지가 사용중이므로 삭제할 수 없습니다");
     }
 }
