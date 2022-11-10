@@ -75,6 +75,7 @@ public class MemberRestController {
             memberLoginResponse.setMemberType(LOGIN_RIDER);
         }
         memberLoginResponse.setSessionId(session.getId());
+        memberLoginResponse.setMemberId(foundMember.getId());
 
         return ResponseEntity.ok().body(memberLoginResponse);
     }
