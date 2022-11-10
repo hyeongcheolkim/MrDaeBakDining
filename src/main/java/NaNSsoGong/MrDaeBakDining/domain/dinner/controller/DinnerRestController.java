@@ -101,6 +101,10 @@ public class DinnerRestController {
             throw new NoExistInstanceException(MultipartFile.class);
 
         String absolutePath = new File("").getAbsolutePath() + "\\" + "images/";
+        File destinationFolder = new File(absolutePath);
+        if(!destinationFolder.exists())
+            destinationFolder.mkdirs();
+
         String originalFilename = file.getOriginalFilename();
         File destination = new File(absolutePath + originalFilename);
         file.transferTo(destination);
