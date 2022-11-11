@@ -150,7 +150,7 @@ public class OrderRestController {
             throw new NoExistInstanceException(OrderSheet.class);
         });
 
-        if(!(order.getOrderStatus().equals(ORDERED) && order.getOrderStatus().equals(RESERVED)))
+        if(!(order.getOrderStatus().equals(ORDERED) || order.getOrderStatus().equals(RESERVED)))
             throw new NoProperOrderStatusException("주문 수정은 주문상태가 ORDERED이거나 RESERVED인 주문만 가능합니다");
 
         Integer previousTotalPriceAfterSale = order.getTotalPriceAfterSale();
