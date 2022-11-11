@@ -53,7 +53,7 @@ public class MemberRestController {
         Optional<Member> member = memberService.login(memberLoginRequest.getLoginId(), memberLoginRequest.getPassword());
 
         if (member.isEmpty()) {
-            if (memberService.isLoginIdExist(memberLoginRequest.getLoginId()))
+            if (!memberService.isLoginIdExist(memberLoginRequest.getLoginId()))
                 throw new LoginFailException("존재하지 않는 아이디입니다");
             else
                 throw new LoginFailException("비밀번호가 틀렸습니다");
@@ -111,10 +111,10 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DISABLE_COMPLETE);
     }
 
-    @Operation(summary = "아이디 중복체크")
+    @Operation(summary = "아이디 중복체크", description = "true:사용가능(비중복), false:사용불가능(중복)")
     @GetMapping("/valid-id")
     public ResponseEntity<Boolean> isLoginIdAvailable(@RequestParam String loginId) {
-        Boolean loginIdAvailable = memberService.isLoginIdExist(loginId);
+        Boolean loginIdAvailable = !memberService.isLoginIdExist(loginId);
         return ResponseEntity.ok().body(loginIdAvailable);
     }
 
