@@ -148,7 +148,7 @@ public class OrderRestController {
             @PathVariable(name = "orderId") Long orderId,
             @RequestBody OrderUpdateRequest orderUpdateRequest) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> {
-            throw new NoExistInstanceException(OrderSheet.class);
+            throw new NoExistInstanceException(Order.class);
         });
 
         if (!(order.getOrderStatus().equals(ORDERED) || order.getOrderStatus().equals(RESERVED)))
