@@ -100,7 +100,7 @@ public class OrderRestController {
 
     @Operation(summary = "주문상태 변경")
     @PatchMapping("/status")
-    public ResponseEntity changeOrderStatus(@RequestBody @Validated ChangeOrderStatusRequest changeOrderStatusRequest) {
+    public ResponseEntity<String> changeOrderStatus(@RequestBody @Validated ChangeOrderStatusRequest changeOrderStatusRequest) {
         Long orderId = changeOrderStatusRequest.getOrderId();
         OrderStatus orderStatus = changeOrderStatusRequest.getOrderStatus();
         Order order = orderRepository.findById(orderId).orElseThrow(() -> {
@@ -160,10 +160,10 @@ public class OrderRestController {
             OrderSheet orderSheet = orderSheetRepository.findById(orderSheetUpdateRequest.getOrderSheetId()).orElseThrow(() -> {
                 throw new NoExistInstanceException(OrderSheet.class);
             });
-            Style style = styleRepository.findById(orderSheetUpdateRequest.getStyleId()).orElseGet(() -> {
+            Style style = styleRepository.findById(orderSheetUpdateRequest.getStyleId()).orElseThrow(() -> {
                 throw new NoExistInstanceException(Style.class);
             });
-            Dinner dinner = dinnerRepository.findById(orderSheetUpdateRequest.getDinnerId()).orElseGet(() -> {
+            Dinner dinner = dinnerRepository.findById(orderSheetUpdateRequest.getDinnerId()).orElseThrow(() -> {
                 throw new NoExistInstanceException(Dinner.class);
             });
 
