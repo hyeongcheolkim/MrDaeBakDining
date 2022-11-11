@@ -3,6 +3,7 @@ package NaNSsoGong.MrDaeBakDining.domain.order.controller;
 import NaNSsoGong.MrDaeBakDining.domain.client.domain.Client;
 import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.ExcludedStyle;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
 import NaNSsoGong.MrDaeBakDining.domain.guest.repository.GuestRepository;
@@ -113,8 +114,8 @@ public class OrderRestController {
 
     @Operation(summary = "라이더 변경 by riderId", description = "변경기능이지만, 배정 기능처럼 사용할 수 있습니다")
     @PatchMapping("/rider/{riderId}")
-    public ResponseEntity changeRiderByRiderId(@PathVariable(value = "riderId") Long riderId,
-                                               @RequestBody @Validated ChangeRiderRequest changeRiderRequest) {
+    public ResponseEntity<String> changeRiderByRiderId(@PathVariable(value = "riderId") Long riderId,
+                                                       @RequestBody @Validated ChangeRiderRequest changeRiderRequest) {
         Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
             throw new NoExistInstanceException(Rider.class);
         });
@@ -128,8 +129,8 @@ public class OrderRestController {
 
     @Operation(summary = "라이더 변경 by Session", description = "변경기능이지만, 배정 기능처럼 사용할 수 있습니다")
     @PatchMapping("/rider")
-    public ResponseEntity changeRiderBySession(@Parameter(name = "riderId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_RIDER) Long riderId,
-                                               @RequestBody @Validated ChangeRiderRequest changeRiderRequest) {
+    public ResponseEntity<String> changeRiderBySession(@Parameter(name = "riderId", hidden = true, allowEmptyValue = true) @SessionAttribute(name = LOGIN_RIDER) Long riderId,
+                                                       @RequestBody @Validated ChangeRiderRequest changeRiderRequest) {
         Rider rider = riderRepository.findById(riderId).orElseThrow(() -> {
             throw new NoExistInstanceException(Rider.class);
         });
@@ -150,7 +151,7 @@ public class OrderRestController {
             throw new NoExistInstanceException(OrderSheet.class);
         });
 
-        if(!(order.getOrderStatus().equals(ORDERED) || order.getOrderStatus().equals(RESERVED)))
+        if (!(order.getOrderStatus().equals(ORDERED) || order.getOrderStatus().equals(RESERVED)))
             throw new NoProperOrderStatusException("주문 수정은 주문상태가 ORDERED이거나 RESERVED인 주문만 가능합니다");
 
         Integer previousTotalPriceAfterSale = order.getTotalPriceAfterSale();
@@ -202,7 +203,9 @@ public class OrderRestController {
             Style style = styleRepository.findById(orderSheet.getStyleId()).orElseThrow(() -> {
                 throw new NoExistInstanceException(Style.class);
             });
-            if (dinner.getExcludedStyleList().contains(style))
+            if (dinner.getExcludedStyleList().stream()
+                    .map(ExcludedStyle::getStyle)
+                    .anyMatch(e -> e == style))
                 throw new BusinessException(String.format("dinnerId:%d에서 styleId:%d를 고를 수 없습니다", dinner.getId(), style.getId()));
         }
     }
