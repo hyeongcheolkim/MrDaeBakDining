@@ -21,12 +21,13 @@ public class OrderSheetService {
 
     public Integer orderSheetPriceBeforeSale(OrderSheet orderSheet){
         Integer ret = 0;
-        Map<Food, Integer> calculatedFoodIdAndQuantity = calculatedFoodAndQuantity(orderSheet);
-        for(var food : calculatedFoodIdAndQuantity.keySet()){
+        Map<Food, Integer> calculatedFoodAndQuantity = calculatedFoodAndQuantity(orderSheet);
+        for(var food : calculatedFoodAndQuantity.keySet()){
             Integer sellPrice = food.getSellPrice();
-            Integer quantity = calculatedFoodIdAndQuantity.get(food);
+            Integer quantity = calculatedFoodAndQuantity.get(food);
             ret += sellPrice * quantity;
         }
+        ret += orderSheet.getStyle().getSellPrice();
         return ret;
     }
 
@@ -34,9 +35,9 @@ public class OrderSheetService {
         var ret = new ConcurrentHashMap<Food, Integer>();
 
         Dinner dinner = orderSheet.getDinner();
-        Map<Food, Integer> dinnerFoodIdAndQuantity = dinnerService.toFoodAndQuantity(dinner.getId());
-        for (var foodId : dinnerFoodIdAndQuantity.keySet())
-            ret.put(foodId, dinnerFoodIdAndQuantity.get(foodId));
+        Map<Food, Integer> dinnerFoodAndQuantity = dinnerService.toFoodAndQuantity(dinner);
+        for (var food : dinnerFoodAndQuantity.keySet())
+            ret.put(food, dinnerFoodAndQuantity.get(food));
 
         List<FoodDifference> foodDifferenceList = orderSheet.getFoodDifferenceList();
         for (var foodDifference : foodDifferenceList) {

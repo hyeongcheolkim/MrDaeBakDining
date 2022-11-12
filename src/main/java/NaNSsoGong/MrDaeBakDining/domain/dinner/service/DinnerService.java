@@ -66,11 +66,8 @@ public class DinnerService {
         return ret;
     }
 
-    public Map<Food, Integer> toFoodAndQuantity(Long dinnerId) {
+    public Map<Food, Integer> toFoodAndQuantity(Dinner dinner) {
         var ret = new ConcurrentHashMap<Food, Integer>();
-        Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
-            throw new NoExistInstanceException(Dinner.class);
-        });
 
         List<DinnerFood> dinnerFoodList = dinner.getDinnerFoodList();
         for (var dinnerFood : dinnerFoodList) {
