@@ -32,9 +32,10 @@ public class MrDaeBakDiningApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
-						.allowedOrigins("*")
+						.allowedOrigins("http://localhost:5173", "https://mr-daebak.netlify.app")
 						.allowedHeaders("*")
-						.allowedMethods("*");
+						.allowedMethods("*")
+						.allowCredentials(true);
 			}
 		};
 	}
