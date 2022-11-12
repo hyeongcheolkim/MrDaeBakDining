@@ -188,6 +188,7 @@ public class DataInitiator {
             var style = new Style();
             styleRepository.save(style);
             style.setName("스타일" + i);
+            style.setSellPrice(5000);
             var styleItem = new StyleTableware();
             styleItem.setTableware(tableware1);
             styleItem.setStyle(style);
