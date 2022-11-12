@@ -64,18 +64,15 @@ public class OrderBuilder {
             orderSheet.setDinner(dinner);
             orderSheet.setStyle(style);
 
-            buildToFoodDifferenceList(orderSheet, orderDto);
+            buildToFoodDifferenceList(orderSheet, orderSheetDto);
             ret.add(orderSheet);
         }
         return ret;
     }
 
-    private void buildToFoodDifferenceList(OrderSheet orderSheet, OrderDto orderDto) {
-        List<OrderSheetDto> orderSheetDtoList = orderDto.getOrderSheetDtoList();
-        for (var orderSheetDto : orderSheetDtoList) {
-            Map<Long, Integer> foodIdAndDifference = orderSheetDto.getFoodIdAndDifference();
-            addToFoodDifferenceList(orderSheet, foodIdAndDifference);
-        }
+    private void buildToFoodDifferenceList(OrderSheet orderSheet, OrderSheetDto orderSheetDto) {
+        Map<Long, Integer> foodIdAndDifference = orderSheetDto.getFoodIdAndDifference();
+        addToFoodDifferenceList(orderSheet, foodIdAndDifference);
     }
 
     public void addToFoodDifferenceList(OrderSheet orderSheet, Map<Long, Integer> foodIdAndDifference) {
