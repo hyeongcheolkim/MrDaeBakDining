@@ -63,16 +63,11 @@ public class OrderBuilder {
             orderSheet.setOrder(order);
             orderSheet.setDinner(dinner);
             orderSheet.setStyle(style);
+            addToFoodDifferenceList(orderSheet, orderSheetDto.getFoodIdAndDifference());
 
-            buildToFoodDifferenceList(orderSheet, orderSheetDto);
             ret.add(orderSheet);
         }
         return ret;
-    }
-
-    private void buildToFoodDifferenceList(OrderSheet orderSheet, OrderSheetDto orderSheetDto) {
-        Map<Long, Integer> foodIdAndDifference = orderSheetDto.getFoodIdAndDifference();
-        addToFoodDifferenceList(orderSheet, foodIdAndDifference);
     }
 
     public void addToFoodDifferenceList(OrderSheet orderSheet, Map<Long, Integer> foodIdAndDifference) {
