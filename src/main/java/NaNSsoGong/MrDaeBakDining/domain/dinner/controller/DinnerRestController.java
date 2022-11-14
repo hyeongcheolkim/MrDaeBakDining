@@ -2,6 +2,7 @@ package NaNSsoGong.MrDaeBakDining.domain.dinner.controller;
 
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.request.DinnerCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.request.DinnerOderableUpdateRequest;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerNameAndIdResponse;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerInfoResponse;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerNameAndIdDto;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
@@ -20,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -169,10 +169,11 @@ public class DinnerRestController {
 
     @Operation(summary = "디너 이름,아이디 리스트 조회", description = "디너의 전체필드가아닌, 디너와 이름 필드만 질의합니다. /를 기준으로 파싱해서 사용해야합니다.")
     @GetMapping("/list/name-id")
-    public ResponseEntity<List<String>> dinnerNameList() {
-        List<DinnerNameAndIdDto> dinnerNameAndIdList = dinnerRepository.findAllByEnable(true);
-        return ResponseEntity.ok().body(dinnerNameAndIdList.stream()
+    public ResponseEntity<DinnerNameAndIdResponse> dinnerNameAndIdList() {
+        List<String> dinnerNameAndIdList = dinnerRepository.findAllByEnable(true)
+                .stream()
                 .map(DinnerNameAndIdDto::convertToJsonString)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
+        return ResponseEntity.ok().body(new DinnerNameAndIdResponse(dinnerNameAndIdList));
     }
 }
