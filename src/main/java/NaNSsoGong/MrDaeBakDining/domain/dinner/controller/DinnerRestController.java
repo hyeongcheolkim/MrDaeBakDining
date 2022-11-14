@@ -3,6 +3,7 @@ package NaNSsoGong.MrDaeBakDining.domain.dinner.controller;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.request.DinnerCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.request.DinnerOderableUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerInfoResponse;
+import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerNameAndIdDto;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.service.DinnerService;
@@ -31,6 +32,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static NaNSsoGong.MrDaeBakDining.exception.response.ResponseConst.DISABLE_COMPLETE;
 
@@ -162,5 +165,14 @@ public class DinnerRestController {
             throw new BusinessException("기존 디너 이미지가 사용중이므로 삭제할 수 없습니다");
 
         return ret;
+    }
+
+    @Operation(summary = "디너 이름,아이디 리스트 조회", description = "디너의 전체필드가아닌, 디너와 이름 필드만 질의합니다. /를 기준으로 파싱해서 사용해야합니다.")
+    @GetMapping("/dinner-name")
+    public ResponseEntity<List<String>> dinnerNameList() {
+        List<DinnerNameAndIdDto> dinnerNameAndIdList = dinnerRepository.findAllByEnable(true);
+        return ResponseEntity.ok().body(dinnerNameAndIdList.stream()
+                .map(DinnerNameAndIdDto::convertToJsonString)
+                .collect(Collectors.toList()));
     }
 }

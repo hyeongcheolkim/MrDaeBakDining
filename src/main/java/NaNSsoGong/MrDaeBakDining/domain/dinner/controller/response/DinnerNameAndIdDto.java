@@ -1,4 +1,4 @@
-package NaNSsoGong.MrDaeBakDining.domain.voice.controller.response;
+package NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response;
 
 public interface DinnerNameAndIdDto {
     String getName();
