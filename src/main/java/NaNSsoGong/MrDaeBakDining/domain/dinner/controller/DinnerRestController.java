@@ -168,7 +168,7 @@ public class DinnerRestController {
     }
 
     @Operation(summary = "디너 이름,아이디 리스트 조회", description = "디너의 전체필드가아닌, 디너와 이름 필드만 질의합니다. /를 기준으로 파싱해서 사용해야합니다.")
-    @GetMapping("/dinner-name")
+    @GetMapping("/list/name-id")
     public ResponseEntity<List<String>> dinnerNameList() {
         List<DinnerNameAndIdDto> dinnerNameAndIdList = dinnerRepository.findAllByEnable(true);
         return ResponseEntity.ok().body(dinnerNameAndIdList.stream()
