@@ -26,6 +26,8 @@ dependencies {
 	implementation 'org.springframework.session:spring-session-core'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5'
 
+	implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client'
+
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.11'
 
 	compileOnly 'org.projectlombok:lombok'
