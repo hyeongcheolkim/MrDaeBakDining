@@ -108,7 +108,7 @@ public class OrderInfoRestController {
     @Operation(summary = "주문리스트조회 by clientId")
     @GetMapping("client/list/{clientId}")
     public Page<ClientOrderInfoResponse> orderInfoListByClientId(@PathVariable("clientId") Long clientId, Pageable pageable) {
-        if (!orderRepository.existsById(clientId))
+        if (!clientOrderRepository.existsByClientId(clientId))
             throw new NoExistInstanceException(Client.class);
         Page<ClientOrder> clientOrderList = clientOrderRepository.findAllByClientId(clientId, pageable);
         return clientOrderList.map(ClientOrderInfoResponse::new);
