@@ -8,7 +8,6 @@ import lombok.Data;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class OrderCreateRequest {
     @Nullable
     private LocalDateTime reservedTime;
     @JsonIgnore
-    private LocalDateTime orderTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+    private LocalDateTime orderTime = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     @NotNull
     private Integer totalPriceAfterSale;
     private List<OrderSheetCreateRequest> orderSheetCreateRequestList = new ArrayList<>();
