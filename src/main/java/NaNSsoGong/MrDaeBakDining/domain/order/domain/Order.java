@@ -32,7 +32,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "rider_id")
     private Rider rider;
     private Integer totalPriceAfterSale;
     @OneToMany(mappedBy = "order")
