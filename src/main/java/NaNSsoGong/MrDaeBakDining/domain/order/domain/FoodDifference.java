@@ -13,11 +13,10 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-@Table(name = "order_sheet_food")
 public class FoodDifference {
     @Id
     @GeneratedValue
-    @Column(name = "order_sheet_food_id")
+    @Column(name = "food_difference_id")
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_sheet_id")
