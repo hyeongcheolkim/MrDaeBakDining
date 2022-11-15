@@ -48,7 +48,7 @@ public class MrDaeBakDiningApplication {
 				.version("V1.0")
 				.contact(new Contact()
 						.name("Front WEB")
-						.url("https://uos.ac.kr"))
+						.url("https://mr-daebak.netlify.app/"))
 				.license(new License()
 						.name("Apache License Version 2.0")
 						.url("http://www.apache.org/license/LICENSE-2.0"));

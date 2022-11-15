@@ -18,6 +18,6 @@ import javax.persistence.ManyToOne;
 @EqualsAndHashCode
 public class ClientOrder extends Order{
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "client_id")
     private Client client;
 }

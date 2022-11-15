@@ -221,7 +221,7 @@ public class DataInitiator {
 
                 var orderDto = OrderDto.builder()
                         .address(client.getAddress())
-                        .orderTime(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES))
+                        .orderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                         .orderSheetDtoList(List.of(orderSheetDto))
                         .orderStatus(OrderStatus.ORDERED)
                         .build();
@@ -384,7 +384,7 @@ public class DataInitiator {
 
         orderDto = OrderDto.builder()
                 .address(client1.getAddress())
-                .orderTime(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES))
+                .orderTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .orderSheetDtoList(List.of(orderSheetDto))
                 .orderStatus(OrderStatus.ORDERED)
                 .build();
