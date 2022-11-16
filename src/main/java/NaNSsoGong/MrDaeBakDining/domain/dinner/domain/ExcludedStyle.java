@@ -1,10 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.dinner.domain;
 
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -24,4 +21,9 @@ public class ExcludedStyle {
     @ManyToOne
     @JoinColumn(name = "style_id")
     private Style style;
+
+    public ExcludedStyle(Dinner dinner, Style style){
+        this.dinner = dinner;
+        this.style = style;
+    }
 }
