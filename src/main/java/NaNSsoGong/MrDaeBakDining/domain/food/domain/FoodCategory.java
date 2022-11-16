@@ -1,7 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.food.domain;
 
 public enum FoodCategory {
-    WINE,
+    ALCOHOL,
     BREAD,
     MEAT,
     SALAD,
