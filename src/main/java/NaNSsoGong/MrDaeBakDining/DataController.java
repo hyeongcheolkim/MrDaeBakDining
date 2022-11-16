@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Data")
+@Tag(name = "data")
 @RestController
 @Transactional
 @RequestMapping("/api/data")

@@ -1055,7 +1055,7 @@ public class DataInitiator {
             Map<Long, Integer> foodIdAndDifferenceMap = new HashMap<>();
             for (int j = 0; j < seed % 5; ++j)
                 foodIdAndDifferenceMap.put(foodList.get(random.nextInt(foodList.size())).getId(),
-                        (random.nextInt(10) % 2 == 0 ? -1 : +1) * Integer.max(1, random.nextInt(3)));
+                        Integer.max(1, random.nextInt(3)));
             OrderSheetDto orderSheetDto = OrderSheetDto.builder()
                     .dinnerId(dinnerList.get((seed) % dinnerList.size()).getId())
                     .styleId(styleList.get((seed) % styleList.size()).getId())
@@ -1092,7 +1092,7 @@ public class DataInitiator {
             Map<Long, Integer> foodIdAndDifferenceMap = new HashMap<>();
             for (int j = 0; j < seed % 5; ++j)
                 foodIdAndDifferenceMap.put(foodList.get(random.nextInt(foodList.size())).getId(),
-                        (random.nextInt(10) % 2 == 0 ? -1 : +1) * Integer.max(1, random.nextInt(3)));
+                         Integer.max(1, random.nextInt(3)));
             OrderSheetDto orderSheetDto = OrderSheetDto.builder()
                     .dinnerId(dinnerList.get((seed) % dinnerList.size()).getId())
                     .styleId(styleList.get((seed) % styleList.size()).getId())
