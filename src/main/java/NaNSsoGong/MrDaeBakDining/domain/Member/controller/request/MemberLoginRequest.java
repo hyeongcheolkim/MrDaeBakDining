@@ -14,9 +14,7 @@ public class MemberLoginRequest {
     private final int loginIdMaxSize = 20;
 
     @NotEmpty
-    @Schema(example = "ClientAId")
     private String loginId;
     @NotEmpty
-    @Schema(example = "!ClientA12")
     private String password;
 }
