@@ -5,18 +5,21 @@ import NaNSsoGong.MrDaeBakDining.domain.client.repository.ClientRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.ExcludedStyle;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
+import NaNSsoGong.MrDaeBakDining.domain.food.domain.Food;
+import NaNSsoGong.MrDaeBakDining.domain.food.service.FoodService;
 import NaNSsoGong.MrDaeBakDining.domain.guest.domain.Guest;
 import NaNSsoGong.MrDaeBakDining.domain.guest.repository.GuestRepository;
+import NaNSsoGong.MrDaeBakDining.domain.ingredient.domain.Ingredient;
+import NaNSsoGong.MrDaeBakDining.domain.ingredient.service.IngredientService;
 import NaNSsoGong.MrDaeBakDining.domain.order.controller.request.*;
-import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.ClientOrderInfoResponse;
-import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.GuestOrderInfoResponse;
-import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.OrderUpdateResponse;
+import NaNSsoGong.MrDaeBakDining.domain.order.controller.response.*;
 import NaNSsoGong.MrDaeBakDining.domain.order.domain.*;
 import NaNSsoGong.MrDaeBakDining.domain.order.dto.OrderDto;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.repository.OrderSheetRepository;
 import NaNSsoGong.MrDaeBakDining.domain.order.service.OrderBuilder;
 import NaNSsoGong.MrDaeBakDining.domain.order.service.OrderService;
+import NaNSsoGong.MrDaeBakDining.domain.recipe.service.RecipeService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
 import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderRepository;
 import NaNSsoGong.MrDaeBakDining.domain.style.domain.Style;
@@ -37,6 +40,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus.ORDERED;
 import static NaNSsoGong.MrDaeBakDining.domain.order.domain.OrderStatus.RESERVED;
@@ -59,7 +64,60 @@ public class OrderRestController {
     private final RiderRepository riderRepository;
     private final StyleRepository styleRepository;
     private final OrderService orderService;
+    private final FoodService foodService;
+    private final RecipeService recipeService;
+    private final IngredientService ingredientService;
     private final OrderBuilder orderBuilder;
+
+    @Operation(summary = "주문음식 재료재고확인 및 요리가능여부 확인", description = "오더에 포함된 모든 음식들의 재료 필요량과 해당 재료들의 재고량을 반환합니다. 필요량과 재고량을 기반으로 요리가능여부를 반환합니다.")
+    @GetMapping("/make/{orderId}")
+    public ResponseEntity<IsMakeableOrderResponse> isMakeableOrder(@PathVariable(name = "orderId") Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> {
+            throw new NoExistInstanceException(Order.class);
+        });
+
+        Map<Food, Integer> totalFoodAndQuantity = foodService.calculateTotalFoodQuantity(order);
+        Map<Ingredient, Integer> totalDemandIngredient = recipeService.calculateTotalDemandIngredient(totalFoodAndQuantity);
+
+        List<IngredientDemandAndStockInfoResponse> ingredientDemandAndStockInfoResponseList =
+                totalDemandIngredient.entrySet()
+                        .stream()
+                        .map(e -> new IngredientDemandAndStockInfoResponse(
+                                e.getKey().getId(),
+                                e.getKey().getName(),
+                                e.getKey().getStockQuantity(),
+                                e.getValue()))
+                        .collect(Collectors.toList());
+        boolean allMakeable = ingredientDemandAndStockInfoResponseList.stream()
+                .allMatch(e -> e.getStockQuantity() >= e.getDemandQuantity());
+
+        return ResponseEntity.ok().body(IsMakeableOrderResponse.builder()
+                .makeable(allMakeable)
+                .ingredientDemandAndStockInfoList(ingredientDemandAndStockInfoResponseList)
+                .build());
+    }
+
+    @Operation(summary = "음식요리", description = "오더에 포함된 모든음식들의 총 재료 필요량만큼 재료재고량을 감소시킵니다.")
+    @PostMapping("/make/{orderId}")
+    public ResponseEntity<String> makeOrderFood(@PathVariable(name = "orderId") Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> {
+            throw new NoExistInstanceException(Order.class);
+        });
+
+        Map<Food, Integer> totalFoodAndQuantity = foodService.calculateTotalFoodQuantity(order);
+        Map<Ingredient, Integer> totalDemandIngredient = recipeService.calculateTotalDemandIngredient(totalFoodAndQuantity);
+
+        for (var e : totalDemandIngredient.entrySet()) {
+            Ingredient ingredient = e.getKey();
+            Integer demandQuantity = e.getValue();
+            Integer nextQuantity = ingredient.getStockQuantity() - demandQuantity;
+            if (nextQuantity < 0)
+                throw new MinusQuantityException("요구재료량이 재료재고량보다 많습니다");
+            ingredient.setStockQuantity(nextQuantity);
+        }
+
+        return ResponseEntity.ok().body("ok");
+    }
 
     @Operation(summary = "클라이언트 주문", description = "클라이언트 세션이 필요합니다")
     @PostMapping("/client")
