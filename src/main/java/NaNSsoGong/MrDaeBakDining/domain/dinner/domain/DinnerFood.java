@@ -24,4 +24,10 @@ public class DinnerFood {
     @JoinColumn(name="food_id")
     private Food food;
     private Integer foodQuantity;
+
+    public DinnerFood(Dinner dinner, Food food, Integer foodQuantity){
+        this.dinner = dinner;
+        this.food = food;
+        this.foodQuantity = foodQuantity;
+    }
 }
