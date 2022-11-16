@@ -50,23 +50,18 @@ import java.util.*;
 @Transactional
 @RequiredArgsConstructor
 public class DataInitiator {
-    private final FoodService foodService;
     private final FoodRepository foodRepository;
-    private final IngredientService ingredientService;
-    private final RecipeService recipeService;
     private final RecipeRepository recipeRepository;
     private final IngredientRepository ingredientRepository;
     private final OrderService orderService;
     private final OrderRepository orderRepository;
     private final TablewareRepository tablewareRepository;
-    private final GuestOrderRepository guestOrderRepository;
     private final DinnerRepository dinnerRepository;
     private final StyleRepository styleRepository;
     private final GuestRepository guestRepository;
     private final ChefRepository chefRepository;
     private final ClientRepository clientRepository;
     private final RiderRepository riderRepository;
-    private final MemberRepository memberRepository;
     private final Random random = new Random();
 
     Client client1, client2, client3, client4, client5, client6, client7, client8;
