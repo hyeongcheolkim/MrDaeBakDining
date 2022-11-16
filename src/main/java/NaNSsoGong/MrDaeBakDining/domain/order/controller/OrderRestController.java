@@ -66,7 +66,6 @@ public class OrderRestController {
     private final OrderService orderService;
     private final FoodService foodService;
     private final RecipeService recipeService;
-    private final IngredientService ingredientService;
     private final OrderBuilder orderBuilder;
 
     @Operation(summary = "주문음식 재료재고확인 및 요리가능여부 확인", description = "오더에 포함된 모든 음식들의 재료 필요량과 해당 재료들의 재고량을 반환합니다. 필요량과 재고량을 기반으로 요리가능여부를 반환합니다.")
