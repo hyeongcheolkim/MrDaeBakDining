@@ -32,7 +32,7 @@ public class MrDaeBakDiningApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
-						.allowedOrigins("http://localhost:5173", "https://mr-daebak.netlify.app")
+						.allowedOrigins("http://localhost:5173", "https://mr-daebak.netlify.app", "https://mrdaebakservice.kro.kr")
 						.allowedHeaders("*")
 						.allowedMethods("*")
 						.allowCredentials(true);
