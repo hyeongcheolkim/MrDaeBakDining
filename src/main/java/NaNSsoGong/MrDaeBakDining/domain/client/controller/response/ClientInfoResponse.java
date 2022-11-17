@@ -16,6 +16,7 @@ public class ClientInfoResponse {
     private String cardNumber;
     private ClientGrade clientGrade;
     private Address address;
+    private Boolean personalInformationCollectionAgreement;
 
     public ClientInfoResponse(Client client){
         this.id = client.getId();
@@ -26,5 +27,6 @@ public class ClientInfoResponse {
         this.cardNumber = client.getCardNumber();
         this.clientGrade = client.getClientGrade();
         this.address = client.getAddress();
+        this.personalInformationCollectionAgreement = client.getPersonalInformationCollectionAgreement();
     }
 }
