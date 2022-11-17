@@ -70,7 +70,7 @@ public class MrDaeBakDiningApplication {
 		prod.setUrl("https://mrdaebakservice.kro.kr");
 
 		return new OpenAPI()
-//				.servers(List.of(local, prod))
+				.servers(List.of(local, prod))
 				.components(new Components().addSecuritySchemes("basicAuth", auth))
 				.addSecurityItem(new SecurityRequirement().addList("basicAuth"))
 				.info(info);
