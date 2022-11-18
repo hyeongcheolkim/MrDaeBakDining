@@ -24,6 +24,7 @@ public class Dinner {
     @Lob
     private String description;
     private String imagePath;
+    private String imageAbsolutePath;
     private Boolean enable = true;
     private Boolean orderable = true;
     @OneToMany(mappedBy = "dinner", cascade = CascadeType.ALL, orphanRemoval = true)

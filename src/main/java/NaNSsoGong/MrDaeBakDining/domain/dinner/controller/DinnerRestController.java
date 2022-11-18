@@ -112,7 +112,8 @@ public class DinnerRestController {
 
         String path = s3Uploader.uploadFiles(file, "image");
         dinner.setImagePath(path);
-        return ResponseEntity.ok().body(amazonS3Client.getUrl(bucket, path).toString());
+        dinner.setImageAbsolutePath(amazonS3Client.getUrl(bucket, path).toString());
+        return ResponseEntity.ok().body(dinner.getImageAbsolutePath());
     }
 
     @Operation(summary = "디너이미지 삭제")
