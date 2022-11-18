@@ -1,5 +1,6 @@
 package NaNSsoGong.MrDaeBakDining.domain.dinner.controller;
 
+import NaNSsoGong.MrDaeBakDining.s3.S3Uploader;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.request.DinnerCreateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.request.DinnerOderableUpdateRequest;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerNameAndIdResponse;
@@ -8,10 +9,10 @@ import NaNSsoGong.MrDaeBakDining.domain.dinner.controller.response.DinnerNameAnd
 import NaNSsoGong.MrDaeBakDining.domain.dinner.domain.Dinner;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.repository.DinnerRepository;
 import NaNSsoGong.MrDaeBakDining.domain.dinner.service.DinnerService;
-import NaNSsoGong.MrDaeBakDining.exception.exception.BusinessException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.DuplicatedFieldValueException;
 import NaNSsoGong.MrDaeBakDining.exception.exception.NoExistInstanceException;
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
+import com.amazonaws.services.s3.AmazonS3Client;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -28,10 +30,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +46,10 @@ import static NaNSsoGong.MrDaeBakDining.exception.response.ResponseConst.DISABLE
 public class DinnerRestController {
     private final DinnerRepository dinnerRepository;
     private final DinnerService dinnerService;
+    private final S3Uploader s3Uploader;
+    private final AmazonS3Client amazonS3Client;
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
 
     @Operation(summary = "디너 생성")
     @PostMapping("")
@@ -104,44 +107,12 @@ public class DinnerRestController {
         Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
             throw new NoExistInstanceException(Dinner.class);
         });
-        if (file == null)
-            throw new NoExistInstanceException(MultipartFile.class);
+        if (dinner.getImagePath() != null)
+            dinnerImageDelete(dinnerId);
 
-        String absolutePath = new File("").getAbsolutePath() + "\\" + "images/";
-        File destinationFolder = new File(absolutePath);
-        if (!destinationFolder.exists())
-            destinationFolder.mkdirs();
-
-        dinnerImageDelete(dinnerId);
-
-        String originalFilename = file.getOriginalFilename();
-        File destination = new File(absolutePath + originalFilename);
-        file.transferTo(destination);
-        dinner.setImageName(originalFilename);
-        return ResponseEntity.ok().body("ok");
-    }
-
-    @Operation(summary = "디너이미지 다운로드")
-    @GetMapping(value = "image/{dinnerId}")
-    public ResponseEntity<byte[]> dinnerImageDownload(@PathVariable(value = "dinnerId") Long dinnerId) throws IOException {
-        Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
-            throw new NoExistInstanceException(Dinner.class);
-        });
-        if (dinner.getImageName() == null || dinner.getImageName().isEmpty())
-            throw new NoExistInstanceException(MultipartFile.class);
-
-        String absolutePath = new File("").getAbsolutePath() + "\\" + "images/";
-        String imageName = dinner.getImageName();
-        File file = new File(absolutePath + imageName);
-        if (!file.exists())
-            throw new NoExistInstanceException(MultipartFile.class);
-        InputStream imageStream = new FileInputStream(file);
-        byte[] image = imageStream.readAllBytes();
-        imageStream.close();
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.IMAGE_PNG)
-                .body(image);
+        String path = s3Uploader.uploadFiles(file, "image");
+        dinner.setImagePath(path);
+        return ResponseEntity.ok().body(amazonS3Client.getUrl(bucket, path).toString());
     }
 
     @Operation(summary = "디너이미지 삭제")
@@ -150,21 +121,8 @@ public class DinnerRestController {
         Dinner dinner = dinnerRepository.findById(dinnerId).orElseThrow(() -> {
             throw new NoExistInstanceException(Dinner.class);
         });
-        var ret = ResponseEntity.ok().body("deleteComplete");
-        if (dinner.getImageName() == null)
-            return ret;
-
-        String absolutePath = new File("").getAbsolutePath() + "\\" + "images/";
-        String imageName = dinner.getImageName();
-        File file = new File(absolutePath + imageName);
-
-        if (file.exists() && file.delete()) {
-            dinner.setImageName(null);
-            return ret;
-        } else if (file.exists())
-            throw new BusinessException("기존 디너 이미지가 사용중이므로 삭제할 수 없습니다");
-
-        return ret;
+        s3Uploader.removeFile(dinner.getImagePath());
+        return ResponseEntity.ok().body("delete");
     }
 
     @Operation(summary = "디너 이름,아이디 리스트 조회", description = "디너의 전체필드가아닌, 디너와 이름 필드만 질의합니다. /를 기준으로 파싱해서 사용해야합니다.")

@@ -19,60 +19,59 @@ import java.util.List;
 
 @SpringBootApplication
 public class MrDaeBakDiningApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(MrDaeBakDiningApplication.class, args);
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(MrDaeBakDiningApplication.class, args);
-	}
+    @Bean
+    Hibernate5Module hibernate5Module() {
+        return new Hibernate5Module();
+    }
 
-	@Bean
-	Hibernate5Module hibernate5Module() {
-		return new Hibernate5Module();
-	}
+    @Bean
+    public WebMvcConfigurer webMvcConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5173", "https://mr-daebak.netlify.app", "https://mrdaebakservice.kro.kr")
+                        .allowedHeaders("*")
+                        .allowedMethods("*")
+                        .allowCredentials(true);
+            }
+        };
+    }
 
-	@Bean
-	public WebMvcConfigurer webMvcConfigurer() {
-		return new WebMvcConfigurer() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**")
-						.allowedOrigins("http://localhost:5173", "https://mr-daebak.netlify.app", "https://mrdaebakservice.kro.kr")
-						.allowedHeaders("*")
-						.allowedMethods("*")
-						.allowCredentials(true);
-			}
-		};
-	}
+    @Bean
+    public OpenAPI api() {
+        Info info = new Info()
+                .title("MrDaeBak Dinner Service")
+                .description("Software Engineering Project by Team.NaNSsoGong")
+                .version("V1.0")
+                .contact(new Contact()
+                        .name("Front WEB")
+                        .url("https://mr-daebak.netlify.app/"))
+                .license(new License()
+                        .name("Apache License Version 2.0")
+                        .url("http://www.apache.org/license/LICENSE-2.0"));
 
-	@Bean
-	public OpenAPI api() {
-		Info info = new Info()
-				.title("MrDaeBak Dinner Service")
-				.description("Software Engineering Project by Team.NaNSsoGong")
-				.version("V1.0")
-				.contact(new Contact()
-						.name("Front WEB")
-						.url("https://mr-daebak.netlify.app/"))
-				.license(new License()
-						.name("Apache License Version 2.0")
-						.url("http://www.apache.org/license/LICENSE-2.0"));
+        SecurityScheme auth = new SecurityScheme()
+                .type(SecurityScheme.Type.APIKEY)
+                .in(SecurityScheme.In.COOKIE)
+                .name("JSESSIONID");
 
-		SecurityScheme auth = new SecurityScheme()
-				.type(SecurityScheme.Type.APIKEY)
-				.in(SecurityScheme.In.COOKIE)
-				.name("JSESSIONID");
+        Server local = new Server();
+        local.setDescription("local");
+        local.setUrl("http://localhost:8080");
 
-		Server local = new Server();
-		local.setDescription("local");
-		local.setUrl("http://localhost:8080");
+        Server prod = new Server();
+        prod.setDescription("prod");
+        prod.setUrl("https://mrdaebakservice.kro.kr");
 
-		Server prod = new Server();
-		prod.setDescription("prod");
-		prod.setUrl("https://mrdaebakservice.kro.kr");
-
-		return new OpenAPI()
-				.servers(List.of(local, prod))
-				.components(new Components().addSecuritySchemes("basicAuth", auth))
-				.addSecurityItem(new SecurityRequirement().addList("basicAuth"))
-				.info(info);
-	}
+        return new OpenAPI()
+                .servers(List.of(local, prod))
+                .components(new Components().addSecuritySchemes("basicAuth", auth))
+                .addSecurityItem(new SecurityRequirement().addList("basicAuth"))
+                .info(info);
+    }
 }

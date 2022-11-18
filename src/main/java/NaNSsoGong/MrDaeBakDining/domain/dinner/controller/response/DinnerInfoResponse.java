@@ -19,6 +19,7 @@ public class DinnerInfoResponse {
     private String dinnerName;
     private String dinnerDescription;
     private Boolean dinnerOrderable;
+    private String dinnerImagePath;
     List<DinnerFoodInfoResponse> dinnerFoodInfoResponseList = new ArrayList<>();
     List<ExcludedStyleInfoResponse> excludedStyleInfoResponseList = new ArrayList<>();
 
@@ -27,6 +28,7 @@ public class DinnerInfoResponse {
         this.dinnerName = dinner.getName();
         this.dinnerDescription = dinner.getDescription();
         this.dinnerOrderable = dinner.getOrderable();
+        this.dinnerImagePath = dinner.getImagePath();
 
         this.dinnerFoodInfoResponseList = dinner.getDinnerFoodList().stream()
                 .map(DinnerFoodInfoResponse::new)

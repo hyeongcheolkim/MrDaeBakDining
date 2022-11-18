@@ -1,4 +1,4 @@
-package NaNSsoGong.MrDaeBakDining;
+package NaNSsoGong.MrDaeBakDining.data;
 
 import NaNSsoGong.MrDaeBakDining.domain.Address;
 import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;

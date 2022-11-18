@@ -1,4 +1,4 @@
-package NaNSsoGong.MrDaeBakDining;
+package NaNSsoGong.MrDaeBakDining.data;
 
 import NaNSsoGong.MrDaeBakDining.exception.response.BusinessExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;

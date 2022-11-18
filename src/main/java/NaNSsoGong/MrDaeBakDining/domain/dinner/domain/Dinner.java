@@ -23,7 +23,7 @@ public class Dinner {
     private String name;
     @Lob
     private String description;
-    private String imageName;
+    private String imagePath;
     private Boolean enable = true;
     private Boolean orderable = true;
     @OneToMany(mappedBy = "dinner", cascade = CascadeType.ALL, orphanRemoval = true)
