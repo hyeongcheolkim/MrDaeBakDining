@@ -1,7 +1,10 @@
 package NaNSsoGong.MrDaeBakDining.domain.member.service;
 
+import NaNSsoGong.MrDaeBakDining.domain.chef.repository.ChefSignRepository;
 import NaNSsoGong.MrDaeBakDining.domain.member.domain.Member;
 import NaNSsoGong.MrDaeBakDining.domain.member.repository.MemberRepository;
+import NaNSsoGong.MrDaeBakDining.domain.rider.domain.RiderSign;
+import NaNSsoGong.MrDaeBakDining.domain.rider.repositroy.RiderSignRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +17,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final ChefSignRepository chefSignRepository;
+    private final RiderSignRepository riderSignRepository;
 
     public Boolean isLoginIdExist(String loginId) {
-        return memberRepository.findAllByLoginId(loginId).stream()
+        boolean memberExist = memberRepository.findAllByLoginId(loginId).stream()
                 .map(Member::getEnable)
                 .anyMatch(e -> e == true);
+        boolean chefSignExist = chefSignRepository.existsByLoginId(loginId);
+        boolean riderSignExist = riderSignRepository.existsByLoginId(loginId);
+
+        return memberExist || chefSignExist || riderSignExist;
     }
 
     public Optional<Member> login(String loginId, String password) {

@@ -1,6 +1,7 @@
 package NaNSsoGong.MrDaeBakDining.domain.chef.controller.request;
 
 import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;
+import NaNSsoGong.MrDaeBakDining.domain.chef.domain.ChefSign;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -14,11 +15,11 @@ public class ChefSignRequest {
     @NotEmpty
     private String password;
 
-    public Chef toChef(){
-        Chef chef = new Chef();
-        chef.setName(this.name);
-        chef.setLoginId(this.loginId);
-        chef.setPassword(this.password);
-        return chef;
+    public ChefSign toChefSign(){
+        ChefSign chefSign = new ChefSign();
+        chefSign.setName(this.name);
+        chefSign.setLoginId(this.loginId);
+        chefSign.setPassword(this.password);
+        return chefSign;
     }
 }

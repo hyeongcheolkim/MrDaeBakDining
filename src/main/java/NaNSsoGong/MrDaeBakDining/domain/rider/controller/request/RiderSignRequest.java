@@ -2,6 +2,7 @@ package NaNSsoGong.MrDaeBakDining.domain.rider.controller.request;
 
 import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;
 import NaNSsoGong.MrDaeBakDining.domain.rider.domain.Rider;
+import NaNSsoGong.MrDaeBakDining.domain.rider.domain.RiderSign;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -15,11 +16,11 @@ public class RiderSignRequest {
     @NotEmpty
     private String password;
 
-    public Rider toRider(){
-        Rider rider = new Rider();
-        rider.setName(this.name);
-        rider.setLoginId(this.loginId);
-        rider.setPassword(this.password);
-        return rider;
+    public RiderSign toRiderSign(){
+        RiderSign riderSign = new RiderSign();
+        riderSign.setName(this.name);
+        riderSign.setLoginId(this.loginId);
+        riderSign.setPassword(this.password);
+        return riderSign;
     }
 }
