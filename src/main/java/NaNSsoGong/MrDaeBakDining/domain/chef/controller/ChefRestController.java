@@ -53,6 +53,16 @@ public class ChefRestController {
         return ResponseEntity.ok().body("ok");
     }
 
+    @Operation(summary = "회원가입거절")
+    @DeleteMapping("/sign-deny/{chefSignId}")
+    public ResponseEntity<String> signDeny(@PathVariable(name = "chefSignId") Long chefSignId){
+        ChefSign chefSign = chefSignRepository.findById(chefSignId).orElseThrow(() -> {
+            throw new NoExistInstanceException(ChefSign.class);
+        });
+        chefSignRepository.deleteById(chefSign.getId());
+        return ResponseEntity.ok().body("deleteComplete");
+    }
+
     @Operation(summary = "회원가입승인")
     @PostMapping("/sign-allow/{chefSignId}")
     public ResponseEntity<ChefInfoResponse> signAllow(@PathVariable(name = "chefSignId") Long chefSignId){

@@ -1,8 +1,5 @@
 package NaNSsoGong.MrDaeBakDining.domain.rider.controller;
 
-import NaNSsoGong.MrDaeBakDining.domain.chef.controller.response.ChefInfoResponse;
-import NaNSsoGong.MrDaeBakDining.domain.chef.domain.Chef;
-import NaNSsoGong.MrDaeBakDining.domain.chef.domain.ChefSign;
 import NaNSsoGong.MrDaeBakDining.domain.member.service.MemberService;
 import NaNSsoGong.MrDaeBakDining.domain.rider.controller.request.RiderSignRequest;
 import NaNSsoGong.MrDaeBakDining.domain.rider.controller.request.RiderUpdateRequest;
@@ -29,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.*;
+import static NaNSsoGong.MrDaeBakDining.domain.session.SessionConst.LOGIN_RIDER;
 
 @Tag(name = "rider")
 @RestController
@@ -51,6 +48,16 @@ public class RiderRestController {
         RiderSign riderSign = riderSignRequest.toRiderSign();
         riderSignRepository.save(riderSign);
         return ResponseEntity.ok().body("ok");
+    }
+
+    @Operation(summary = "회원가입거절")
+    @DeleteMapping("/sign-deny/{riderSignId}")
+    public ResponseEntity<String> signDeny(@PathVariable(name = "riderSignId") Long riderSignId){
+        RiderSign riderSign = riderSignRepository.findById(riderSignId).orElseThrow(() -> {
+            throw new NoExistInstanceException(RiderSign.class);
+        });
+        riderSignRepository.deleteById(riderSign.getId());
+        return ResponseEntity.ok().body("deleteComplete");
     }
 
     @Operation(summary="회원가입승인대기리스트 조회")
