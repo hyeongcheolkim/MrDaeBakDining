@@ -265,7 +265,7 @@ public class DataInitiator {
     }
 
     public void foodInit() {
-        for (int i = 0; i < 27; ++i) {
+        for (int i = 0; i < 30; ++i) {
             Food food = new Food();
             food.setOrderable(true);
             food.setEnable(true);
