@@ -379,6 +379,18 @@ public class DataInitiator {
         foodList.get(26).setName("초콜릿");
         foodList.get(26).setSellPrice(7000);
 
+        foodList.get(27).setFoodCategory(FoodCategory.COFFEE);
+        foodList.get(27).setName("커피한포트");
+        foodList.get(27).setSellPrice(10000);
+
+        foodList.get(28).setFoodCategory(FoodCategory.COFFEE);
+        foodList.get(28).setName("커피한잔");
+        foodList.get(28).setSellPrice(3000);
+
+        foodList.get(29).setFoodCategory(FoodCategory.ALCOHOL);
+        foodList.get(29).setName("와인한잔");
+        foodList.get(29).setSellPrice(4000);
+
         foodRepository.saveAll(foodList);
     }
 
@@ -914,7 +926,7 @@ public class DataInitiator {
         dinnerList.get(0).getDinnerFoodList().add(
                 new DinnerFood(dinnerList.get(0), foodList.get(8), 4));
         dinnerList.get(0).getDinnerFoodList().add(
-                new DinnerFood(dinnerList.get(0), foodList.get(0), 2));
+                new DinnerFood(dinnerList.get(0), foodList.get(27), 1));
 
         dinnerList.get(1).getDinnerFoodList().add(
                 new DinnerFood(dinnerList.get(1), foodList.get(26), 2));
@@ -926,9 +938,9 @@ public class DataInitiator {
                 new DinnerFood(dinnerList.get(1), foodList.get(9), 2));
 
         dinnerList.get(2).getDinnerFoodList().add(
-                new DinnerFood(dinnerList.get(2), foodList.get(10), 1));
+                new DinnerFood(dinnerList.get(2), foodList.get(28), 1));
         dinnerList.get(2).getDinnerFoodList().add(
-                new DinnerFood(dinnerList.get(2), foodList.get(14), 1));
+                new DinnerFood(dinnerList.get(2), foodList.get(29), 1));
         dinnerList.get(2).getDinnerFoodList().add(
                 new DinnerFood(dinnerList.get(2), foodList.get(18), 1));
         dinnerList.get(2).getDinnerFoodList().add(
