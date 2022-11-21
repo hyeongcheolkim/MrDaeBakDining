@@ -772,7 +772,7 @@ public class DataInitiator {
         styleList.get(0).setSellPrice(3000);
 
         styleList.get(1).setName("그랜드");
-        styleList.get(1).setSellPrice(50000);
+        styleList.get(1).setSellPrice(5000);
 
         styleList.get(2).setName("디럭스");
         styleList.get(2).setSellPrice(7000);
