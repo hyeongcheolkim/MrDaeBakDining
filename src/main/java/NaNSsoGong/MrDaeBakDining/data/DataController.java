@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Transactional
 @RequestMapping("/api/data")
 @RequiredArgsConstructor
-@Profile("!prod")
 @ApiResponse(responseCode = "400", description = "business error", content = @Content(schema = @Schema(implementation = BusinessExceptionResponse.class)))
 public class DataController {
     private final DataInitiator dataInitiator;
