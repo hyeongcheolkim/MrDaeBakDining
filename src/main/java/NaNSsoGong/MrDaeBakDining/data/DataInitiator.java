@@ -743,7 +743,7 @@ public class DataInitiator {
         tablewareList.get(17).setName("린넨냅킨");
         tablewareList.get(18).setName("종이냅킨");
         tablewareList.get(19).setName("은쟁반");
-        tablewareList.get(29).setName("금쟁반");
+        tablewareList.get(20).setName("금쟁반");
         tablewareList.get(21).setName("은그릇");
         tablewareList.get(22).setName("금그릇");
         tablewareList.get(23).setName("냅킨");
