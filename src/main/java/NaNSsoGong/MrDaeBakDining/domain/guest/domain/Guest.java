@@ -19,7 +19,7 @@ public class Guest {
     @GeneratedValue
     @Column(name = "guest_id")
     private Long id;
-    @Column(columnDefinition = "BINARY(16)")
+    @Column(columnDefinition = "UUID()")
     private UUID uuid = UUID.randomUUID();
     private String name;
     private String cardNumber;
