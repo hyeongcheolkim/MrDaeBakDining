@@ -111,8 +111,8 @@ public class DataInitiator {
         client1.setCardNumber("4212331286423323");
         client1.setName("나고객");
         client1.setEnable(true);
-        client1.setLoginId("client1753");
-        client1.setPassword("password1234");
+        client1.setLoginId("client");
+        client1.setPassword("test");
         client1.setPersonalInformationCollectionAgreement(true);
 
         client2 = new Client();
@@ -191,10 +191,10 @@ public class DataInitiator {
     public void riderInit() {
         rider1 = new Rider();
         riderRepository.save(rider1);
-        rider1.setPassword("password1132");
+        rider1.setPassword("test");
         rider1.setEnable(true);
         rider1.setName("나배달");
-        rider1.setLoginId("rider121232");
+        rider1.setLoginId("rider");
 
         rider2 = new Rider();
         riderRepository.save(rider2);
@@ -230,10 +230,10 @@ public class DataInitiator {
     public void chefInit() {
         chef1 = new Chef();
         chefRepository.save(chef1);
-        chef1.setPassword("password9932");
+        chef1.setPassword("test");
         chef1.setName("박쉐프");
         chef1.setEnable(true);
-        chef1.setLoginId("chefloginid123");
+        chef1.setLoginId("chef");
 
         chef2 = new Chef();
         chefRepository.save(chef2);
