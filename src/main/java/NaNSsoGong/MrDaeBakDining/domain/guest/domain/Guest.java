@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class Guest {
     @GeneratedValue
     @Column(name = "guest_id")
     private Long id;
-    @Column(columnDefinition = "UUID()")
+    @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID uuid = UUID.randomUUID();
     private String name;
     private String cardNumber;
