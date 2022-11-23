@@ -848,13 +848,9 @@ public class DataInitiator {
 
         dinnerList.get(2).setName("프렌치디너");
         dinnerList.get(2).setDescription("Frech느낌의 식사입니다.");
-        dinnerList.get(2).getExcludedStyleList().add(
-                new ExcludedStyle(dinnerList.get(2), styleList.get(0)));
 
         dinnerList.get(3).setName("잉글리시디너");
         dinnerList.get(3).setDescription("English느낌의 식사입니다.");
-        dinnerList.get(3).getExcludedStyleList().add(
-                new ExcludedStyle(dinnerList.get(3), styleList.get(0)));
 
         dinnerList.get(4).setName("코리아디너");
         dinnerList.get(4).setDescription("Korea느낌의 식사입니다.");
