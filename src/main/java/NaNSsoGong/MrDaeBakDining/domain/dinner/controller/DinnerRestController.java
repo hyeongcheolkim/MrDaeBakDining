@@ -123,6 +123,8 @@ public class DinnerRestController {
             throw new NoExistInstanceException(Dinner.class);
         });
         s3Uploader.removeFile(dinner.getImagePath());
+        dinner.setImagePath(null);
+        dinner.setImageAbsolutePath(null);
         return ResponseEntity.ok().body("delete");
     }
 
